@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import {
   Building2,
@@ -13,6 +14,7 @@ import {
   Calculator,
 } from 'lucide-react'
 import RentabilidadeTorneios from '@/components/admin/RentabilidadeTorneios'
+import { LogoutButton } from '@/components/admin/logout-button'
 
 export default function EnterpriseBackoffice() {
   const [activeTab, setActiveTab] = useState<'kpis' | 'pipeline' | 'partners' | 'events' | 'roi'>('kpis')
@@ -96,25 +98,28 @@ export default function EnterpriseBackoffice() {
           </div>
         </div>
 
-        <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
-          <button
-            onClick={() => setManagerFilter('ALL')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${managerFilter === 'ALL' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
-          >
-            Visão Global
-          </button>
-          <button
-            onClick={() => setManagerFilter('PAI')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${managerFilter === 'PAI' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'}`}
-          >
-            🇵🇹 Operações Algarve (Pai)
-          </button>
-          <button
-            onClick={() => setManagerFilter('FILHO')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${managerFilter === 'FILHO' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'}`}
-          >
-            🇪🇸 Comercial / Espanha (Filho)
-          </button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+            <button
+              onClick={() => setManagerFilter('ALL')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${managerFilter === 'ALL' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+            >
+              Visão Global
+            </button>
+            <button
+              onClick={() => setManagerFilter('PAI')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${managerFilter === 'PAI' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'}`}
+            >
+              🇵🇹 Operações Algarve (Pai)
+            </button>
+            <button
+              onClick={() => setManagerFilter('FILHO')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${managerFilter === 'FILHO' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'}`}
+            >
+              🇪🇸 Comercial / Espanha (Filho)
+            </button>
+          </div>
+          <LogoutButton />
         </div>
       </header>
 
@@ -149,6 +154,12 @@ export default function EnterpriseBackoffice() {
         >
           <Calculator className="w-4 h-4" /> Rentabilidade Torneios
         </button>
+        <Link
+          href="/admin/simulador"
+          className="py-3 flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-amber-400 hover:border-amber-400/50 transition-all"
+        >
+          <Calculator className="w-4 h-4" /> Simulador Financeiro
+        </Link>
       </nav>
 
       <main className="p-6 flex-1 overflow-y-auto">

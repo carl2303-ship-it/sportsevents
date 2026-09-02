@@ -151,7 +151,7 @@ export default function Home() {
               href="/admin"
               className="hidden sm:inline-flex text-xs font-semibold text-app-white/60 hover:text-cyan transition-colors"
             >
-              Backoffice
+              Staff
             </Link>
           </div>
         </div>

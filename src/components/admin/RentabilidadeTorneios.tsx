@@ -1,1 +1,1 @@
-@file:///tmp/rent_content_only.txt
+PLACEHOLDER

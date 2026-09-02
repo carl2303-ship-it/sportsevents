@@ -10,17 +10,17 @@ import {
   Calendar,
   Plus,
   BarChart3,
+  Calculator,
 } from 'lucide-react'
+import RentabilidadeTorneios from '@/components/admin/RentabilidadeTorneios'
 
 export default function EnterpriseBackoffice() {
-  const [activeTab, setActiveTab] = useState<'kpis' | 'pipeline' | 'partners' | 'events'>('kpis')
+  const [activeTab, setActiveTab] = useState<'kpis' | 'pipeline' | 'partners' | 'events' | 'roi'>('kpis')
   const [leads, setLeads] = useState<any[]>([])
   const [partners, setPartners] = useState<any[]>([])
   const [events, setEvents] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [managerFilter, setManagerFilter] = useState<string>('ALL')
-
-  const supabase = createClient()
 
   useEffect(() => {
     loadEnterpriseData()
@@ -28,6 +28,13 @@ export default function EnterpriseBackoffice() {
 
   async function loadEnterpriseData() {
     setLoading(true)
+
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      setLoading(false)
+      return
+    }
+
+    const supabase = createClient()
 
     const { data: leadsData } = await supabase
       .from('leads')
@@ -135,6 +142,12 @@ export default function EnterpriseBackoffice() {
           className={`py-3 flex items-center gap-2 border-b-2 transition-all ${activeTab === 'partners' ? 'border-cyan-400 text-cyan-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
         >
           <Building2 className="w-4 h-4" /> Rede de Parceiros (ERP)
+        </button>
+        <button
+          onClick={() => setActiveTab('roi')}
+          className={`py-3 flex items-center gap-2 border-b-2 transition-all ${activeTab === 'roi' ? 'border-cyan-400 text-cyan-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+        >
+          <Calculator className="w-4 h-4" /> Rentabilidade Torneios
         </button>
       </nav>
 
@@ -402,6 +415,8 @@ export default function EnterpriseBackoffice() {
             </div>
           </div>
         )}
+
+        {activeTab === 'roi' && <RentabilidadeTorneios />}
 
         {activeTab === 'events' && (
           <div className="space-y-4">

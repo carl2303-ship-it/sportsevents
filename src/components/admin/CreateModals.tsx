@@ -3,6 +3,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Save, X } from 'lucide-react'
+import {
+  isHospitalityPartner,
+  isVenuePartner,
+  PARTNER_TYPES,
+  partnerTypeLabel,
+  type PartnerTypeValue,
+} from '@/lib/partner-types'
 
 export type LookupOption = { id: string; name: string; code?: string | null }
 
@@ -80,12 +87,14 @@ function ModalShell({
   )
 }
 
-export function CreateClubModal({
+export function CreatePartnerModal({
   destinations,
+  initialType = 'CLUBE_PADEL',
   onClose,
   onCreated,
 }: {
   destinations: LookupOption[]
+  initialType?: PartnerTypeValue
   onClose: () => void
   onCreated: () => void
 }) {
@@ -93,8 +102,9 @@ export function CreateClubModal({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
+    type: initialType as PartnerTypeValue,
     name: '',
-    country_code: 'FR',
+    country_code: 'PT',
     city: '',
     region: '',
     address: '',
@@ -105,9 +115,16 @@ export function CreateClubModal({
     contact_name: '',
     coaches: '',
     responsibles: '',
-    preferred_language: 'fr',
+    preferred_language: 'pt',
     status: 'PROSPECAO',
+    negotiated_rate: '',
+    notes: '',
   })
+
+  const typeMeta = PARTNER_TYPES.find((t) => t.value === form.type)
+  const showVenue = isVenuePartner(form.type)
+  const showHospitality = isHospitalityPartner(form.type)
+  const showCoachFields = form.type === 'TREINADOR' || showVenue
 
   function setCountry(code: string) {
     const c = COUNTRY_OPTIONS.find((x) => x.code === code)
@@ -121,24 +138,33 @@ export function CreateClubModal({
   async function handleSave() {
     setError(null)
     if (!form.name.trim()) {
-      setError('Nome do clube é obrigatório.')
+      setError('Nome é obrigatório.')
       return
     }
     setSaving(true)
     const country = COUNTRY_OPTIONS.find((c) => c.code === form.country_code)
     const destination =
       destinations.find((d) => d.code === form.country_code) ||
-      destinations.find((d) => d.name === country?.name)
+      destinations.find((d) => d.name === country?.name) ||
+      (form.country_code === 'PT'
+        ? destinations.find((d) => d.code === 'ALG' || d.code === 'ALGARVE')
+        : form.country_code === 'ES'
+          ? destinations.find((d) => d.code === 'BCN' || d.code === 'MAR')
+          : undefined)
 
     const { error: insertError } = await supabase.from('partners').insert({
       name: form.name.trim(),
-      type: 'CLUBE_PADEL',
+      type: form.type,
       destination_id: destination?.id || null,
-      contact_name: form.contact_name || 'Clube',
+      contact_name:
+        form.contact_name || typeMeta?.defaultContact || 'Parceiro',
       email: form.email || null,
       phone: form.phone || null,
       status: form.status,
       rating: 5,
+      negotiated_rate: form.negotiated_rate
+        ? Number(form.negotiated_rate)
+        : null,
       country_code: form.country_code,
       country_name: country?.name || form.country_code,
       city: form.city || null,
@@ -149,7 +175,9 @@ export function CreateClubModal({
       coaches: form.coaches || null,
       responsibles: form.responsibles || null,
       preferred_language: form.preferred_language,
-      notes: 'Criado manualmente no backoffice',
+      notes:
+        form.notes.trim() ||
+        `Criado manualmente — ${partnerTypeLabel(form.type)}`,
     })
     setSaving(false)
     if (insertError) {
@@ -162,8 +190,8 @@ export function CreateClubModal({
 
   return (
     <ModalShell
-      title="Adicionar Clube"
-      subtitle="Nova ficha de prospeção / parceiro"
+      title={`Adicionar ${typeMeta?.short || 'parceiro'}`}
+      subtitle="Hotel, restaurante, sponsor, treinador, clube e outros"
       onClose={onClose}
       footer={
         <>
@@ -181,17 +209,46 @@ export function CreateClubModal({
             className="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl"
           >
             <Save className="w-3.5 h-3.5" />
-            {saving ? 'A guardar...' : 'Guardar clube'}
+            {saving ? 'A guardar...' : 'Guardar parceiro'}
           </button>
         </>
       }
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-        <Field label="Nome do clube *" className="sm:col-span-2">
+        <Field label="Tipo de parceiro *" className="sm:col-span-2">
+          <select
+            className={inputCls}
+            value={form.type}
+            onChange={(e) =>
+              setForm({ ...form, type: e.target.value as PartnerTypeValue })
+            }
+          >
+            {PARTNER_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field
+          label={`Nome ${typeMeta?.short ? `do ${typeMeta.short.toLowerCase()}` : ''} *`}
+          className="sm:col-span-2"
+        >
           <input
             className={inputCls}
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder={
+              form.type === 'HOTEL'
+                ? 'Ex.: Amendoeira Resort'
+                : form.type === 'RESTAURANTE'
+                  ? 'Ex.: Restaurante do Clube'
+                  : form.type === 'TREINADOR'
+                    ? 'Ex.: João Silva'
+                    : form.type === 'SPONSOR'
+                      ? 'Ex.: Marca XYZ'
+                      : 'Ex.: nome do parceiro'
+            }
           />
         </Field>
         <Field label="País">
@@ -225,11 +282,12 @@ export function CreateClubModal({
             onChange={(e) => setForm({ ...form, city: e.target.value })}
           />
         </Field>
-        <Field label="Região">
+        <Field label="Região / Hub">
           <input
             className={inputCls}
             value={form.region}
             onChange={(e) => setForm({ ...form, region: e.target.value })}
+            placeholder="Algarve · Marbella · Barcelona"
           />
         </Field>
         <Field label="Email">
@@ -247,32 +305,87 @@ export function CreateClubModal({
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
           />
         </Field>
-        <Field label="Responsáveis" className="sm:col-span-2">
+        <Field label="Contacto / responsável" className="sm:col-span-2">
+          <input
+            className={inputCls}
+            value={form.contact_name}
+            onChange={(e) => setForm({ ...form, contact_name: e.target.value })}
+          />
+        </Field>
+        <Field label="Responsáveis / equipa" className="sm:col-span-2">
           <input
             className={inputCls}
             value={form.responsibles}
             onChange={(e) => setForm({ ...form, responsibles: e.target.value })}
           />
         </Field>
-        <Field label="Treinadores" className="sm:col-span-2">
-          <input
-            className={inputCls}
-            value={form.coaches}
-            onChange={(e) => setForm({ ...form, coaches: e.target.value })}
-          />
-        </Field>
-        <Field label="Campos" className="sm:col-span-2">
-          <input
-            className={inputCls}
-            value={form.courts_info}
-            onChange={(e) => setForm({ ...form, courts_info: e.target.value })}
-          />
-        </Field>
+        {showCoachFields && (
+          <Field
+            label={form.type === 'TREINADOR' ? 'Especialidade / níveis' : 'Treinadores'}
+            className="sm:col-span-2"
+          >
+            <input
+              className={inputCls}
+              value={form.coaches}
+              onChange={(e) => setForm({ ...form, coaches: e.target.value })}
+            />
+          </Field>
+        )}
+        {showVenue && (
+          <Field label="Campos / courts" className="sm:col-span-2">
+            <input
+              className={inputCls}
+              value={form.courts_info}
+              onChange={(e) => setForm({ ...form, courts_info: e.target.value })}
+            />
+          </Field>
+        )}
+        {(showHospitality ||
+          form.type === 'SPONSOR' ||
+          form.type === 'TRANSPORTES' ||
+          form.type === 'OUTROS') && (
+          <Field label="Tarifa negociada (€)">
+            <input
+              className={inputCls}
+              type="number"
+              min={0}
+              step={1}
+              value={form.negotiated_rate}
+              onChange={(e) =>
+                setForm({ ...form, negotiated_rate: e.target.value })
+              }
+            />
+          </Field>
+        )}
+        {(showHospitality || form.type === 'OUTROS') && (
+          <Field label="Infraestrutura / detalhes">
+            <input
+              className={inputCls}
+              value={form.infrastructure}
+              onChange={(e) =>
+                setForm({ ...form, infrastructure: e.target.value })
+              }
+              placeholder={
+                form.type === 'HOTEL'
+                  ? 'BB / HB / transfer...'
+                  : 'Detalhes úteis'
+              }
+            />
+          </Field>
+        )}
         <Field label="Morada" className="sm:col-span-2">
           <input
             className={inputCls}
             value={form.address}
             onChange={(e) => setForm({ ...form, address: e.target.value })}
+          />
+        </Field>
+        <Field label="Notas" className="sm:col-span-2">
+          <textarea
+            className={inputCls}
+            rows={2}
+            value={form.notes}
+            onChange={(e) => setForm({ ...form, notes: e.target.value })}
           />
         </Field>
       </div>
@@ -283,6 +396,13 @@ export function CreateClubModal({
       )}
     </ModalShell>
   )
+}
+
+/** @deprecated use CreatePartnerModal */
+export function CreateClubModal(
+  props: Omit<Parameters<typeof CreatePartnerModal>[0], 'initialType'>
+) {
+  return <CreatePartnerModal {...props} initialType="CLUBE_PADEL" />
 }
 
 export function CreateLeadModal({

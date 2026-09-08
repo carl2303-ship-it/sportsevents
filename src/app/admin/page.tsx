@@ -16,13 +16,14 @@ import {
 import RentabilidadeTorneios from '@/components/admin/RentabilidadeTorneios'
 import PartnersNetwork from '@/components/admin/PartnersNetwork'
 import {
-  CreateClubModal,
+  CreatePartnerModal,
   CreateLeadModal,
   type LookupOption,
 } from '@/components/admin/CreateModals'
 import { EventFichaModal, type EventRow } from '@/components/admin/EventFichaModal'
 import { LogoutButton } from '@/components/admin/logout-button'
 import { BrandLogo } from '@/components/brand-logo'
+import type { PartnerTypeValue } from '@/lib/partner-types'
 
 export default function EnterpriseBackoffice() {
   const [activeTab, setActiveTab] = useState<'kpis' | 'pipeline' | 'partners' | 'events' | 'roi'>('kpis')
@@ -37,6 +38,8 @@ export default function EnterpriseBackoffice() {
   const [showEventModal, setShowEventModal] = useState(false)
   const [editingEvent, setEditingEvent] = useState<EventRow | null>(null)
   const [showClubModal, setShowClubModal] = useState(false)
+  const [partnerModalType, setPartnerModalType] =
+    useState<PartnerTypeValue>('CLUBE_PADEL')
 
   useEffect(() => {
     loadEnterpriseData()
@@ -320,7 +323,10 @@ export default function EnterpriseBackoffice() {
           <PartnersNetwork
             partners={partners}
             onRefresh={loadEnterpriseData}
-            onRequestAddClub={() => setShowClubModal(true)}
+            onRequestAddPartner={(type) => {
+              setPartnerModalType(type || 'CLUBE_PADEL')
+              setShowClubModal(true)
+            }}
           />
         )}
 
@@ -565,8 +571,10 @@ export default function EnterpriseBackoffice() {
         />
       )}
       {showClubModal && (
-        <CreateClubModal
+        <CreatePartnerModal
+          key={partnerModalType}
           destinations={destinations}
+          initialType={partnerModalType}
           onClose={() => setShowClubModal(false)}
           onCreated={loadEnterpriseData}
         />

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
   Building2,
+  ChevronDown,
   Languages,
   Mail,
   MapPin,
@@ -17,6 +18,11 @@ import {
   Wand2,
   X,
 } from 'lucide-react'
+import {
+  PARTNER_TYPES,
+  partnerTypeShort,
+  type PartnerTypeValue,
+} from '@/lib/partner-types'
 
 export type PartnerRow = {
   id: string
@@ -114,15 +120,17 @@ function partnerLang(p: PartnerRow) {
 export default function PartnersNetwork({
   partners,
   onRefresh,
-  onRequestAddClub,
+  onRequestAddPartner,
 }: {
   partners: PartnerRow[]
   onRefresh: () => Promise<void> | void
-  onRequestAddClub?: () => void
+  onRequestAddPartner?: (type?: PartnerTypeValue) => void
 }) {
   const supabase = useMemo(() => createClient(), [])
   const [listMode, setListMode] = useState<ListMode>('PROSPECAO')
   const [countryFilter, setCountryFilter] = useState<string>('ALL')
+  const [typeFilter, setTypeFilter] = useState<string>('ALL')
+  const [addMenuOpen, setAddMenuOpen] = useState(false)
   const [scripts, setScripts] = useState<OutreachScript[]>([])
   const [scriptLang, setScriptLang] = useState('pt')
   const [scriptDraft, setScriptDraft] = useState({ subject: '', body: '' })
@@ -162,9 +170,24 @@ export default function PartnersNetwork({
   }, [partners])
 
   const scopedPartners = useMemo(() => {
-    if (listMode === 'ALL') return partners
-    return partners.filter((p) => (p.status || 'PROSPECAO') === listMode)
-  }, [partners, listMode])
+    let list =
+      listMode === 'ALL'
+        ? partners
+        : partners.filter((p) => (p.status || 'PROSPECAO') === listMode)
+    if (typeFilter !== 'ALL') {
+      list = list.filter((p) => (p.type || 'CLUBE_PADEL') === typeFilter)
+    }
+    return list
+  }, [partners, listMode, typeFilter])
+
+  const typeCounts = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const p of partners) {
+      const t = p.type || 'CLUBE_PADEL'
+      map.set(t, (map.get(t) || 0) + 1)
+    }
+    return map
+  }, [partners])
 
   const countries = useMemo(() => {
     const map = new Map<string, number>()
@@ -347,6 +370,7 @@ export default function PartnersNetwork({
       .from('partners')
       .update({
         name: form.name,
+        type: form.type || 'CLUBE_PADEL',
         contact_name: form.contact_name,
         email: form.email,
         phone: form.phone,
@@ -360,6 +384,7 @@ export default function PartnersNetwork({
         preferred_language: form.preferred_language,
         status: form.status || 'PROSPECAO',
         notes: form.notes,
+        negotiated_rate: form.negotiated_rate ?? null,
       })
       .eq('id', form.id)
     setSavingPartner(false)
@@ -385,29 +410,77 @@ export default function PartnersNetwork({
 
   const modeHelp =
     listMode === 'PROSPECAO'
-      ? 'Lista de prospeção — clubes a contactar. Ainda não são parceiros.'
+      ? 'Lista de prospeção — clubes, hotéis, restaurantes e outros a contactar.'
       : listMode === 'RESPONDIDO'
-        ? 'Clubes que já responderam — em conversa / follow-up.'
+        ? 'Parceiros que já responderam — em conversa / follow-up.'
         : listMode === 'PARCEIRO'
-          ? 'Parceiros ativos — fichas completas com treinadores e responsáveis.'
-          : 'Vista completa de todas as fichas.'
+          ? 'Parceiros ativos — clubes, hospitality, sponsors e treinadores.'
+          : 'Vista completa de todas as fichas da rede.'
 
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap justify-between items-start gap-4">
         <div>
           <h2 className="text-lg font-bold text-white">
-            Rede Europeia de Clubes & Parceiros
+            Rede de Parceiros (clubes, hotels, sponsors…)
           </h2>
           <p className="text-xs text-slate-400 mt-1">{modeHelp}</p>
         </div>
-        <button
-          type="button"
-          onClick={() => onRequestAddClub?.()}
-          className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" /> Adicionar Clube
-        </button>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setAddMenuOpen((o) => !o)}
+            className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" /> Adicionar parceiro
+            <ChevronDown className="w-3.5 h-3.5" />
+          </button>
+          {addMenuOpen && (
+            <>
+              <button
+                type="button"
+                className="fixed inset-0 z-10 cursor-default"
+                aria-label="Fechar menu"
+                onClick={() => setAddMenuOpen(false)}
+              />
+              <div className="absolute right-0 z-20 mt-2 w-56 rounded-xl border border-slate-700 bg-slate-900 shadow-xl py-1">
+                {PARTNER_TYPES.map((t) => (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => {
+                      setAddMenuOpen(false)
+                      onRequestAddPartner?.(t.value)
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-cyan-300"
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Tipo de parceiro */}
+      <div className="flex flex-wrap gap-1.5">
+        <FilterChip
+          active={typeFilter === 'ALL'}
+          onClick={() => setTypeFilter('ALL')}
+          label={`Todos (${partners.length})`}
+        />
+        {PARTNER_TYPES.map((t) => {
+          const n = typeCounts.get(t.value) || 0
+          return (
+            <FilterChip
+              key={t.value}
+              active={typeFilter === t.value}
+              onClick={() => setTypeFilter(t.value)}
+              label={`${t.short} (${n})`}
+            />
+          )
+        })}
       </div>
 
       {/* Prospeção vs Parceiros */}
@@ -586,7 +659,8 @@ export default function PartnersNetwork({
 
       {grouped.length === 0 ? (
         <div className="bg-slate-900 border border-slate-800 p-8 text-center rounded-2xl text-xs text-slate-500">
-          Nenhum clube nesta lista. Muda o filtro de estado ou adiciona fichas.
+          Nenhum parceiro nesta lista. Muda o filtro ou adiciona clube, hotel,
+          restaurante, sponsor, treinador ou outros.
         </div>
       ) : (
         <div className="space-y-8">
@@ -619,7 +693,7 @@ export default function PartnersNetwork({
                     >
                       <div className="flex justify-between items-start gap-2 mb-3">
                         <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-800 text-cyan-400 uppercase tracking-wider">
-                          {p.type || 'CLUBE_PADEL'}
+                          {partnerTypeShort(p.type)}
                         </span>
                         <select
                           value={status}
@@ -825,7 +899,20 @@ function PartnerEditModal({
         </div>
 
         <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <Field label="Nome do clube">
+          <Field label="Tipo">
+            <select
+              value={form.type || 'CLUBE_PADEL'}
+              onChange={(e) => set('type', e.target.value)}
+              className={inputCls}
+            >
+              {PARTNER_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Nome">
             <input
               value={form.name || ''}
               onChange={(e) => set('name', e.target.value)}
@@ -864,6 +951,19 @@ function PartnerEditModal({
               placeholder="Nome"
             />
           </Field>
+          <Field label="Tarifa negociada (€)">
+            <input
+              type="number"
+              value={form.negotiated_rate ?? ''}
+              onChange={(e) =>
+                set(
+                  'negotiated_rate',
+                  e.target.value === '' ? null : Number(e.target.value)
+                )
+              }
+              className={inputCls}
+            />
+          </Field>
           <Field label="Responsáveis / gestão" className="sm:col-span-2">
             <textarea
               value={form.responsibles || ''}
@@ -873,7 +973,7 @@ function PartnerEditModal({
               placeholder="Ex.: Marie Dupont (Directora), Jean Martin (Manager)"
             />
           </Field>
-          <Field label="Treinadores" className="sm:col-span-2">
+          <Field label="Treinadores / especialidade" className="sm:col-span-2">
             <textarea
               value={form.coaches || ''}
               onChange={(e) => set('coaches', e.target.value)}
@@ -924,7 +1024,7 @@ function PartnerEditModal({
               className={inputCls}
             />
           </Field>
-          <Field label="Infraestrutura" className="sm:col-span-2">
+          <Field label="Infraestrutura / detalhes" className="sm:col-span-2">
             <textarea
               value={form.infrastructure || ''}
               onChange={(e) => set('infrastructure', e.target.value)}

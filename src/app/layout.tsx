@@ -24,17 +24,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://sportsevents.app"
   ),
-  title: "SportsEvents.app — Iberian Sports Platform",
+  title: "SportsEvents.app — Turismo e Estágios Desportivos Ibéricos",
   description:
-    "One App. Two Countries. Infinite Sports Experiences. Plataforma ibérica de estágios, camps e eventos desportivos em Portugal e Espanha.",
+    "A Plataforma Ibérica de Turismo e Estágios Desportivos. Experiências de alto rendimento em Padel e Futebol em Portugal e Espanha.",
   icons: {
     icon: [{ url: "/brand/icon.png", type: "image/png" }],
     apple: [{ url: "/brand/icon.png", type: "image/png" }],
   },
   openGraph: {
-    title: "SportsEvents.app — Iberian Sports Platform",
+    title: "SportsEvents.app — Turismo e Estágios Desportivos Ibéricos",
     description:
-      "One App. Two Countries. Infinite Sports Experiences. Plataforma ibérica de estágios, camps e eventos desportivos em Portugal e Espanha.",
+      "Experiências de alto rendimento em Padel e Futebol. Treino profissional, competição local e alojamento premium.",
     images: [{ url: "/brand/logo.png" }],
   },
 };

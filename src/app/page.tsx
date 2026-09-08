@@ -2,176 +2,53 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
-import { ChevronDown, MapPin } from 'lucide-react'
+import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 import { BrandLogo } from '@/components/brand-logo'
 
-type HubId = 'algarve' | 'barcelona' | 'marbella'
-type Country = 'portugal' | 'spain'
+const HERO_IMAGE =
+  'https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=2000&q=80'
 
-const hubs = [
+const formula = [
   {
-    id: 'algarve' as HubId,
-    country: 'portugal' as Country,
-    flag: '🇵🇹',
-    label: 'Hub Algarve',
-    region: 'Portugal',
-    focus: 'Padel & Beach Camps',
-    blurb:
-      'Sol, resorts à beira-mar e hospitality de topo para camps de padel e estágios de primavera/outono.',
-    image:
-      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=1600&q=80',
+    title: 'Manhãs de Evolução',
+    text: '2 horas de treino técnico intensivo com treinadores certificados (Rácio 1:4).',
   },
   {
-    id: 'barcelona' as HubId,
-    country: 'spain' as Country,
-    flag: '🇪🇸',
-    label: 'Hub Barcelona',
-    region: 'España',
-    focus: 'Padel & Football Stages',
-    blurb:
-      'Capital cosmopolita do desporto europeu — centros urbanos de alto rendimento e dinamismo de grande cidade.',
-    image:
-      'https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1600&q=80',
+    title: 'Tardes de Competição',
+    text: '2 horas de confronto direto contra a comunidade local de jogadores ibéricos, nivelados ao seu escalão.',
   },
   {
-    id: 'marbella' as HubId,
-    country: 'spain' as Country,
-    flag: '🇪🇸',
-    label: 'Hub Marbella / Málaga',
-    region: 'Costa del Sol',
-    focus: 'VIP Padel & Winter Football',
-    blurb:
-      'Luxo da Costa del Sol, clubes VIP de padel e infraestruturas de topo para Winter Football Camps.',
-    image:
-      'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=1600&q=80',
+    title: 'Noites de Conexão',
+    text: 'Jantares de grupo, networking e alojamento em resorts de topo.',
   },
 ]
 
-const languages = ['PT', 'ES', 'FR', 'EN', 'DE'] as const
+const audiences = [
+  {
+    title: 'Club Trips & Academias',
+    text: 'Rentabilize o seu clube organizando a viagem anual dos seus sócios. Nós tratamos da logística, você lidera a equipa.',
+  },
+  {
+    title: 'Corporate & Teambuilding',
+    text: 'Reforce os laços da sua empresa com pacotes VIP que combinam desporto, reuniões estratégicas e alta gastronomia.',
+  },
+  {
+    title: 'Grupos Privados',
+    text: 'O refúgio desportivo ideal para fechar a sua época com os amigos, com competição e diversão garantidas.',
+  },
+]
 
 export default function Home() {
-  const [country, setCountry] = useState<Country>('portugal')
-  const [lang, setLang] = useState<(typeof languages)[number]>('PT')
-  const [openDestinos, setOpenDestinos] = useState(false)
-  const [openModalidades, setOpenModalidades] = useState(false)
-
-  const activeHub =
-    hubs.find((h) =>
-      country === 'portugal' ? h.id === 'algarve' : h.id === 'barcelona'
-    ) ?? hubs[0]
-
   return (
     <div className="min-h-screen bg-navy text-app-white">
-      <header className="absolute inset-x-0 top-0 z-30 px-5 md:px-10 pt-4 md:pt-5">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <BrandLogo
-            variant="full"
-            priority
-            className="h-16 w-auto sm:h-20 md:h-24 lg:h-28 drop-shadow-[0_2px_16px_rgba(0,0,0,0.6)]"
-          />
+      <SiteHeader transparent />
 
-          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-app-white/80">
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setOpenDestinos((v) => !v)
-                  setOpenModalidades(false)
-                }}
-                className="inline-flex items-center gap-1 hover:text-app-white transition-colors"
-              >
-                Destinos <ChevronDown className="w-4 h-4" />
-              </button>
-              {openDestinos && (
-                <div className="absolute top-full left-0 mt-3 min-w-[220px] rounded-xl border border-white/10 bg-navy/95 backdrop-blur-md p-2 shadow-xl">
-                  {hubs.map((hub) => (
-                    <button
-                      key={hub.id}
-                      onClick={() => {
-                        setCountry(hub.country)
-                        setOpenDestinos(false)
-                        document
-                          .getElementById('hubs')
-                          ?.scrollIntoView({ behavior: 'smooth' })
-                      }}
-                      className="block w-full text-left rounded-lg px-3 py-2 text-sm hover:bg-white/5"
-                    >
-                      {hub.flag} {hub.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setOpenModalidades((v) => !v)
-                  setOpenDestinos(false)
-                }}
-                className="inline-flex items-center gap-1 hover:text-app-white transition-colors"
-              >
-                Modalidades <ChevronDown className="w-4 h-4" />
-              </button>
-              {openModalidades && (
-                <div className="absolute top-full left-0 mt-3 min-w-[180px] rounded-xl border border-white/10 bg-navy/95 backdrop-blur-md p-2 shadow-xl">
-                  {['Padel', 'Football', 'Beach Camps', 'VIP Stages'].map(
-                    (m) => (
-                      <div
-                        key={m}
-                        className="rounded-lg px-3 py-2 text-sm hover:bg-white/5"
-                      >
-                        {m}
-                      </div>
-                    )
-                  )}
-                </div>
-              )}
-            </div>
-
-            <a href="#builder" className="hover:text-app-white transition-colors">
-              Orçamento
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-2 md:gap-3">
-            <div className="flex rounded-full border border-white/15 bg-black/25 p-0.5 text-[11px] font-semibold tracking-wide">
-              {languages.map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setLang(l)}
-                  className={`px-2 py-1 rounded-full transition-colors ${
-                    lang === l
-                      ? 'bg-cyan text-navy'
-                      : 'text-app-white/70 hover:text-app-white'
-                  }`}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
-            <Link
-              href="/eventos"
-              className="hidden sm:inline-flex text-xs font-semibold text-app-white/60 hover:text-cyan transition-colors"
-            >
-              Eventos
-            </Link>
-            <Link
-              href="/admin"
-              className="hidden sm:inline-flex text-xs font-semibold text-app-white/60 hover:text-cyan transition-colors"
-            >
-              Staff
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* HERO — first viewport: brand, headline, support, CTA, dominant image */}
+      {/* HERO */}
       <section className="relative min-h-[100svh] overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src={activeHub.image}
-            alt={activeHub.label}
+            src={HERO_IMAGE}
+            alt="Estágio desportivo na Península Ibérica"
             fill
             priority
             className="object-cover animate-hero-pan"
@@ -190,133 +67,180 @@ export default function Home() {
           />
 
           <h1 className="animate-fade-up-delay mt-8 md:mt-10 max-w-4xl font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-5xl font-bold leading-tight text-app-white">
-            One App. Two Countries. Infinite Sports Experiences.
+            A Plataforma Ibérica de Turismo e Estágios Desportivos.
           </h1>
 
           <p className="animate-fade-up-delay mt-4 max-w-2xl text-base md:text-lg text-app-white/75">
-            A plataforma ibérica de estágios, camps e eventos — Algarve, Barcelona
-            e Costa del Sol numa só experiência tech.
+            Experiências de alto rendimento em Padel e Futebol. Combinamos treino
+            profissional, competição com a comunidade local e alojamento premium
+            em Portugal e Espanha.
           </p>
 
-          <div className="animate-fade-up-delay-2 mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
-            <div className="inline-flex rounded-full border border-white/15 bg-black/35 p-1 backdrop-blur-sm">
-              <button
-                onClick={() => setCountry('portugal')}
-                className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-all ${
-                  country === 'portugal'
-                    ? 'bg-cyan text-navy'
-                    : 'text-app-white/75 hover:text-app-white'
-                }`}
-              >
-                🇵🇹 Portugal (Algarve)
-              </button>
-              <button
-                onClick={() => setCountry('spain')}
-                className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition-all ${
-                  country === 'spain'
-                    ? 'bg-cyan text-navy'
-                    : 'text-app-white/75 hover:text-app-white'
-                }`}
-              >
-                🇪🇸 España (Barcelona / Marbella)
-              </button>
-            </div>
-
+          <div className="animate-fade-up-delay-2 mt-8">
             <Link
+              id="builder"
               href="/eventos"
               className="animate-cta-glow inline-flex items-center justify-center rounded-full bg-gold px-6 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
             >
-              Ver eventos & reservar
+              Construir o Meu Estágio
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Destination Hubs */}
-      <section id="hubs" className="relative bg-navy px-5 md:px-10 py-20 md:py-28">
+      {/* Filosofia */}
+      <section className="relative px-5 md:px-10 py-20 md:py-28 bg-gradient-to-b from-navy via-[#071a2e] to-navy">
         <div className="mx-auto max-w-7xl">
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
-            Iberian Sports Platform
+            A Nossa Filosofia — A Fórmula Perfeita
           </p>
-          <h2 className="mt-3 font-[family-name:var(--font-display)] text-3xl md:text-5xl font-extrabold tracking-tight">
-            Três hubs. Um corredor desportivo.
+          <h2 className="mt-3 max-w-3xl font-[family-name:var(--font-display)] text-3xl md:text-5xl font-extrabold tracking-tight">
+            Não vendemos apenas viagens. Construímos atletas.
           </h2>
-          <p className="mt-4 max-w-2xl text-app-white/65">
-            Alterna entre Portugal e Espanha — da hospitalidade algarvia ao
-            ritmo urbano de Barcelona e ao luxo da Costa del Sol.
+          <p className="mt-5 max-w-3xl text-app-white/70 text-base md:text-lg leading-relaxed">
+            Esqueça as &quot;bolhas turísticas&quot; onde a sua equipa viaja milhares de
+            quilómetros apenas para jogar entre si. A SportsEvents.app redefiniu
+            o Sports Travel na Europa com a nossa fórmula exclusiva de imersão:
           </p>
 
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-            {hubs.map((hub) => (
-              <button
-                key={hub.id}
-                onClick={() => setCountry(hub.country)}
-                className={`group relative overflow-hidden rounded-2xl text-left min-h-[320px] border transition-all duration-300 ${
-                  (country === 'portugal' && hub.id === 'algarve') ||
-                  (country === 'spain' && hub.id !== 'algarve')
-                    ? 'border-cyan/60 ring-1 ring-cyan/30'
-                    : 'border-white/10 hover:border-white/25'
-                }`}
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+            {formula.map((item, i) => (
+              <div
+                key={item.title}
+                className="relative pl-5 border-l border-cyan/40 animate-fade-up"
+                style={{ animationDelay: `${i * 80}ms` }}
               >
-                <Image
-                  src={hub.image}
-                  alt={hub.label}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/55 to-navy/10" />
-                <div className="relative z-10 flex h-full min-h-[320px] flex-col justify-end p-5">
-                  <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold text-app-white/90 backdrop-blur-sm">
-                    <MapPin className="w-3.5 h-3.5 text-gold" />
-                    {hub.region}
-                  </span>
-                  <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl font-bold">
-                    {hub.label}
-                  </h3>
-                  <p className="mt-1 text-sm font-semibold text-cyan">{hub.focus}</p>
-                  <p className="mt-2 text-sm text-app-white/70 leading-relaxed">
-                    {hub.blurb}
-                  </p>
-                </div>
-              </button>
+                <h3 className="font-[family-name:var(--font-display)] text-xl font-bold text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-3 text-sm md:text-base text-app-white/65 leading-relaxed">
+                  {item.text}
+                </p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Closing brand strip */}
-      <section className="border-t border-white/10 bg-gradient-to-br from-navy via-[#0c4a6e]/40 to-navy px-5 md:px-10 py-16">
-        <div className="mx-auto max-w-7xl flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-          <div>
-            <p className="font-[family-name:var(--font-display)] text-2xl md:text-3xl font-bold max-w-xl">
-              Tech-driven. Multilíngue. Feito para o eixo Algarve ↔ Costa del Sol.
-            </p>
-            <p className="mt-3 text-app-white/60 text-sm md:text-base">
-              PT · ES · FR · EN · DE — uma aplicação para clubs, escolas e
-              operadores de turismo desportivo.
-            </p>
+      {/* Destinos */}
+      <section id="hubs" className="relative px-5 md:px-10 py-20 md:py-28">
+        <div className="mx-auto max-w-7xl">
+          <p className="font-mono text-xs uppercase tracking-[0.25em] text-gold">
+            Os Nossos Destinos
+          </p>
+          <h2 className="mt-3 font-[family-name:var(--font-display)] text-3xl md:text-5xl font-extrabold tracking-tight max-w-3xl">
+            Os Melhores Hubs Desportivos do Sul da Europa
+          </h2>
+
+          <div className="mt-12 space-y-6">
+            <DestinationRow
+              flag="🇵🇹"
+              title="Algarve (Portugal)"
+              text="O nosso Flagship Hub no Amendoeira Golf Resort. Mais de 300 dias de sol, campos de classe mundial e a autêntica hospitalidade portuguesa."
+              href="/destinos/algarve"
+              image="https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=1600&q=80"
+            />
+            <DestinationRow
+              flag="🇪🇸"
+              title="Barcelona (Espanha)"
+              text="O epicentro urbano do desporto e da inovação. Ideal para Corporate / Teambuilding, com a sofisticação Meliá e a energia cosmopolita da capital catalã."
+              href="/destinos/barcelona"
+              image="https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1600&q=80"
+              reverse
+            />
+            <DestinationRow
+              flag="🇪🇸"
+              title="Marbella (Espanha)"
+              text="A Meca do Padel Europeu. Luxo, alta competição e a energia inigualável da Costa del Sol com a garantia de qualidade Meliá Hotels."
+              href="/destinos/marbella"
+              image="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=1600&q=80"
+            />
           </div>
-          <a
-            href="#builder"
-            className="inline-flex w-fit items-center justify-center rounded-full bg-gold px-6 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
-          >
-            Pedir orçamento na app
-          </a>
         </div>
       </section>
 
-      <footer className="border-t border-white/10 px-5 md:px-10 py-12 text-xs text-app-white/45">
-        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row flex-wrap items-center justify-between gap-6">
-          <BrandLogo
-            variant="full"
-            className="h-16 w-auto sm:h-20 md:h-24 drop-shadow-md"
-          />
-          <span className="text-sm text-center sm:text-right">
-            Portugal (Algarve) · España (Barcelona · Marbella · Málaga)
-          </span>
+      {/* B2B */}
+      <section className="relative border-t border-white/10 px-5 md:px-10 py-20 md:py-28 bg-gradient-to-br from-navy via-[#0c4a6e]/25 to-navy">
+        <div className="mx-auto max-w-7xl">
+          <p className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
+            Para Quem Trabalhamos
+          </p>
+          <h2 className="mt-3 font-[family-name:var(--font-display)] text-3xl md:text-5xl font-extrabold tracking-tight">
+            Soluções B2B à Medida
+          </h2>
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+            {audiences.map((a) => (
+              <div key={a.title}>
+                <h3 className="font-[family-name:var(--font-display)] text-xl font-bold text-gold">
+                  {a.title}
+                </h3>
+                <p className="mt-3 text-sm md:text-base text-app-white/65 leading-relaxed">
+                  {a.text}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-14">
+            <Link
+              href="/eventos"
+              className="inline-flex items-center justify-center rounded-full bg-gold px-6 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
+            >
+              Construir o Meu Estágio
+            </Link>
+          </div>
         </div>
-      </footer>
+      </section>
+
+      <SiteFooter />
+    </div>
+  )
+}
+
+function DestinationRow({
+  flag,
+  title,
+  text,
+  href,
+  image,
+  reverse = false,
+}: {
+  flag: string
+  title: string
+  text: string
+  href: string
+  image: string
+  reverse?: boolean
+}) {
+  return (
+    <div
+      className={`grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden rounded-none lg:rounded-2xl border border-white/10 ${
+        reverse ? 'lg:[&>*:first-child]:order-2' : ''
+      }`}
+    >
+      <div className="relative min-h-[240px] lg:min-h-[320px]">
+        <Image
+          src={image}
+          alt={title}
+          fill
+          className="object-cover"
+          sizes="(max-width: 1024px) 100vw, 50vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy/40 to-transparent" />
+      </div>
+      <div className="flex flex-col justify-center bg-[#071525] p-8 md:p-10">
+        <p className="text-sm font-semibold text-cyan">
+          {flag} {title}
+        </p>
+        <p className="mt-4 text-base text-app-white/75 leading-relaxed">{text}</p>
+        <Link
+          href={href}
+          className="mt-6 inline-flex w-fit text-sm font-bold text-gold hover:brightness-110 transition"
+        >
+          Saber mais →
+        </Link>
+      </div>
     </div>
   )
 }

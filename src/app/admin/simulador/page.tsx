@@ -36,6 +36,7 @@ import {
   Users,
 } from 'lucide-react'
 import { LogoutButton } from '@/components/admin/logout-button'
+import { BrandLogo } from '@/components/brand-logo'
 
 const TEMPORADA_LABEL: Record<Temporada, string> = {
   baixa: 'Época Baixa (Nov–Fev)',
@@ -167,9 +168,7 @@ export default function SimuladorPage() {
                 <ArrowLeft className="w-4 h-4" />
               </Link>
               <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-tr from-cyan to-gold p-2 rounded-xl text-slate-950">
-                  <Calculator className="w-5 h-5" />
-                </div>
+                <BrandLogo variant="mark" href="/admin" className="h-11 w-11 rounded-xl" />
                 <div>
                   <h1 className="text-lg font-black tracking-tight font-[family-name:var(--font-display)]">
                     Simulador Financeiro
@@ -183,6 +182,12 @@ export default function SimuladorPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/admin/definicoes"
+                className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-950 border border-slate-800 text-slate-300 hover:text-cyan-400 hover:border-cyan-500/30 transition-all"
+              >
+                Definições
+              </Link>
               <button
                 type="button"
                 onClick={restaurarPadroes}

@@ -5,24 +5,38 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import {
   Building2,
-  Trophy,
   MapPin,
   Briefcase,
   Calendar,
   Plus,
   BarChart3,
   Calculator,
+  Settings,
 } from 'lucide-react'
 import RentabilidadeTorneios from '@/components/admin/RentabilidadeTorneios'
+import PartnersNetwork from '@/components/admin/PartnersNetwork'
+import {
+  CreateClubModal,
+  CreateLeadModal,
+  type LookupOption,
+} from '@/components/admin/CreateModals'
+import { EventFichaModal, type EventRow } from '@/components/admin/EventFichaModal'
 import { LogoutButton } from '@/components/admin/logout-button'
+import { BrandLogo } from '@/components/brand-logo'
 
 export default function EnterpriseBackoffice() {
   const [activeTab, setActiveTab] = useState<'kpis' | 'pipeline' | 'partners' | 'events' | 'roi'>('kpis')
   const [leads, setLeads] = useState<any[]>([])
   const [partners, setPartners] = useState<any[]>([])
   const [events, setEvents] = useState<any[]>([])
+  const [destinations, setDestinations] = useState<LookupOption[]>([])
+  const [sports, setSports] = useState<LookupOption[]>([])
   const [loading, setLoading] = useState(true)
   const [managerFilter, setManagerFilter] = useState<string>('ALL')
+  const [showLeadModal, setShowLeadModal] = useState(false)
+  const [showEventModal, setShowEventModal] = useState(false)
+  const [editingEvent, setEditingEvent] = useState<EventRow | null>(null)
+  const [showClubModal, setShowClubModal] = useState(false)
 
   useEffect(() => {
     loadEnterpriseData()
@@ -38,24 +52,35 @@ export default function EnterpriseBackoffice() {
 
     const supabase = createClient()
 
-    const { data: leadsData } = await supabase
-      .from('leads')
-      .select('*, destinations(name), sports(name)')
-      .order('created_at', { ascending: false })
-
-    const { data: partnersData } = await supabase
-      .from('partners')
-      .select('*, destinations(name)')
-      .order('name', { ascending: true })
-
-    const { data: eventsData } = await supabase
-      .from('events')
-      .select('*, destinations(name), sports(name)')
-      .order('start_date', { ascending: true })
+    const [
+      { data: leadsData },
+      { data: partnersData },
+      { data: eventsData },
+      { data: destinationsData },
+      { data: sportsData },
+    ] = await Promise.all([
+      supabase
+        .from('leads')
+        .select('*, destinations(name), sports(name)')
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('partners')
+        .select('*, destinations(name)')
+        .order('country_code', { ascending: true })
+        .order('name', { ascending: true }),
+      supabase
+        .from('events')
+        .select('*, destinations(name), sports(name)')
+        .order('start_date', { ascending: true }),
+      supabase.from('destinations').select('id, name, code').order('name'),
+      supabase.from('sports').select('id, name').order('name'),
+    ])
 
     if (leadsData) setLeads(leadsData)
     if (partnersData) setPartners(partnersData)
     if (eventsData) setEvents(eventsData)
+    if (destinationsData) setDestinations(destinationsData)
+    if (sportsData) setSports(sportsData)
 
     setLoading(false)
   }
@@ -82,9 +107,7 @@ export default function EnterpriseBackoffice() {
     <div className="min-h-screen bg-navy text-app-white font-sans flex flex-col">
       <header className="bg-navy/90 border-b border-white/10 px-6 py-4 flex flex-wrap justify-between items-center gap-4">
         <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-tr from-cyan to-gold p-2 rounded-xl text-navy font-bold">
-            <Trophy className="w-6 h-6" />
-          </div>
+          <BrandLogo variant="mark" href="/admin" className="h-12 w-12 rounded-xl" />
           <div>
             <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-2 font-[family-name:var(--font-display)]">
               SportsEvents<span className="text-cyan">.app</span>{' '}
@@ -159,6 +182,12 @@ export default function EnterpriseBackoffice() {
           className="py-3 flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-amber-400 hover:border-amber-400/50 transition-all"
         >
           <Calculator className="w-4 h-4" /> Simulador Financeiro
+        </Link>
+        <Link
+          href="/admin/definicoes"
+          className="py-3 flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-cyan-400 hover:border-cyan-400/50 transition-all"
+        >
+          <Settings className="w-4 h-4" /> Definições
         </Link>
       </nav>
 
@@ -288,70 +317,11 @@ export default function EnterpriseBackoffice() {
         )}
 
         {activeTab === 'partners' && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-lg font-bold text-white">
-                  Rede Ibérica de Parceiros & Fornecedores
-                </h2>
-                <p className="text-xs text-slate-400">
-                  Gestão de acordos com Hotéis, Clubes de Padel, Campos de Futebol,
-                  Treinadores e Patrocinadores.
-                </p>
-              </div>
-              <button className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2">
-                <Plus className="w-4 h-4" /> Adicionar Novo Parceiro
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {partners.map((p) => (
-                <div
-                  key={p.id}
-                  className="bg-slate-900 border border-slate-800 p-4 rounded-2xl hover:border-slate-700 transition-all"
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-800 text-cyan-400 uppercase tracking-wider">
-                      {p.type}
-                    </span>
-                    <span className="text-xs text-amber-400 font-bold">
-                      ★ {p.rating}/5
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-sm text-white">{p.name}</h3>
-                  <div className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-500" />{' '}
-                    {p.destinations?.name || 'Geral'}
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-800/80 flex justify-between items-center text-xs">
-                    <div>
-                      <div className="text-[10px] text-slate-500 uppercase">
-                        Tarifa Negociada
-                      </div>
-                      <div className="font-bold text-emerald-400">
-                        {p.negotiated_rate
-                          ? `${p.negotiated_rate} €`
-                          : 'Sob Consulta'}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-[10px] text-slate-500 uppercase">
-                        Contacto
-                      </div>
-                      <div className="text-slate-300">{p.contact_name || 'N/D'}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {partners.length === 0 && (
-                <div className="col-span-3 bg-slate-900 border border-slate-800 p-8 text-center rounded-2xl text-xs text-slate-500">
-                  Nenhum parceiro registado na base de dados. Clica em &quot;Adicionar
-                  Novo Parceiro&quot; para começar.
-                </div>
-              )}
-            </div>
-          </div>
+          <PartnersNetwork
+            partners={partners}
+            onRefresh={loadEnterpriseData}
+            onRequestAddClub={() => setShowClubModal(true)}
+          />
         )}
 
         {activeTab === 'pipeline' && (
@@ -360,7 +330,11 @@ export default function EnterpriseBackoffice() {
               <h2 className="text-lg font-bold text-white">
                 Pipeline de Vendas & Pedidos de Orçamento
               </h2>
-              <button className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setShowLeadModal(true)}
+                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2"
+              >
                 <Plus className="w-4 h-4" /> Inserir Novo Lead Manual
               </button>
             </div>
@@ -380,7 +354,18 @@ export default function EnterpriseBackoffice() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
-                  {leads.map((l) => (
+                  {leads.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={8}
+                        className="p-8 text-center text-slate-500"
+                      >
+                        Sem leads ainda. Clica em &quot;Inserir Novo Lead Manual&quot;
+                        para criar o primeiro.
+                      </td>
+                    </tr>
+                  ) : (
+                    leads.map((l) => (
                     <tr key={l.id} className="hover:bg-slate-800/50">
                       <td className="p-3">
                         <div className="font-bold text-white">{l.client_name}</div>
@@ -420,7 +405,8 @@ export default function EnterpriseBackoffice() {
                         </span>
                       </td>
                     </tr>
-                  ))}
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -431,16 +417,24 @@ export default function EnterpriseBackoffice() {
 
         {activeTab === 'events' && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-3 flex-wrap">
               <div>
                 <h2 className="text-lg font-bold text-white">
                   Estágios & Eventos Operacionais
                 </h2>
                 <p className="text-xs text-slate-400">
-                  Calendário de operações confirmadas e em preparação.
+                  Fichas completas (hubs Algarve · Marbella · Barcelona) para
+                  publicar no site e receber reservas Stripe.
                 </p>
               </div>
-              <button className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingEvent(null)
+                  setShowEventModal(true)
+                }}
+                className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2"
+              >
                 <Plus className="w-4 h-4" /> Novo Evento
               </button>
             </div>
@@ -451,30 +445,96 @@ export default function EnterpriseBackoffice() {
               </div>
             ) : events.length === 0 ? (
               <div className="bg-slate-900 border border-slate-800 p-8 text-center rounded-2xl text-xs text-slate-500">
-                Sem eventos operacionais agendados.
+                Sem eventos. Cria a primeira ficha completa com programa, hotel,
+                preços e publicação no site.
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {events.map((e) => (
                   <div
                     key={e.id}
-                    className="bg-slate-900 border border-slate-800 p-4 rounded-2xl"
+                    className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3"
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-bold text-sm text-white">{e.title}</h3>
-                      <span className="text-[10px] uppercase font-bold text-slate-400">
-                        {e.status}
-                      </span>
+                    <div className="flex justify-between items-start gap-2">
+                      <div>
+                        <h3 className="font-bold text-sm text-white">{e.title}</h3>
+                        <div className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                          {e.destinations?.name || 'N/D'} · {e.sports?.name || 'Padel'}
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="text-[10px] uppercase font-bold text-slate-400">
+                          {e.status}
+                        </span>
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                            e.published
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                              : 'bg-slate-800 text-slate-500 border-slate-700'
+                          }`}
+                        >
+                          {e.published ? 'No site' : 'Rascunho'}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-xs text-slate-400 flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                      {e.destinations?.name || 'N/D'} · {e.sports?.name || 'Padel'}
+
+                    <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-400">
+                      <div>
+                        <span className="text-slate-500">Datas</span>
+                        <div className="text-slate-200 font-semibold">
+                          {e.start_date} → {e.end_date}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-slate-500">Preço / pax</span>
+                        <div className="text-emerald-400 font-bold">
+                          {Number(e.sale_price_per_person || 0).toLocaleString('pt-PT')} €
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-slate-500">Campos</span>
+                        <div className="text-slate-200">
+                          P{e.courts_padel || 0} · F{e.courts_football || 0} · O
+                          {e.courts_other || 0}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-slate-500">Reserva Stripe</span>
+                        <div className="text-amber-400 font-semibold">
+                          {Number(e.deposit_amount || 0).toLocaleString('pt-PT')} €
+                        </div>
+                      </div>
                     </div>
-                    <div className="mt-3 flex justify-between text-xs">
-                      <span className="text-slate-300">{e.group_size} pax</span>
-                      <span className="font-bold text-emerald-400">
-                        {e.total_revenue || 0} €
-                      </span>
+
+                    {(e.hotel_name || e.coaches) && (
+                      <div className="text-[11px] text-slate-400 space-y-0.5 border-t border-slate-800 pt-2">
+                        {e.hotel_name && <div>Hotel: {e.hotel_name}</div>}
+                        {e.coaches && (
+                          <div className="line-clamp-2">Treinadores: {e.coaches}</div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingEvent(e)
+                          setShowEventModal(true)
+                        }}
+                        className="flex-1 text-[11px] font-semibold rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-300 hover:border-cyan-500/40 hover:text-cyan-400"
+                      >
+                        Editar ficha
+                      </button>
+                      {e.published && e.slug && (
+                        <Link
+                          href={`/eventos/${e.slug}`}
+                          className="flex-1 text-center text-[11px] font-semibold rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-emerald-400 hover:bg-emerald-500/20"
+                        >
+                          Ver no site
+                        </Link>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -483,6 +543,34 @@ export default function EnterpriseBackoffice() {
           </div>
         )}
       </main>
+
+      {showLeadModal && (
+        <CreateLeadModal
+          destinations={destinations}
+          sports={sports}
+          onClose={() => setShowLeadModal(false)}
+          onCreated={loadEnterpriseData}
+        />
+      )}
+      {showEventModal && (
+        <EventFichaModal
+          destinations={destinations}
+          sports={sports}
+          initial={editingEvent}
+          onClose={() => {
+            setShowEventModal(false)
+            setEditingEvent(null)
+          }}
+          onSaved={loadEnterpriseData}
+        />
+      )}
+      {showClubModal && (
+        <CreateClubModal
+          destinations={destinations}
+          onClose={() => setShowClubModal(false)}
+          onCreated={loadEnterpriseData}
+        />
+      )}
     </div>
   )
 }

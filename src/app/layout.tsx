@@ -21,9 +21,22 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://sportsevents.app"
+  ),
   title: "SportsEvents.app — Iberian Sports Platform",
   description:
     "One App. Two Countries. Infinite Sports Experiences. Plataforma ibérica de estágios, camps e eventos desportivos em Portugal e Espanha.",
+  icons: {
+    icon: [{ url: "/brand/icon.png", type: "image/png" }],
+    apple: [{ url: "/brand/icon.png", type: "image/png" }],
+  },
+  openGraph: {
+    title: "SportsEvents.app — Iberian Sports Platform",
+    description:
+      "One App. Two Countries. Infinite Sports Experiences. Plataforma ibérica de estágios, camps e eventos desportivos em Portugal e Espanha.",
+    images: [{ url: "/brand/logo.png" }],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

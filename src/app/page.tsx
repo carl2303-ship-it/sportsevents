@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { ChevronDown, MapPin } from 'lucide-react'
+import { BrandLogo } from '@/components/brand-logo'
 
 type HubId = 'algarve' | 'barcelona' | 'marbella'
 type Country = 'portugal' | 'spain'
@@ -62,11 +63,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-navy text-app-white">
-      <header className="absolute inset-x-0 top-0 z-30 px-5 md:px-10 pt-5">
+      <header className="absolute inset-x-0 top-0 z-30 px-5 md:px-10 pt-4 md:pt-5">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <Link href="/" className="font-[family-name:var(--font-display)] text-xl md:text-2xl font-extrabold tracking-tight">
-            SportsEvents<span className="text-cyan">.app</span>
-          </Link>
+          <BrandLogo
+            variant="full"
+            priority
+            className="h-16 w-auto sm:h-20 md:h-24 lg:h-28 drop-shadow-[0_2px_16px_rgba(0,0,0,0.6)]"
+          />
 
           <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-app-white/80">
             <div className="relative">
@@ -148,6 +151,12 @@ export default function Home() {
               ))}
             </div>
             <Link
+              href="/eventos"
+              className="hidden sm:inline-flex text-xs font-semibold text-app-white/60 hover:text-cyan transition-colors"
+            >
+              Eventos
+            </Link>
+            <Link
               href="/admin"
               className="hidden sm:inline-flex text-xs font-semibold text-app-white/60 hover:text-cyan transition-colors"
             >
@@ -172,21 +181,24 @@ export default function Home() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(6,182,212,0.22),_transparent_55%)]" />
         </div>
 
-        <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-end px-5 md:px-10 pb-16 md:pb-20 pt-28">
-          <p className="animate-fade-up font-[family-name:var(--font-display)] text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[0.95]">
-            SportsEvents<span className="text-cyan">.app</span>
-          </p>
+        <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center items-center text-center px-5 md:px-10 pb-14 md:pb-20 pt-28 md:pt-32">
+          <BrandLogo
+            href={null}
+            variant="full"
+            priority
+            className="h-52 w-auto max-w-[min(96vw,56rem)] sm:h-64 md:h-80 lg:h-[22rem] xl:h-96 mx-auto animate-fade-up drop-shadow-[0_12px_40px_rgba(0,0,0,0.7)]"
+          />
 
-          <h1 className="animate-fade-up-delay mt-5 max-w-3xl font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-app-white">
+          <h1 className="animate-fade-up-delay mt-8 md:mt-10 max-w-4xl font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-5xl font-bold leading-tight text-app-white">
             One App. Two Countries. Infinite Sports Experiences.
           </h1>
 
-          <p className="animate-fade-up-delay mt-4 max-w-xl text-base md:text-lg text-app-white/75">
+          <p className="animate-fade-up-delay mt-4 max-w-2xl text-base md:text-lg text-app-white/75">
             A plataforma ibérica de estágios, camps e eventos — Algarve, Barcelona
             e Costa del Sol numa só experiência tech.
           </p>
 
-          <div className="animate-fade-up-delay-2 mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="animate-fade-up-delay-2 mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
             <div className="inline-flex rounded-full border border-white/15 bg-black/35 p-1 backdrop-blur-sm">
               <button
                 onClick={() => setCountry('portugal')}
@@ -210,13 +222,12 @@ export default function Home() {
               </button>
             </div>
 
-            <a
-              id="builder"
-              href="#hubs"
+            <Link
+              href="/eventos"
               className="animate-cta-glow inline-flex items-center justify-center rounded-full bg-gold px-6 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
             >
-              Construir Estágio na App
-            </a>
+              Ver eventos & reservar
+            </Link>
           </div>
         </div>
       </section>
@@ -295,12 +306,15 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-white/10 px-5 md:px-10 py-8 text-xs text-app-white/45">
-        <div className="mx-auto max-w-7xl flex flex-wrap justify-between gap-3">
-          <span className="font-semibold text-app-white/70">
-            SportsEvents.app
+      <footer className="border-t border-white/10 px-5 md:px-10 py-12 text-xs text-app-white/45">
+        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row flex-wrap items-center justify-between gap-6">
+          <BrandLogo
+            variant="full"
+            className="h-16 w-auto sm:h-20 md:h-24 drop-shadow-md"
+          />
+          <span className="text-sm text-center sm:text-right">
+            Portugal (Algarve) · España (Barcelona · Marbella · Málaga)
           </span>
-          <span>Portugal (Algarve) · España (Barcelona · Marbella · Málaga)</span>
         </div>
       </footer>
     </div>

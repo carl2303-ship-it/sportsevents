@@ -4,7 +4,8 @@ import { FormEvent, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Calculator, Lock, Trophy } from 'lucide-react'
+import { Calculator, Lock } from 'lucide-react'
+import { BrandLogo } from '@/components/brand-logo'
 
 export default function StaffLoginForm() {
   const router = useRouter()
@@ -47,9 +48,7 @@ export default function StaffLoginForm() {
       <header className="border-b border-slate-800 px-6 py-4">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="bg-gradient-to-tr from-cyan to-gold p-2 rounded-xl text-slate-950">
-              <Trophy className="w-5 h-5" />
-            </div>
+            <BrandLogo variant="mark" href={null} className="h-12 w-12 rounded-xl" />
             <div>
               <p className="text-sm font-black tracking-tight font-[family-name:var(--font-display)]">
                 SportsEvents<span className="text-cyan-400">.app</span>
@@ -134,8 +133,8 @@ export default function StaffLoginForm() {
             <div className="mt-6 pt-5 border-t border-slate-800 flex items-start gap-2">
               <Calculator className="w-3.5 h-3.5 text-slate-600 mt-0.5 shrink-0" />
               <p className="text-[10px] text-slate-500 leading-relaxed">
-                Contas Staff são criadas no Supabase Auth pelo administrador. Não existe
-                registo público — apenas utilizadores autorizados.
+                Contas Staff são criadas em Admin → Definições. Não existe registo
+                público — apenas utilizadores autorizados.
               </p>
             </div>
           </div>

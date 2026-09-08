@@ -46,6 +46,9 @@ export type PartnerRow = {
   responsibles?: string | null
   preferred_language?: string | null
   last_contacted_at?: string | null
+  emailed_at?: string | null
+  phoned_at?: string | null
+  interest?: 'INTERESSE' | 'SEM_INTERESSE' | null
   destinations?: { name?: string | null } | null
 }
 
@@ -57,7 +60,15 @@ type OutreachScript = {
   body: string
 }
 
-type ListMode = 'PROSPECAO' | 'RESPONDIDO' | 'PARCEIRO' | 'ALL'
+type ListMode =
+  | 'A_CONTACTAR'
+  | 'EMAIL'
+  | 'TELEFONE'
+  | 'RESPONDIDO'
+  | 'INTERESSE'
+  | 'SEM_INTERESSE'
+  | 'PARCEIRO'
+  | 'ALL'
 
 const COUNTRY_META: Record<
   string,
@@ -76,13 +87,14 @@ const COUNTRY_META: Record<
   ES: { flag: '🇪🇸', label: 'Espanha', order: 11, defaultLang: 'es' },
 }
 
-const STATUS_META: Record<
-  string,
-  { label: string; className: string }
-> = {
+const STATUS_META: Record<string, { label: string; className: string }> = {
   PROSPECAO: {
-    label: 'Prospeção',
+    label: 'A contactar',
     className: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  },
+  CONTACTADO: {
+    label: 'Contactado',
+    className: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
   },
   RESPONDIDO: {
     label: 'Respondido',
@@ -92,6 +104,29 @@ const STATUS_META: Record<
     label: 'Parceiro',
     className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
   },
+}
+
+const INTEREST_META = {
+  INTERESSE: {
+    label: 'Com interesse',
+    className: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  },
+  SEM_INTERESSE: {
+    label: 'Sem interesse',
+    className: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+  },
+} as const
+
+function formatContactDate(iso?: string | null) {
+  if (!iso) return null
+  try {
+    return new Date(iso).toLocaleDateString('pt-PT', {
+      day: '2-digit',
+      month: 'short',
+    })
+  } catch {
+    return null
+  }
 }
 
 const LANG_OPTIONS = [
@@ -127,7 +162,7 @@ export default function PartnersNetwork({
   onRequestAddPartner?: (type?: PartnerTypeValue) => void
 }) {
   const supabase = useMemo(() => createClient(), [])
-  const [listMode, setListMode] = useState<ListMode>('PROSPECAO')
+  const [listMode, setListMode] = useState<ListMode>('A_CONTACTAR')
   const [countryFilter, setCountryFilter] = useState<string>('ALL')
   const [typeFilter, setTypeFilter] = useState<string>('ALL')
   const [addMenuOpen, setAddMenuOpen] = useState(false)
@@ -161,19 +196,71 @@ export default function PartnersNetwork({
   }, [scriptLang, scripts])
 
   const counts = useMemo(() => {
-    const base = { PROSPECAO: 0, RESPONDIDO: 0, PARCEIRO: 0, ALL: partners.length }
+    let aContactar = 0
+    let email = 0
+    let telefone = 0
+    let respondido = 0
+    let interesse = 0
+    let semInteresse = 0
+    let parceiro = 0
+
     for (const p of partners) {
-      const st = (p.status || 'PROSPECAO') as keyof typeof base
-      if (st in base && st !== 'ALL') base[st] += 1
+      const status = p.status || 'PROSPECAO'
+      if (!p.emailed_at && !p.phoned_at && status !== 'PARCEIRO') aContactar += 1
+      if (p.emailed_at) email += 1
+      if (p.phoned_at) telefone += 1
+      if (status === 'RESPONDIDO' || p.interest) respondido += 1
+      if (p.interest === 'INTERESSE') interesse += 1
+      if (p.interest === 'SEM_INTERESSE') semInteresse += 1
+      if (status === 'PARCEIRO') parceiro += 1
     }
-    return base
+
+    return {
+      A_CONTACTAR: aContactar,
+      EMAIL: email,
+      TELEFONE: telefone,
+      RESPONDIDO: respondido,
+      INTERESSE: interesse,
+      SEM_INTERESSE: semInteresse,
+      PARCEIRO: parceiro,
+      ALL: partners.length,
+    }
   }, [partners])
 
   const scopedPartners = useMemo(() => {
-    let list =
-      listMode === 'ALL'
-        ? partners
-        : partners.filter((p) => (p.status || 'PROSPECAO') === listMode)
+    let list = partners
+    switch (listMode) {
+      case 'A_CONTACTAR':
+        list = partners.filter(
+          (p) =>
+            !p.emailed_at &&
+            !p.phoned_at &&
+            (p.status || 'PROSPECAO') !== 'PARCEIRO'
+        )
+        break
+      case 'EMAIL':
+        list = partners.filter((p) => Boolean(p.emailed_at))
+        break
+      case 'TELEFONE':
+        list = partners.filter((p) => Boolean(p.phoned_at))
+        break
+      case 'RESPONDIDO':
+        list = partners.filter(
+          (p) => (p.status || '') === 'RESPONDIDO' || Boolean(p.interest)
+        )
+        break
+      case 'INTERESSE':
+        list = partners.filter((p) => p.interest === 'INTERESSE')
+        break
+      case 'SEM_INTERESSE':
+        list = partners.filter((p) => p.interest === 'SEM_INTERESSE')
+        break
+      case 'PARCEIRO':
+        list = partners.filter((p) => (p.status || '') === 'PARCEIRO')
+        break
+      default:
+        list = partners
+    }
     if (typeFilter !== 'ALL') {
       list = list.filter((p) => (p.type || 'CLUBE_PADEL') === typeFilter)
     }
@@ -353,10 +440,67 @@ export default function PartnersNetwork({
 
   async function updateStatus(id: string, status: string) {
     const payload: Record<string, unknown> = { status }
-    if (status === 'RESPONDIDO' || status === 'PARCEIRO') {
+    if (status === 'RESPONDIDO' || status === 'PARCEIRO' || status === 'CONTACTADO') {
       payload.last_contacted_at = new Date().toISOString()
     }
     const { error } = await supabase.from('partners').update(payload).eq('id', id)
+    if (error) {
+      alert(error.message)
+      return
+    }
+    await onRefresh()
+  }
+
+  async function markChannel(
+    partner: PartnerRow,
+    channel: 'email' | 'phone',
+    clear = false
+  ) {
+    const now = new Date().toISOString()
+    const payload: Record<string, unknown> = {
+      last_contacted_at: clear ? partner.last_contacted_at : now,
+    }
+    if (channel === 'email') {
+      payload.emailed_at = clear ? null : now
+    } else {
+      payload.phoned_at = clear ? null : now
+    }
+    const status = partner.status || 'PROSPECAO'
+    if (
+      !clear &&
+      (status === 'PROSPECAO' || !status) &&
+      status !== 'PARCEIRO' &&
+      status !== 'RESPONDIDO'
+    ) {
+      payload.status = 'CONTACTADO'
+    }
+    const { error } = await supabase
+      .from('partners')
+      .update(payload)
+      .eq('id', partner.id)
+    if (error) {
+      alert(error.message)
+      return
+    }
+    await onRefresh()
+  }
+
+  async function markInterest(
+    partner: PartnerRow,
+    interest: 'INTERESSE' | 'SEM_INTERESSE' | null
+  ) {
+    const payload: Record<string, unknown> = {
+      interest,
+      last_contacted_at: new Date().toISOString(),
+    }
+    if (interest) {
+      payload.status =
+        partner.status === 'PARCEIRO' ? 'PARCEIRO' : 'RESPONDIDO'
+    }
+    const { error } = await supabase
+      .from('partners')
+      .update(payload)
+      .eq('id', partner.id)
     if (error) {
       alert(error.message)
       return
@@ -385,6 +529,9 @@ export default function PartnersNetwork({
         status: form.status || 'PROSPECAO',
         notes: form.notes,
         negotiated_rate: form.negotiated_rate ?? null,
+        emailed_at: form.emailed_at || null,
+        phoned_at: form.phoned_at || null,
+        interest: form.interest || null,
       })
       .eq('id', form.id)
     setSavingPartner(false)
@@ -409,13 +556,21 @@ export default function PartnersNetwork({
   }
 
   const modeHelp =
-    listMode === 'PROSPECAO'
-      ? 'Lista de prospeção — clubes, hotéis, restaurantes e outros a contactar.'
-      : listMode === 'RESPONDIDO'
-        ? 'Parceiros que já responderam — em conversa / follow-up.'
-        : listMode === 'PARCEIRO'
-          ? 'Parceiros ativos — clubes, hospitality, sponsors e treinadores.'
-          : 'Vista completa de todas as fichas da rede.'
+    listMode === 'A_CONTACTAR'
+      ? 'Ainda sem email nem telefone — próximos a contactar.'
+      : listMode === 'EMAIL'
+        ? 'Já enviaste email — aguardam follow-up ou resposta.'
+        : listMode === 'TELEFONE'
+          ? 'Já contactaste por telefone.'
+          : listMode === 'RESPONDIDO'
+            ? 'Responderam — classifica com interesse ou sem interesse.'
+            : listMode === 'INTERESSE'
+              ? 'Responderam com interesse — candidatos a parceiro.'
+              : listMode === 'SEM_INTERESSE'
+                ? 'Responderam sem interesse — arquivados para não voltar a insistir.'
+                : listMode === 'PARCEIRO'
+                  ? 'Parceiros ativos — clubes, hospitality, sponsors e treinadores.'
+                  : 'Vista completa de todas as fichas da rede.'
 
   return (
     <div className="space-y-5">
@@ -483,16 +638,20 @@ export default function PartnersNetwork({
         })}
       </div>
 
-      {/* Prospeção vs Parceiros */}
-      <div className="flex flex-wrap gap-2 bg-slate-950 border border-slate-800 p-1 rounded-2xl w-fit">
+      {/* Pipeline de contacto */}
+      <div className="flex flex-wrap gap-2 bg-slate-950 border border-slate-800 p-1 rounded-2xl w-fit max-w-full">
         {(
           [
-            ['PROSPECAO', `Prospeção (${counts.PROSPECAO})`],
-            ['RESPONDIDO', `Respondidos (${counts.RESPONDIDO})`],
-            ['PARCEIRO', `Parceiros (${counts.PARCEIRO})`],
-            ['ALL', `Todos (${counts.ALL})`],
+            ['A_CONTACTAR', `A contactar (${counts.A_CONTACTAR})`, 'amber'],
+            ['EMAIL', `Email enviado (${counts.EMAIL})`, 'sky'],
+            ['TELEFONE', `Telefone (${counts.TELEFONE})`, 'violet'],
+            ['RESPONDIDO', `Respondidos (${counts.RESPONDIDO})`, 'cyan'],
+            ['INTERESSE', `Com interesse (${counts.INTERESSE})`, 'emerald'],
+            ['SEM_INTERESSE', `Sem interesse (${counts.SEM_INTERESSE})`, 'rose'],
+            ['PARCEIRO', `Parceiros (${counts.PARCEIRO})`, 'emerald'],
+            ['ALL', `Todos (${counts.ALL})`, 'slate'],
           ] as const
-        ).map(([mode, label]) => (
+        ).map(([mode, label, tone]) => (
           <button
             key={mode}
             type="button"
@@ -502,13 +661,19 @@ export default function PartnersNetwork({
             }}
             className={`px-3 py-2 rounded-xl text-xs font-bold transition-all ${
               listMode === mode
-                ? mode === 'PARCEIRO'
-                  ? 'bg-emerald-500 text-slate-950'
-                  : mode === 'RESPONDIDO'
-                    ? 'bg-cyan-500 text-slate-950'
-                    : mode === 'PROSPECAO'
-                      ? 'bg-amber-500 text-slate-950'
-                      : 'bg-slate-800 text-white'
+                ? tone === 'amber'
+                  ? 'bg-amber-500 text-slate-950'
+                  : tone === 'sky'
+                    ? 'bg-sky-500 text-slate-950'
+                    : tone === 'violet'
+                      ? 'bg-violet-500 text-white'
+                      : tone === 'cyan'
+                        ? 'bg-cyan-500 text-slate-950'
+                        : tone === 'rose'
+                          ? 'bg-rose-500 text-white'
+                          : tone === 'emerald'
+                            ? 'bg-emerald-500 text-slate-950'
+                            : 'bg-slate-800 text-white'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -659,8 +824,8 @@ export default function PartnersNetwork({
 
       {grouped.length === 0 ? (
         <div className="bg-slate-900 border border-slate-800 p-8 text-center rounded-2xl text-xs text-slate-500">
-          Nenhum parceiro nesta lista. Muda o filtro ou adiciona clube, hotel,
-          restaurante, sponsor, treinador ou outros.
+          Nenhum parceiro nesta lista. Usa os botões na ficha para marcar email,
+          telefone, interesse ou sem interesse.
         </div>
       ) : (
         <div className="space-y-8">
@@ -685,6 +850,9 @@ export default function PartnersNetwork({
                   const st = STATUS_META[status] || STATUS_META.PROSPECAO
                   const s = scriptForPartner(p)
                   const lang = partnerLang(p)
+                  const interestMeta = p.interest
+                    ? INTEREST_META[p.interest]
+                    : null
 
                   return (
                     <article
@@ -700,7 +868,8 @@ export default function PartnersNetwork({
                           onChange={(e) => updateStatus(p.id, e.target.value)}
                           className={`text-[10px] font-bold border rounded-full px-2 py-0.5 bg-slate-950 focus:outline-none ${st.className}`}
                         >
-                          <option value="PROSPECAO">Prospeção</option>
+                          <option value="PROSPECAO">A contactar</option>
+                          <option value="CONTACTADO">Contactado</option>
                           <option value="RESPONDIDO">Respondido</option>
                           <option value="PARCEIRO">Parceiro</option>
                         </select>
@@ -717,12 +886,109 @@ export default function PartnersNetwork({
                         </span>
                       </div>
 
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            p.emailed_at
+                              ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
+                              : 'bg-slate-950 text-slate-600 border-slate-800'
+                          }`}
+                        >
+                          <Mail className="w-3 h-3" />
+                          {p.emailed_at
+                            ? `Email ${formatContactDate(p.emailed_at)}`
+                            : 'Sem email'}
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            p.phoned_at
+                              ? 'bg-violet-500/15 text-violet-300 border-violet-500/30'
+                              : 'bg-slate-950 text-slate-600 border-slate-800'
+                          }`}
+                        >
+                          <Phone className="w-3 h-3" />
+                          {p.phoned_at
+                            ? `Tel. ${formatContactDate(p.phoned_at)}`
+                            : 'Sem tel.'}
+                        </span>
+                        {interestMeta && (
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${interestMeta.className}`}
+                          >
+                            {interestMeta.label}
+                          </span>
+                        )}
+                      </div>
+
                       <div className="mt-2 flex items-center gap-1.5 text-[10px] text-slate-500">
                         <Languages className="w-3 h-3" />
                         Script:{' '}
                         <span className="text-cyan-400 font-semibold uppercase">
                           {lang}
                         </span>
+                      </div>
+
+                      <div className="mt-3 grid grid-cols-2 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            markChannel(p, 'email', Boolean(p.emailed_at))
+                          }
+                          className={`text-[10px] font-bold rounded-lg border px-2 py-1.5 ${
+                            p.emailed_at
+                              ? 'border-sky-500/40 text-sky-300 bg-sky-500/10'
+                              : 'border-slate-700 text-slate-400 hover:border-sky-500/40 hover:text-sky-300'
+                          }`}
+                        >
+                          {p.emailed_at ? 'Email ✓' : 'Marcar email'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            markChannel(p, 'phone', Boolean(p.phoned_at))
+                          }
+                          className={`text-[10px] font-bold rounded-lg border px-2 py-1.5 ${
+                            p.phoned_at
+                              ? 'border-violet-500/40 text-violet-300 bg-violet-500/10'
+                              : 'border-slate-700 text-slate-400 hover:border-violet-500/40 hover:text-violet-300'
+                          }`}
+                        >
+                          {p.phoned_at ? 'Tel. ✓' : 'Marcar telefone'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            markInterest(
+                              p,
+                              p.interest === 'INTERESSE' ? null : 'INTERESSE'
+                            )
+                          }
+                          className={`text-[10px] font-bold rounded-lg border px-2 py-1.5 ${
+                            p.interest === 'INTERESSE'
+                              ? 'border-emerald-500/40 text-emerald-300 bg-emerald-500/10'
+                              : 'border-slate-700 text-slate-400 hover:border-emerald-500/40 hover:text-emerald-300'
+                          }`}
+                        >
+                          Com interesse
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            markInterest(
+                              p,
+                              p.interest === 'SEM_INTERESSE'
+                                ? null
+                                : 'SEM_INTERESSE'
+                            )
+                          }
+                          className={`text-[10px] font-bold rounded-lg border px-2 py-1.5 ${
+                            p.interest === 'SEM_INTERESSE'
+                              ? 'border-rose-500/40 text-rose-300 bg-rose-500/10'
+                              : 'border-slate-700 text-slate-400 hover:border-rose-500/40 hover:text-rose-300'
+                          }`}
+                        >
+                          Sem interesse
+                        </button>
                       </div>
 
                       {(p.coaches || p.responsibles || p.contact_name) && (
@@ -925,10 +1191,61 @@ function PartnerEditModal({
               onChange={(e) => set('status', e.target.value)}
               className={inputCls}
             >
-              <option value="PROSPECAO">Prospeção</option>
+              <option value="PROSPECAO">A contactar</option>
+              <option value="CONTACTADO">Contactado</option>
               <option value="RESPONDIDO">Respondido</option>
               <option value="PARCEIRO">Parceiro</option>
             </select>
+          </Field>
+          <Field label="Resposta / interesse">
+            <select
+              value={form.interest || ''}
+              onChange={(e) =>
+                set(
+                  'interest',
+                  (e.target.value || null) as PartnerRow['interest']
+                )
+              }
+              className={inputCls}
+            >
+              <option value="">Ainda sem resposta</option>
+              <option value="INTERESSE">Com interesse</option>
+              <option value="SEM_INTERESSE">Sem interesse</option>
+            </select>
+          </Field>
+          <Field label="Email enviado em">
+            <input
+              type="datetime-local"
+              value={
+                form.emailed_at
+                  ? new Date(form.emailed_at).toISOString().slice(0, 16)
+                  : ''
+              }
+              onChange={(e) =>
+                set(
+                  'emailed_at',
+                  e.target.value ? new Date(e.target.value).toISOString() : null
+                )
+              }
+              className={inputCls}
+            />
+          </Field>
+          <Field label="Telefone em">
+            <input
+              type="datetime-local"
+              value={
+                form.phoned_at
+                  ? new Date(form.phoned_at).toISOString().slice(0, 16)
+                  : ''
+              }
+              onChange={(e) =>
+                set(
+                  'phoned_at',
+                  e.target.value ? new Date(e.target.value).toISOString() : null
+                )
+              }
+              className={inputCls}
+            />
           </Field>
           <Field label="Idioma do script">
             <select

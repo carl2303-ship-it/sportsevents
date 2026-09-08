@@ -270,7 +270,8 @@ export function CreatePartnerModal({
             value={form.status}
             onChange={(e) => setForm({ ...form, status: e.target.value })}
           >
-            <option value="PROSPECAO">Prospeção</option>
+            <option value="PROSPECAO">A contactar</option>
+            <option value="CONTACTADO">Contactado</option>
             <option value="RESPONDIDO">Respondido</option>
             <option value="PARCEIRO">Parceiro</option>
           </select>

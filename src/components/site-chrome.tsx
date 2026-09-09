@@ -156,7 +156,7 @@ export function SiteFooter() {
               Morada Algarve
             </p>
             <p className="mt-1 text-app-white/75 leading-relaxed">
-              ADV Lote 1 Fração G
+              Rua Leonardo Coimbra 1
               <br />
               8200-112 Albufeira
             </p>
@@ -193,6 +193,12 @@ export function SiteFooter() {
           </Link>
           <Link href="/contacto" className="hover:text-cyan">
             Contactos
+          </Link>
+          <Link href="/privacidade" className="hover:text-cyan">
+            Privacidade
+          </Link>
+          <Link href="/termos" className="hover:text-cyan">
+            Termos
           </Link>
         </div>
         <span>© SportsEvents.app</span>

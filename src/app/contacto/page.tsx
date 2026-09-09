@@ -219,7 +219,7 @@ export default function ContactoPage() {
                         Algarve
                       </p>
                       <p className="text-sm text-app-white/75 leading-relaxed">
-                        ADV Lote 1 Fração G
+                        Rua Leonardo Coimbra 1
                         <br />
                         8200-112 Albufeira
                       </p>

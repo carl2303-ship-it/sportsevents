@@ -71,7 +71,7 @@ export default function Home() {
           </h1>
 
           <p className="animate-fade-up-delay mt-4 max-w-2xl text-base md:text-lg text-app-white/75">
-            Experiências de alto rendimento em Padel e Futebol. Combinamos treino
+            Experiências de alto rendimento em Padel. Combinamos treino
             profissional, competição com a comunidade local e alojamento premium
             em Portugal e Espanha.
           </p>
@@ -79,7 +79,7 @@ export default function Home() {
           <div className="animate-fade-up-delay-2 mt-8">
             <Link
               id="builder"
-              href="/eventos"
+              href="/construir"
               className="animate-cta-glow inline-flex items-center justify-center rounded-full bg-gold px-6 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
             >
               Construir o Meu Estágio
@@ -184,7 +184,7 @@ export default function Home() {
 
           <div className="mt-14">
             <Link
-              href="/eventos"
+              href="/construir"
               className="inline-flex items-center justify-center rounded-full bg-gold px-6 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
             >
               Construir o Meu Estágio

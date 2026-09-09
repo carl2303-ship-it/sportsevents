@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   ),
   title: "SportsEvents.app — Turismo e Estágios Desportivos Ibéricos",
   description:
-    "A Plataforma Ibérica de Turismo e Estágios Desportivos. Experiências de alto rendimento em Padel e Futebol em Portugal e Espanha.",
+    "A Plataforma Ibérica de Turismo e Estágios Desportivos. Experiências de alto rendimento em Padel em Portugal e Espanha.",
   icons: {
     icon: [{ url: "/brand/icon.png", type: "image/png" }],
     apple: [{ url: "/brand/icon.png", type: "image/png" }],
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SportsEvents.app — Turismo e Estágios Desportivos Ibéricos",
     description:
-      "Experiências de alto rendimento em Padel e Futebol. Treino profissional, competição local e alojamento premium.",
+      "Experiências de alto rendimento em Padel. Treino profissional, competição local e alojamento premium.",
     images: [{ url: "/brand/logo.png" }],
   },
 };

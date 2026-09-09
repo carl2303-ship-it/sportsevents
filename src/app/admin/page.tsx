@@ -378,6 +378,11 @@ export default function EnterpriseBackoffice() {
                         <div className="text-[10px] text-slate-400">
                           {l.company_or_club || l.client_email}
                         </div>
+                        {l.source === 'stage_builder' && (
+                          <span className="mt-1 inline-block text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/25">
+                            App Builder
+                          </span>
+                        )}
                       </td>
                       <td className="p-3 font-semibold text-cyan-400">
                         {l.sports?.name || 'Padel'}

@@ -9,9 +9,9 @@ type BrandLogoProps = {
   priority?: boolean
 }
 
-/** Intrinsic pixel sizes of /brand assets (cropped logo is ~16:9). */
+/** Intrinsic pixel sizes of /brand assets. */
 const sizes = {
-  full: { width: 962, height: 542, className: 'h-12 w-auto' },
+  full: { width: 1400, height: 742, className: 'h-12 w-auto' },
   mark: { width: 128, height: 128, className: 'h-10 w-10' },
 } as const
 
@@ -33,7 +33,8 @@ export function BrandLogo({
       width={size.width}
       height={size.height}
       priority={priority}
-      sizes="(max-width: 768px) 96vw, 900px"
+      sizes="(max-width: 768px) 96vw, 1100px"
+      quality={95}
       className={cn(size.className, 'object-contain', className)}
     />
   )

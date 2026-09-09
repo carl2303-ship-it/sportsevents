@@ -112,11 +112,12 @@ export default async function EventoDetailPage({
             </Section>
           )}
 
-          <Section title="Campos">
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <Stat label="Padel" value={event.courts_padel || 0} icon={<Trophy className="w-4 h-4" />} />
-              <Stat label="Futebol" value={event.courts_football || 0} icon={<Building2 className="w-4 h-4" />} />
-              <Stat label="Outros" value={event.courts_other || 0} icon={<Building2 className="w-4 h-4" />} />
+          <Section title="Campos de padel">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-center max-w-md">
+              <Stat label="Campos padel" value={event.courts_padel || 0} icon={<Trophy className="w-4 h-4" />} />
+              {(event.courts_other || 0) > 0 && (
+                <Stat label="Outros" value={event.courts_other || 0} icon={<Building2 className="w-4 h-4" />} />
+              )}
             </div>
             {event.courts_notes && (
               <p className="mt-3 text-xs text-slate-400">{event.courts_notes}</p>

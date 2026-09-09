@@ -16,7 +16,7 @@ const highlights = [
   },
   {
     title: 'A Força da Comunidade Catalã',
-    text: 'Barcelona tem uma das maiores e mais competitivas comunidades de Padel e Futebol da Europa. As suas tardes serão passadas a medir forças com clubes locais apaixonados e altamente táticos.',
+    text: 'Barcelona tem uma das maiores e mais competitivas comunidades de Padel da Europa. As suas tardes serão passadas a medir forças com clubes locais apaixonados e altamente táticos.',
   },
   {
     title: 'O Pós-Match Cosmopolita',

@@ -6,7 +6,7 @@ import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 export const metadata: Metadata = {
   title: 'Algarve Hub — SportsEvents.app',
   description:
-    'Algarve Hub: onde o desporto encontra a natureza. Flagship no Amendoeira Golf Resort — padel, futebol e hospitalidade portuguesa.',
+    'Algarve Hub: onde o desporto encontra a natureza. Flagship no Amendoeira Golf Resort — padel e hospitalidade portuguesa.',
 }
 
 const highlights = [
@@ -89,7 +89,7 @@ export default function AlgarvePage() {
             Algarve foi desenhado para grupos que exigem excelência. Com
             operações centralizadas, o seu grupo não perde tempo em
             deslocações. Do seu apartamento ou moradia de luxo até ao campo de
-            Padel ou ao relvado FIFA, são apenas uns passos.
+            Padel, são apenas uns passos.
           </p>
         </div>
       </section>

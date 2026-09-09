@@ -66,6 +66,9 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
           <Link href="/eventos" className="hover:text-app-white transition-colors">
             Eventos
           </Link>
+          <Link href="/construir" className="hover:text-app-white transition-colors">
+            Construir Estágio
+          </Link>
           <Link href="/#builder" className="hover:text-app-white transition-colors">
             Orçamento
           </Link>
@@ -121,6 +124,9 @@ export function SiteFooter() {
             </Link>
             <Link href="/quem-somos" className="hover:text-cyan">
               Quem Somos
+            </Link>
+            <Link href="/construir" className="hover:text-cyan">
+              Construir Estágio
             </Link>
             <Link href="/eventos" className="hover:text-cyan">
               Eventos

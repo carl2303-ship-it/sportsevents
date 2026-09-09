@@ -120,7 +120,7 @@ export default function QuemSomosPage() {
             e gerir o seu camp em poucos cliques.
           </p>
           <Link
-            href="/eventos"
+            href="/construir"
             className="mt-10 inline-flex rounded-full bg-gold px-6 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
           >
             Construir o Meu Estágio

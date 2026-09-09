@@ -69,8 +69,8 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
           <Link href="/construir" className="hover:text-app-white transition-colors">
             Construir Estágio
           </Link>
-          <Link href="/#builder" className="hover:text-app-white transition-colors">
-            Orçamento
+          <Link href="/contacto" className="hover:text-app-white transition-colors">
+            Contactos
           </Link>
         </nav>
 
@@ -106,36 +106,96 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
 export function SiteFooter() {
   return (
     <footer className="border-t border-white/10 px-5 md:px-10 py-12 text-xs text-app-white/45 bg-navy">
-      <div className="mx-auto max-w-7xl flex flex-col sm:flex-row flex-wrap items-center justify-between gap-6">
-        <BrandLogo
-          variant="full"
-          className="h-16 w-auto sm:h-20 md:h-24 drop-shadow-md"
-        />
-        <div className="flex flex-col sm:items-end gap-2 text-center sm:text-right">
-          <div className="flex flex-wrap justify-center sm:justify-end gap-4 text-sm text-app-white/60">
-            <Link href="/destinos/algarve" className="hover:text-cyan">
-              Algarve
-            </Link>
-            <Link href="/destinos/barcelona" className="hover:text-cyan">
-              Barcelona
-            </Link>
-            <Link href="/destinos/marbella" className="hover:text-cyan">
-              Marbella
-            </Link>
-            <Link href="/quem-somos" className="hover:text-cyan">
-              Quem Somos
-            </Link>
-            <Link href="/construir" className="hover:text-cyan">
-              Construir Estágio
-            </Link>
-            <Link href="/eventos" className="hover:text-cyan">
-              Eventos
-            </Link>
-          </div>
-          <span className="text-sm">
-            Portugal (Algarve) · España (Barcelona · Marbella)
-          </span>
+      <div className="mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="space-y-4">
+          <BrandLogo
+            variant="full"
+            className="h-16 w-auto sm:h-20 md:h-24 drop-shadow-md"
+          />
+          <p className="text-sm text-app-white/55 max-w-xs">
+            Plataforma ibérica de estágios de padel — Algarve, Barcelona e
+            Marbella.
+          </p>
+          <Link
+            href="/contacto"
+            className="inline-flex text-sm font-semibold text-cyan hover:underline"
+          >
+            Formulário de contacto →
+          </Link>
         </div>
+
+        <div className="space-y-3 text-sm">
+          <p className="text-[10px] uppercase tracking-wider text-app-white/40 font-bold">
+            Contactos
+          </p>
+          <p>
+            <a
+              href="mailto:info@sportsevents.app"
+              className="text-app-white/75 hover:text-cyan"
+            >
+              info@sportsevents.app
+            </a>
+          </p>
+          <p className="text-app-white/75">
+            POR{' '}
+            <a href="tel:+351969365059" className="hover:text-cyan">
+              +351 969 365 059
+            </a>
+          </p>
+          <p className="text-app-white/75">
+            ESP{' '}
+            <a href="tel:+34631699818" className="hover:text-cyan">
+              +34 631 699 818
+            </a>
+          </p>
+        </div>
+
+        <div className="space-y-4 text-sm">
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-app-white/40 font-bold">
+              Morada Algarve
+            </p>
+            <p className="mt-1 text-app-white/75 leading-relaxed">
+              ADV Lote 1 Fração G
+              <br />
+              8200-112 Albufeira
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-app-white/40 font-bold">
+              Morada Barcelona
+            </p>
+            <p className="mt-1 text-app-white/75 leading-relaxed">
+              Calle Mallorca 535B
+              <br />
+              08026 Barcelona
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl mt-10 pt-6 border-t border-white/10 flex flex-wrap gap-4 justify-between text-[11px] text-app-white/40">
+        <div className="flex flex-wrap gap-4">
+          <Link href="/destinos/algarve" className="hover:text-cyan">
+            Algarve
+          </Link>
+          <Link href="/destinos/barcelona" className="hover:text-cyan">
+            Barcelona
+          </Link>
+          <Link href="/destinos/marbella" className="hover:text-cyan">
+            Marbella
+          </Link>
+          <Link href="/quem-somos" className="hover:text-cyan">
+            Quem Somos
+          </Link>
+          <Link href="/construir" className="hover:text-cyan">
+            Construir Estágio
+          </Link>
+          <Link href="/contacto" className="hover:text-cyan">
+            Contactos
+          </Link>
+        </div>
+        <span>© SportsEvents.app</span>
       </div>
     </footer>
   )

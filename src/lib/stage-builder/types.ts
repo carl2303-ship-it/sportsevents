@@ -141,5 +141,6 @@ export const BUILDER_STEPS = [
   { id: 'grupo', label: 'Grupo' },
   { id: 'programa', label: 'Programa' },
   { id: 'hospitality', label: 'Hospitality' },
+  { id: 'resumo', label: 'Resumo' },
   { id: 'contacto', label: 'Contacto' },
 ] as const

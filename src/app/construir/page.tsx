@@ -43,7 +43,7 @@ export default function ConstruirEstagioPage() {
   }
 
   function canNext() {
-    if (step === 4) {
+    if (step === 5) {
       return Boolean(config.clientName.trim() && config.clientEmail.trim())
     }
     return true
@@ -126,8 +126,7 @@ export default function ConstruirEstagioPage() {
               </div>
             </div>
           ) : (
-            <div className="mt-10 grid grid-cols-1 lg:grid-cols-5 gap-8">
-              <div className="lg:col-span-3 space-y-6">
+            <div className="mt-10 max-w-3xl mx-auto space-y-6">
                 {/* Steps */}
                 <div className="flex flex-wrap gap-2">
                   {BUILDER_STEPS.map((s, i) => (
@@ -345,6 +344,68 @@ export default function ConstruirEstagioPage() {
 
                   {step === 4 && (
                     <>
+                      <SectionTitle title="Resumo do estágio" />
+                      <div className="rounded-2xl border border-gold/30 bg-gradient-to-b from-gold/10 to-transparent p-5 md:p-6 space-y-4">
+                        <p className="text-[10px] uppercase tracking-wider text-gold font-bold">
+                          As tuas escolhas
+                        </p>
+                        <div className="text-[11px] text-app-white/65 space-y-1">
+                          <p>
+                            {HUB_OPTIONS.find((h) => h.value === config.hub)?.flag}{' '}
+                            {HUB_OPTIONS.find((h) => h.value === config.hub)?.label} ·
+                            Hotel {config.hotelStars}★ · {config.month}
+                          </p>
+                          <p>
+                            {config.players} jogadores
+                            {config.companions
+                              ? ` + ${config.companions} acompanhantes`
+                              : ''}{' '}
+                            · {config.nights} noites · {config.singleRooms} quarto(s)
+                            single
+                          </p>
+                          <p>
+                            {config.trainingHours}h treino · {config.matchHours}h jogo ·{' '}
+                            {config.mealPlan}
+                            {config.tournament ? ' · torneio' : ''}
+                            {config.airportTransfer ? ' · transfer' : ''}
+                          </p>
+                        </div>
+
+                        <div className="pt-3 border-t border-white/10 space-y-3">
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider text-app-white/55">
+                              Preço por jogador (duplo)
+                            </p>
+                            <p className="text-3xl md:text-4xl font-black text-gold leading-none mt-1">
+                              {estimate.pricePerPlayerDouble.toLocaleString('pt-PT')} €
+                            </p>
+                          </div>
+                          <div className="flex justify-between items-end gap-3">
+                            <p className="text-sm text-app-white/60">
+                              Preço por jogador (single)
+                            </p>
+                            <p className="text-xl font-black text-white">
+                              {estimate.pricePerPlayerSingle.toLocaleString('pt-PT')} €
+                            </p>
+                          </div>
+                          <div className="flex justify-between items-end gap-3">
+                            <p className="text-sm text-app-white/60">Total do grupo</p>
+                            <p className="text-2xl font-black text-white">
+                              {estimate.grandTotal.toLocaleString('pt-PT')} €
+                            </p>
+                          </div>
+                        </div>
+
+                        <p className="text-[11px] text-app-white/55 pt-1">
+                          Estes valores são estimativos. O orçamento definitivo será
+                          comunicado por email após o envio do formulário.
+                        </p>
+                      </div>
+                    </>
+                  )}
+
+                  {step === 5 && (
+                    <>
                       <SectionTitle title="Os teus dados" />
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <label className="block space-y-1.5 sm:col-span-2">
@@ -393,11 +454,6 @@ export default function ConstruirEstagioPage() {
                           />
                         </label>
                       </div>
-                      <p className="text-[11px] text-app-white/45">
-                        Ao enviar, criamos um pedido no nosso CRM. A estimativa é
-                        indicativa — o orçamento final confirma hotel, campos e
-                        disponibilidade.
-                      </p>
                     </>
                   )}
 
@@ -437,60 +493,6 @@ export default function ConstruirEstagioPage() {
                     )}
                   </div>
                 </div>
-              </div>
-
-              {/* Live estimate */}
-              <aside className="lg:col-span-2 lg:sticky lg:top-24 h-fit space-y-4">
-                <div className="rounded-2xl border border-gold/30 bg-gradient-to-b from-gold/10 to-transparent p-5 md:p-6 space-y-4">
-                  <p className="text-[10px] uppercase tracking-wider text-gold font-bold">
-                    Estimativa indicativa
-                  </p>
-                  <div>
-                    <div className="text-3xl md:text-4xl font-black text-gold">
-                      {estimate.grandTotal.toLocaleString('pt-PT')} €
-                    </div>
-                    <p className="text-xs text-app-white/55 mt-1">total do grupo</p>
-                  </div>
-                  <div className="pt-3 border-t border-white/10 space-y-2 text-sm">
-                    <div className="flex justify-between gap-3">
-                      <span className="text-app-white/60">
-                        Por jogador · quarto duplo
-                      </span>
-                      <span className="font-black text-white">
-                        {estimate.pricePerPlayerDouble.toLocaleString('pt-PT')} €
-                      </span>
-                    </div>
-                    <div className="flex justify-between gap-3">
-                      <span className="text-app-white/60">
-                        Por jogador · quarto single
-                      </span>
-                      <span className="font-black text-white">
-                        {estimate.pricePerPlayerSingle.toLocaleString('pt-PT')} €
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-[11px] text-app-white/55 space-y-1">
-                  <p>
-                    {HUB_OPTIONS.find((h) => h.value === config.hub)?.flag}{' '}
-                    {HUB_OPTIONS.find((h) => h.value === config.hub)?.label} ·{' '}
-                    Hotel {config.hotelStars}★ · {config.month}
-                  </p>
-                  <p>
-                    {config.players} jogadores
-                    {config.companions
-                      ? ` + ${config.companions} acompanhantes`
-                      : ''}{' '}
-                    · {config.nights} noites · {config.singleRooms} single
-                  </p>
-                  <p>
-                    {config.trainingHours}h treino · {config.matchHours}h jogo ·{' '}
-                    {config.mealPlan}
-                    {config.tournament ? ' · torneio' : ''}
-                    {config.airportTransfer ? ' · transfer' : ''}
-                  </p>
-                </div>
-              </aside>
             </div>
           )}
         </div>

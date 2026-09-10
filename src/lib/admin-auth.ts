@@ -18,11 +18,52 @@ export async function requireStaffUser() {
     }
   }
 
+  const service = createServiceClient()
+  const client = service || supabase
+
+  const { data: staff } = await client
+    .from('staff_members')
+    .select('id, role, active, email, full_name')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!staff) {
+    const { count } = await client
+      .from('staff_members')
+      .select('id', { count: 'exact', head: true })
+    if ((count || 0) === 0) {
+      return {
+        error: null,
+        status: 200 as const,
+        user,
+        staff: null,
+        isBootstrap: true,
+      }
+    }
+    return {
+      error: 'Sem perfil de staff. Pede a um ADMIN para te adicionar.',
+      status: 403 as const,
+      user,
+      staff: null,
+      isBootstrap: false,
+    }
+  }
+
+  if (!staff.active) {
+    return {
+      error: 'Conta desativada.',
+      status: 403 as const,
+      user,
+      staff,
+      isBootstrap: false,
+    }
+  }
+
   return {
     error: null,
     status: 200 as const,
     user,
-    staff: null,
+    staff,
     isBootstrap: false,
   }
 }

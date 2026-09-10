@@ -11,6 +11,7 @@ import {
   Plus,
   BarChart3,
   Calculator,
+  IdCard,
   Settings,
 } from 'lucide-react'
 import RentabilidadeTorneios from '@/components/admin/RentabilidadeTorneios'
@@ -185,6 +186,12 @@ export default function EnterpriseBackoffice() {
           className="py-3 flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-amber-400 hover:border-amber-400/50 transition-all"
         >
           <Calculator className="w-4 h-4" /> Simulador Financeiro
+        </Link>
+        <Link
+          href="/admin/cartoes"
+          className="py-3 flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-amber-400 hover:border-amber-400/50 transition-all"
+        >
+          <IdCard className="w-4 h-4" /> Cartões digitais
         </Link>
         <Link
           href="/admin/definicoes"

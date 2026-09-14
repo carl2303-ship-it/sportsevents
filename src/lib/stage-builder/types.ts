@@ -38,7 +38,7 @@ export const HUB_OPTIONS: {
     value: 'ALG',
     label: 'Algarve',
     flag: '🇵🇹',
-    blurb: 'Flagship Amendoeira · sol e hospitalidade portuguesa',
+    blurb: 'Sol, padel e hospitalidade portuguesa',
   },
   {
     value: 'BCN',

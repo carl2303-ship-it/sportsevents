@@ -136,7 +136,7 @@ export default function Home() {
             <DestinationRow
               flag="🇵🇹"
               title="Algarve (Portugal)"
-              text="O nosso Flagship Hub no Amendoeira Golf Resort. Mais de 300 dias de sol, campos de classe mundial e a autêntica hospitalidade portuguesa."
+              text="O nosso hub em Portugal. Mais de 300 dias de sol, padel de alto nível e a autêntica hospitalidade algarvia."
               href="/destinos/algarve"
               image="https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=1600&q=80"
             />

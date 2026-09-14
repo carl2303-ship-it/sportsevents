@@ -96,7 +96,7 @@ Return ONLY valid JSON with this shape:
   "sv": { "subject": "...", "body": "..." },
   "da": { "subject": "...", "body": "..." }
 }
-Keep tone professional, warm and concise. Preserve meaning, brand name SportsEvents.app, Amendoeira Resort, and Padel Club Challenge. Keep line breaks in body.`,
+Keep tone professional, warm and concise. Preserve meaning, brand name SportsEvents.app and Padel Club Challenge. Keep line breaks in body.`,
         },
         {
           role: 'user',

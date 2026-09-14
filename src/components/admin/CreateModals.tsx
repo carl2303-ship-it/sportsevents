@@ -240,7 +240,7 @@ export function CreatePartnerModal({
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             placeholder={
               form.type === 'HOTEL'
-                ? 'Ex.: Amendoeira Resort'
+                ? 'Ex.: Resort Algarve'
                 : form.type === 'RESTAURANTE'
                   ? 'Ex.: Restaurante do Clube'
                   : form.type === 'TREINADOR'

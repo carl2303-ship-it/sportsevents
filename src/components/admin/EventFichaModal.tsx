@@ -427,7 +427,7 @@ export function EventFichaModal({
                   className={inputCls}
                   value={form.hotel_name || ''}
                   onChange={(e) => set('hotel_name', e.target.value)}
-                  placeholder="Amendoeira Resort"
+                  placeholder="Resort / hotel no Algarve"
                 />
               </Field>
               <Field label="Detalhes hotel">

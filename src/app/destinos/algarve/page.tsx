@@ -6,13 +6,13 @@ import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 export const metadata: Metadata = {
   title: 'Algarve Hub — SportsEvents.app',
   description:
-    'Algarve Hub: onde o desporto encontra a natureza. Flagship no Amendoeira Golf Resort — padel e hospitalidade portuguesa.',
+    'Algarve Hub: onde o desporto encontra a natureza. Estágios de padel, sol e hospitalidade portuguesa no sul de Portugal.',
 }
 
 const highlights = [
   {
-    title: 'O Amendoeira Golf Resort',
-    text: 'O nosso parceiro de alojamento oferece villas privadas exclusivas, campos de golfe de campeonato (Faldo e O\'Connor Jnr.), ginásio de alto rendimento e um Clubhouse deslumbrante para os nossos jantares de equipa.',
+    title: 'Alojamento Premium',
+    text: 'Selecionamos hotéis e resorts 4★ e 5★ no Algarve com villas ou apartamentos, ginásio e espaços comuns pensados para grupos desportivos.',
   },
   {
     title: 'A Comunidade Local',
@@ -61,15 +61,15 @@ export default function AlgarvePage() {
         </div>
         <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-10 pt-36 md:pt-44 pb-20">
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
-            🇵🇹 Portugal · Flagship Hub
+            🇵🇹 Portugal · Hub Algarve
           </p>
           <h1 className="mt-4 max-w-4xl font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight">
             Algarve Hub: Onde o Desporto Encontra a Natureza.
           </h1>
           <p className="mt-5 max-w-2xl text-base md:text-lg text-app-white/75">
-            O nosso quartel-general. Sede de operações no premiado Amendoeira
-            Golf Resort, oferecendo a transição perfeita entre o campo, a
-            piscina e o descanso.
+            O nosso hub em Portugal. Operações no Algarve com padel de alto
+            nível, sol generoso e a transição natural entre o campo, a costa e
+            o descanso.
           </p>
         </div>
       </section>
@@ -85,11 +85,10 @@ export default function AlgarvePage() {
             </h2>
           </div>
           <p className="text-app-white/70 text-base md:text-lg leading-relaxed">
-            Situado no coração do sul de Portugal, o nosso Flagship Hub no
-            Algarve foi desenhado para grupos que exigem excelência. Com
-            operações centralizadas, o seu grupo não perde tempo em
-            deslocações. Do seu apartamento ou moradia de luxo até ao campo de
-            Padel, são apenas uns passos.
+            Situado no coração do sul de Portugal, o nosso hub no Algarve foi
+            desenhado para grupos que exigem excelência. Com operações
+            centralizadas, o seu grupo não perde tempo em deslocações. Do seu
+            alojamento até ao campo de Padel, a logística fica connosco.
           </p>
         </div>
       </section>

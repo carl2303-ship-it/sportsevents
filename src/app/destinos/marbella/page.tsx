@@ -32,8 +32,8 @@ export default function MarbellaPage() {
       <section className="relative min-h-[70svh] overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=2000&q=80"
-            alt="Marbella Hub"
+            src="/destinos/marbella.jpg"
+            alt="Marbella Hub — campos de padel na Costa del Sol"
             fill
             priority
             className="object-cover"

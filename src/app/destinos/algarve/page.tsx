@@ -50,8 +50,8 @@ export default function AlgarvePage() {
       <section className="relative min-h-[70svh] overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=2000&q=80"
-            alt="Algarve Hub"
+            src="/destinos/algarve-hub.jpg"
+            alt="Algarve Hub — campos de padel"
             fill
             priority
             className="object-cover"

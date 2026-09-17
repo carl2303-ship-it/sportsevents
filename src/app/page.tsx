@@ -5,8 +5,7 @@ import Link from 'next/link'
 import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 import { BrandLogo } from '@/components/brand-logo'
 
-const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=2000&q=80'
+const HERO_IMAGE = '/home/hero.jpg'
 
 const formula = [
   {
@@ -138,14 +137,14 @@ export default function Home() {
               title="Algarve (Portugal)"
               text="O nosso hub em Portugal. Mais de 300 dias de sol, padel de alto nível e a autêntica hospitalidade algarvia."
               href="/destinos/algarve"
-              image="https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=1600&q=80"
+              image="/destinos/algarve-hub.jpg"
             />
             <DestinationRow
               flag="🇪🇸"
               title="Barcelona (Espanha)"
               text="O epicentro urbano do desporto e da inovação. Ideal para Corporate / Teambuilding, com a sofisticação Meliá e a energia cosmopolita da capital catalã."
               href="/destinos/barcelona"
-              image="https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1600&q=80"
+              image="/destinos/barcelona.jpg"
               reverse
             />
             <DestinationRow
@@ -153,7 +152,7 @@ export default function Home() {
               title="Marbella (Espanha)"
               text="A Meca do Padel Europeu. Luxo, alta competição e a energia inigualável da Costa del Sol com a garantia de qualidade Meliá Hotels."
               href="/destinos/marbella"
-              image="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=1600&q=80"
+              image="/destinos/marbella.jpg"
             />
           </div>
         </div>

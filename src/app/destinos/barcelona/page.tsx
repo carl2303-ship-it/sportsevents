@@ -50,8 +50,8 @@ export default function BarcelonaPage() {
       <section className="relative min-h-[70svh] overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=2000&q=80"
-            alt="Barcelona Hub"
+            src="/destinos/barcelona.jpg"
+            alt="Barcelona Hub — campos de padel"
             fill
             priority
             className="object-cover"

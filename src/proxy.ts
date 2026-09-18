@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import {
   LOCALE_COOKIE,
   LOCALE_HEADER,
+  localePrefixes,
   stripLocalePrefix,
   type Locale,
 } from '@/i18n/config'
@@ -30,33 +31,42 @@ function redirectStripped(
   return NextResponse.redirect(url)
 }
 
+function rewriteWithLocale(
+  request: NextRequest,
+  pathname: string,
+  locale: Locale
+): NextResponse {
+  const stripped = stripLocalePrefix(pathname)
+  if (stripped === '/admin' || stripped.startsWith('/admin/')) {
+    const url = request.nextUrl.clone()
+    url.pathname = stripped
+    return NextResponse.redirect(url)
+  }
+
+  const url = request.nextUrl.clone()
+  url.pathname = stripped
+
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set(LOCALE_HEADER, locale)
+
+  const response = NextResponse.rewrite(url, {
+    request: { headers: requestHeaders },
+  })
+  return applyLocaleHeaders(request, locale, response)
+}
+
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
-  // Legacy /en → redirect to unprefixed EN (default)
+  // Legacy /en → unprefixed English (default)
   if (pathname === '/en' || pathname.startsWith('/en/')) {
     return redirectStripped(request, pathname)
   }
 
-  // Portuguese URLs: /pt and /pt/... → rewrite to unprefixed path
-  if (pathname === '/pt' || pathname.startsWith('/pt/')) {
-    const stripped = stripLocalePrefix(pathname)
-    if (stripped === '/admin' || stripped.startsWith('/admin/')) {
-      const url = request.nextUrl.clone()
-      url.pathname = stripped
-      return NextResponse.redirect(url)
+  for (const code of localePrefixes) {
+    if (pathname === `/${code}` || pathname.startsWith(`/${code}/`)) {
+      return rewriteWithLocale(request, pathname, code)
     }
-
-    const url = request.nextUrl.clone()
-    url.pathname = stripped
-
-    const requestHeaders = new Headers(request.headers)
-    requestHeaders.set(LOCALE_HEADER, 'pt')
-
-    const response = NextResponse.rewrite(url, {
-      request: { headers: requestHeaders },
-    })
-    return applyLocaleHeaders(request, 'pt', response)
   }
 
   let supabaseResponse = NextResponse.next({
@@ -101,7 +111,6 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  // Refresh session / validate JWT — do not use getSession() for auth checks.
   const { data } = await supabase.auth.getClaims()
   const isAuthenticated = Boolean(data?.claims)
 

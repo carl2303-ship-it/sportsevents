@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { BrandLogo } from '@/components/brand-logo'
 import { CheckCircle2 } from 'lucide-react'
-import { withLocale } from '@/i18n/config'
+import { withLocale, numberLocaleFor } from '@/i18n/config'
 import { fillTemplate } from '@/i18n/dictionaries'
 import { useDictionary } from '@/i18n/use-locale'
 
@@ -14,7 +14,7 @@ function SuccessContent() {
   const sessionId = searchParams.get('session_id')
   const { locale, t } = useDictionary()
   const e = t.events
-  const numberLocale = locale === 'en' ? 'en-GB' : 'pt-PT'
+  const numberLocale = numberLocaleFor(locale)
   const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading')
   const [booking, setBooking] = useState<any>(null)
   const [message, setMessage] = useState('')

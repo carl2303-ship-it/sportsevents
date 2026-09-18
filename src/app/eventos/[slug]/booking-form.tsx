@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
+import { numberLocaleFor } from '@/i18n/config'
 import { fillTemplate } from '@/i18n/dictionaries'
 import { useDictionary } from '@/i18n/use-locale'
 
@@ -17,7 +18,7 @@ export function BookingForm({
 }) {
   const { locale, t } = useDictionary()
   const e = t.events
-  const numberLocale = locale === 'en' ? 'en-GB' : 'pt-PT'
+  const numberLocale = numberLocaleFor(locale)
   const [customerName, setCustomerName] = useState('')
   const [customerEmail, setCustomerEmail] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')

@@ -35,7 +35,7 @@ import {
   type HubPackageView,
   type PackageKey,
 } from '@/lib/hub-packages'
-import { withLocale } from '@/i18n/config'
+import { withLocale, numberLocaleFor } from '@/i18n/config'
 import { fillTemplate } from '@/i18n/dictionaries'
 import { useDictionary } from '@/i18n/use-locale'
 
@@ -67,7 +67,7 @@ export default function ConstruirEstagioPage() {
 function ConstruirEstagioClient() {
   const { locale, t } = useDictionary()
   const b = t.builder
-  const numberLocale = locale === 'en' ? 'en-GB' : 'pt-PT'
+  const numberLocale = numberLocaleFor(locale)
   const searchParams = useSearchParams()
   const [step, setStep] = useState(0)
   const [config, setConfig] = useState<StageBuilderConfig>(DEFAULT_STAGE_CONFIG)

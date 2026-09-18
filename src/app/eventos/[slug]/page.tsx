@@ -13,7 +13,7 @@ import {
   Users,
   Utensils,
 } from 'lucide-react'
-import { withLocale } from '@/i18n/config'
+import { withLocale, numberLocaleFor } from '@/i18n/config'
 import { fillTemplate, getDictionary } from '@/i18n/dictionaries'
 import { getLocale } from '@/i18n/get-locale'
 
@@ -27,7 +27,7 @@ export default async function EventoDetailPage({
   const { slug } = await params
   const locale = await getLocale()
   const t = getDictionary(locale).events
-  const numberLocale = locale === 'en' ? 'en-GB' : 'pt-PT'
+  const numberLocale = numberLocaleFor(locale)
   const supabase = await createClient()
 
   const { data: bySlug } = await supabase

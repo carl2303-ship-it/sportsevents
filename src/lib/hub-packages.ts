@@ -1,3 +1,5 @@
+import type { Locale } from '@/i18n/config'
+
 export type HubId = 'algarve' | 'barcelona' | 'marbella'
 export type PackageKey = 'weekend' | 'experience' | 'premium'
 
@@ -89,6 +91,9 @@ export type PackageLocaleFields = {
 
 export type PackageTranslations = {
   en?: PackageLocaleFields
+  es?: PackageLocaleFields
+  fr?: PackageLocaleFields
+  de?: PackageLocaleFields
 }
 
 export type HubPackageView = {
@@ -184,19 +189,25 @@ function num(v: number | string | null | undefined): number {
 
 export function rowToView(
   row: HubPackageRow,
-  locale: 'pt' | 'en' = 'en'
+  locale: Locale = 'en'
 ): HubPackageView {
   const dest = row.destinations
-  const en = row.translations?.en
-  const useEn = locale === 'en' && Boolean(en)
+  const localized =
+    locale === 'pt'
+      ? null
+      : (row.translations?.[locale as keyof PackageTranslations] as
+          | PackageLocaleFields
+          | undefined) ||
+        row.translations?.en
+  const useLoc = Boolean(localized)
 
   return {
     id: row.id,
     packageKey: row.package_key,
-    name: (useEn && en?.name) || row.name,
-    duration: (useEn && en?.duration) || row.duration,
-    schedule: (useEn && en?.schedule) || row.schedule,
-    concept: (useEn && en?.concept) || row.concept,
+    name: (useLoc && localized?.name) || row.name,
+    duration: (useLoc && localized?.duration) || row.duration,
+    schedule: (useLoc && localized?.schedule) || row.schedule,
+    concept: (useLoc && localized?.concept) || row.concept,
     featured: row.featured,
     courtHours: row.court_hours,
     coachHours: row.coach_hours,
@@ -204,8 +215,8 @@ export function rowToView(
     tournamentHours: row.tournament_hours,
     nights: row.nights,
     itinerary:
-      useEn && Array.isArray(en?.itinerary)
-        ? en!.itinerary!
+      useLoc && Array.isArray(localized?.itinerary)
+        ? localized!.itinerary!
         : Array.isArray(row.itinerary)
           ? row.itinerary
           : [],
@@ -217,17 +228,19 @@ export function rowToView(
       fullDouble: num(row.price_full_double),
       fullSingle: num(row.price_full_single),
     },
-    airportLabel: (useEn && en?.airport_label) || row.airport_label || '',
-    localNetwork: (useEn && en?.local_network) || row.local_network || '',
+    airportLabel:
+      (useLoc && localized?.airport_label) || row.airport_label || '',
+    localNetwork:
+      (useLoc && localized?.local_network) || row.local_network || '',
     inclusions:
-      useEn && Array.isArray(en?.inclusions)
-        ? en!.inclusions!
+      useLoc && Array.isArray(localized?.inclusions)
+        ? localized!.inclusions!
         : Array.isArray(row.inclusions)
           ? row.inclusions
           : [],
     routine:
-      useEn && Array.isArray(en?.routine)
-        ? en!.routine!
+      useLoc && Array.isArray(localized?.routine)
+        ? localized!.routine!
         : Array.isArray(row.routine)
           ? row.routine
           : [],

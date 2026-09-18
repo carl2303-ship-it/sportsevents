@@ -13,9 +13,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function TermosPage() {
   const locale = await getLocale()
-  const t = getDictionary(locale).terms
-  const privacyLabel =
-    locale === 'en' ? 'Privacy Policy' : 'Política de Privacidade'
+  const dict = getDictionary(locale)
+  const t = dict.terms
+  const privacyLabel = dict.privacy.title
 
   return (
     <div className="min-h-screen bg-navy text-app-white">
@@ -37,8 +37,16 @@ export default async function TermosPage() {
               <h2 className="text-lg font-bold text-white">{section.title}</h2>
               {'paragraphs' in section &&
                 section.paragraphs?.map((p) => {
-                  if (p.includes('Política de Privacidade') || p.includes('Privacy Policy')) {
-                    const parts = p.split(/Política de Privacidade|Privacy Policy/)
+                  const privacyTitles = [
+                    'Política de Privacidade',
+                    'Privacy Policy',
+                    'Política de Privacidad',
+                    'Politique de confidentialité',
+                    'Datenschutzerklärung',
+                  ]
+                  const hit = privacyTitles.find((title) => p.includes(title))
+                  if (hit) {
+                    const parts = p.split(hit)
                     return (
                       <p key={p.slice(0, 40)}>
                         {parts[0]}

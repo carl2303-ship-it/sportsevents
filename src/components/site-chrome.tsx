@@ -12,8 +12,14 @@ import {
 } from '@/i18n/config'
 import { useDictionary } from '@/i18n/use-locale'
 
-const activeLanguages: Locale[] = ['en', 'pt']
-const languageLabels: Record<Locale, string> = { en: 'EN', pt: 'PT' }
+const activeLanguages: Locale[] = ['en', 'pt', 'es', 'fr', 'de']
+const languageLabels: Record<Locale, string> = {
+  en: 'EN',
+  pt: 'PT',
+  es: 'ES',
+  fr: 'FR',
+  de: 'DE',
+}
 
 function LocaleSwitcher() {
   const pathname = usePathname() || '/'

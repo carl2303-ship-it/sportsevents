@@ -1,23 +1,56 @@
-export const locales = ['en', 'pt'] as const
+export const locales = ['en', 'pt', 'es', 'fr', 'de'] as const
 export type Locale = (typeof locales)[number]
 /** Inglês é a língua principal (URLs sem prefixo). */
 export const defaultLocale: Locale = 'en'
 export const LOCALE_HEADER = 'x-locale'
 export const LOCALE_COOKIE = 'NEXT_LOCALE'
 
+/** Prefixos de URL para locales que não são o default. */
+export const localePrefixes: Exclude<Locale, typeof defaultLocale>[] = [
+  'pt',
+  'es',
+  'fr',
+  'de',
+]
+
 export function isLocale(value: string | null | undefined): value is Locale {
-  return value === 'pt' || value === 'en'
+  return (
+    value === 'en' ||
+    value === 'pt' ||
+    value === 'es' ||
+    value === 'fr' ||
+    value === 'de'
+  )
 }
 
-/** Detecta locale a partir do pathname (`/pt/...` = português; resto = inglês). */
+export function numberLocaleFor(locale: Locale): string {
+  switch (locale) {
+    case 'pt':
+      return 'pt-PT'
+    case 'es':
+      return 'es-ES'
+    case 'fr':
+      return 'fr-FR'
+    case 'de':
+      return 'de-DE'
+    default:
+      return 'en-GB'
+  }
+}
+
+/** Detecta locale a partir do pathname (`/pt|es|fr|de/...`; resto = inglês). */
 export function localeFromPathname(pathname: string): Locale {
-  if (pathname === '/pt' || pathname.startsWith('/pt/')) return 'pt'
+  for (const code of localePrefixes) {
+    if (pathname === `/${code}` || pathname.startsWith(`/${code}/`)) {
+      return code
+    }
+  }
   return 'en'
 }
 
-/** Remove o prefixo de locale (`/pt` ou legado `/en`). */
+/** Remove prefixos de locale (`/pt|/es|/fr|/de` ou legado `/en`). */
 export function stripLocalePrefix(pathname: string): string {
-  for (const prefix of ['/pt', '/en'] as const) {
+  for (const prefix of ['/pt', '/es', '/fr', '/de', '/en'] as const) {
     if (pathname === prefix) return '/'
     if (pathname.startsWith(`${prefix}/`)) {
       const rest = pathname.slice(prefix.length)
@@ -28,7 +61,7 @@ export function stripLocalePrefix(pathname: string): string {
 }
 
 /**
- * Prefixa o path com `/pt` quando o locale não é o default (EN).
+ * Prefixa o path com `/{locale}` quando não é o default (EN).
  * EN fica sem prefixo.
  */
 export function withLocale(pathname: string, locale: Locale): string {
@@ -39,8 +72,8 @@ export function withLocale(pathname: string, locale: Locale): string {
     locale === defaultLocale
       ? normalized
       : normalized === '/'
-        ? '/pt'
-        : `/pt${normalized}`
+        ? `/${locale}`
+        : `/${locale}${normalized}`
   if (query) localized += `?${query}`
   return localized
 }

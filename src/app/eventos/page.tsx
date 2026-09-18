@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { BrandLogo } from '@/components/brand-logo'
 import { Calendar, MapPin } from 'lucide-react'
-import { withLocale } from '@/i18n/config'
+import { withLocale, numberLocaleFor } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { getLocale } from '@/i18n/get-locale'
 
@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 export default async function EventosPage() {
   const locale = await getLocale()
   const t = getDictionary(locale).events
-  const numberLocale = locale === 'en' ? 'en-GB' : 'pt-PT'
+  const numberLocale = numberLocaleFor(locale)
   const supabase = await createClient()
   const { data: events } = await supabase
     .from('events')

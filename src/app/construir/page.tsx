@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
   ArrowLeft,
   ArrowRight,
@@ -23,23 +24,124 @@ import {
   MEAL_OPTIONS,
   MONTH_OPTIONS,
   type StageBuilderConfig,
+  type StageHub,
 } from '@/lib/stage-builder/types'
+import {
+  formatEuro,
+  HUB_CODE_TO_ID,
+  HUB_ID_TO_CODE,
+  lowestAvailablePrice,
+  type HubId,
+  type HubPackageView,
+  type PackageKey,
+} from '@/lib/hub-packages'
+
+function hubIdFromQuery(raw: string | null): StageHub | null {
+  if (!raw) return null
+  const lower = raw.toLowerCase()
+  if (lower === 'algarve' || lower === 'alg') return 'ALG'
+  if (lower === 'barcelona' || lower === 'bcn') return 'BCN'
+  if (lower === 'marbella' || lower === 'mar' || lower === 'mrb') return 'MAR'
+  if (raw === 'ALG' || raw === 'BCN' || raw === 'MAR') return raw
+  return null
+}
 
 export default function ConstruirEstagioPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-navy text-app-white flex items-center justify-center text-sm text-app-white/60">
+          A carregar construtor…
+        </div>
+      }
+    >
+      <ConstruirEstagioClient />
+    </Suspense>
+  )
+}
+
+function ConstruirEstagioClient() {
+  const searchParams = useSearchParams()
   const [step, setStep] = useState(0)
   const [config, setConfig] = useState<StageBuilderConfig>(DEFAULT_STAGE_CONFIG)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
   const [leadId, setLeadId] = useState<string | null>(null)
+  const [packages, setPackages] = useState<HubPackageView[]>([])
+  const [selectedPackageKey, setSelectedPackageKey] = useState<PackageKey | null>(
+    null
+  )
+  const [bootstrapped, setBootstrapped] = useState(false)
 
   const estimate = useMemo(() => estimateStage(config), [config])
+
+  const hubPackages = useMemo(() => {
+    const hubId = HUB_CODE_TO_ID[config.hub] as HubId | undefined
+    if (!hubId) return []
+    return packages.filter(
+      (p) => p.destinationCode === HUB_ID_TO_CODE[hubId] || HUB_CODE_TO_ID[p.destinationCode] === hubId
+    )
+  }, [packages, config.hub])
+
+  useEffect(() => {
+    fetch('/api/packages')
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data.packages)) setPackages(data.packages)
+      })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (bootstrapped || packages.length === 0) return
+    const hub = hubIdFromQuery(searchParams.get('hub'))
+    const pkgKey = searchParams.get('package') as PackageKey | null
+    if (hub) {
+      setConfig((c) => ({ ...c, hub }))
+    }
+    if (hub && pkgKey) {
+      const hubId = HUB_CODE_TO_ID[hub]
+      const match = packages.find(
+        (p) =>
+          p.packageKey === pkgKey &&
+          (p.destinationCode === hub ||
+            HUB_CODE_TO_ID[p.destinationCode] === hubId)
+      )
+      if (match) {
+        applyPackageToConfig(match)
+        setSelectedPackageKey(match.packageKey)
+        setStep(1)
+      }
+    }
+    setBootstrapped(true)
+  }, [packages, searchParams, bootstrapped])
 
   function patch<K extends keyof StageBuilderConfig>(
     key: K,
     value: StageBuilderConfig[K]
   ) {
     setConfig((c) => ({ ...c, [key]: value }))
+  }
+
+  function applyPackageToConfig(pkg: HubPackageView) {
+    const hub =
+      (Object.entries(HUB_ID_TO_CODE).find(
+        ([, code]) => code === pkg.destinationCode
+      )?.[0] as HubId | undefined) || HUB_CODE_TO_ID[pkg.destinationCode]
+    const stageHub: StageHub =
+      hub === 'barcelona' ? 'BCN' : hub === 'marbella' ? 'MAR' : 'ALG'
+
+    setConfig((c) => ({
+      ...c,
+      hub: stageHub,
+      nights: pkg.nights || c.nights,
+      trainingHours: pkg.coachHours || c.trainingHours,
+      matchHours: pkg.localMatchHours || c.matchHours,
+      tournament: pkg.tournamentHours > 0,
+      airportTransfer: true,
+    }))
+    setSelectedPackageKey(pkg.packageKey)
   }
 
   function canNext() {
@@ -56,7 +158,10 @@ export default function ConstruirEstagioPage() {
       const res = await fetch('/api/stage-builder/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ config }),
+        body: JSON.stringify({
+          config,
+          packageKey: selectedPackageKey,
+        }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -85,8 +190,9 @@ export default function ConstruirEstagioPage() {
             Construir o Meu Estágio
           </h1>
           <p className="mt-3 max-w-2xl text-app-white/65 text-sm md:text-base">
-            Configura o teu camp de padel em minutos. Recebes uma estimativa
-            indicativa e a nossa equipa confirma o orçamento final.
+            Escolhe um pacote pronto ou configura o teu camp à medida. Recebes
+            uma estimativa indicativa e a nossa equipa confirma o orçamento
+            final.
           </p>
 
           {done ? (
@@ -127,7 +233,6 @@ export default function ConstruirEstagioPage() {
             </div>
           ) : (
             <div className="mt-10 max-w-3xl mx-auto space-y-6">
-                {/* Steps */}
                 <div className="flex flex-wrap gap-2">
                   {BUILDER_STEPS.map((s, i) => (
                     <button
@@ -156,12 +261,62 @@ export default function ConstruirEstagioPage() {
                           <ChoiceCard
                             key={h.value}
                             active={config.hub === h.value}
-                            onClick={() => patch('hub', h.value)}
+                            onClick={() => {
+                              patch('hub', h.value)
+                              setSelectedPackageKey(null)
+                            }}
                             title={`${h.flag} ${h.label}`}
                             blurb={h.blurb}
                           />
                         ))}
                       </div>
+
+                      {hubPackages.length > 0 ? (
+                        <>
+                          <SectionTitle title="Pacotes prontos deste hub" />
+                          <p className="text-xs text-app-white/50 -mt-2">
+                            Pré-preenche noites, horas de treino/jogo e torneio.
+                            Podes ajustar nos passos seguintes.
+                          </p>
+                          <div className="grid grid-cols-1 gap-3">
+                            {hubPackages.map((pkg) => (
+                              <button
+                                key={pkg.id}
+                                type="button"
+                                onClick={() => applyPackageToConfig(pkg)}
+                                className={`text-left rounded-xl border px-4 py-3 transition ${
+                                  selectedPackageKey === pkg.packageKey
+                                    ? 'border-gold/50 bg-gold/10'
+                                    : 'border-white/10 bg-navy/40 hover:border-cyan/35'
+                                }`}
+                              >
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                  <div>
+                                    <p className="text-sm font-bold text-white">
+                                      {pkg.name}
+                                      {pkg.featured ? (
+                                        <span className="ml-2 text-[10px] text-gold uppercase tracking-wider">
+                                          Estrela
+                                        </span>
+                                      ) : null}
+                                    </p>
+                                    <p className="text-[11px] text-app-white/50 mt-0.5">
+                                      {pkg.duration} · {pkg.courtHours}h campo
+                                      {lowestAvailablePrice(pkg.prices) != null
+                                        ? ` · desde ${formatEuro(lowestAvailablePrice(pkg.prices)!)}`
+                                        : ''}
+                                    </p>
+                                  </div>
+                                  <span className="text-[11px] font-bold text-cyan">
+                                    Usar este
+                                  </span>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      ) : null}
+
                       <SectionTitle title="Tipo de grupo" />
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {GROUP_TYPE_OPTIONS.map((g) => (

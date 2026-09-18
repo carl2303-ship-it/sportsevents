@@ -142,7 +142,7 @@ export default function Home() {
             <DestinationRow
               flag="🇪🇸"
               title="Barcelona (Espanha)"
-              text="O epicentro urbano do desporto e da inovação. Ideal para Corporate / Teambuilding, com a sofisticação Meliá e a energia cosmopolita da capital catalã."
+              text="O epicentro urbano do desporto e da inovação. Ideal para Corporate / Teambuilding, com a energia cosmopolita da capital catalã."
               href="/destinos/barcelona"
               image="/destinos/barcelona.jpg"
               reverse
@@ -150,7 +150,7 @@ export default function Home() {
             <DestinationRow
               flag="🇪🇸"
               title="Marbella (Espanha)"
-              text="A Meca do Padel Europeu. Luxo, alta competição e a energia inigualável da Costa del Sol com a garantia de qualidade Meliá Hotels."
+              text="A Meca do Padel Europeu. Luxo, alta competição e a energia inigualável da Costa del Sol."
               href="/destinos/marbella"
               image="/destinos/marbella.jpg"
             />

@@ -98,9 +98,8 @@ export default function QuemSomosPage() {
               <p className="mt-4 text-sm md:text-base text-app-white/65 leading-relaxed">
                 Conduzimos a expansão internacional e a gestão tecnológica,
                 criando pontes com clubes de toda a Europa Central, Escandinávia
-                e Reino Unido. Gerimos as parcerias de topo (como a Meliá) para
-                garantir que a sua equipa tem sempre as melhores tarifas e
-                condições.
+                e Reino Unido. Negociamos parcerias de topo para garantir que a
+                sua equipa tem sempre as melhores tarifas e condições.
               </p>
             </div>
           </div>

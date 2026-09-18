@@ -1,12 +1,13 @@
 import Image from 'next/image'
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SiteFooter, SiteHeader } from '@/components/site-chrome'
+import { HubPackagesSection } from '@/components/hub-packages'
+import { fetchPublishedPackagesForHub } from '@/lib/hub-packages.server'
 
 export const metadata: Metadata = {
   title: 'Algarve Hub — SportsEvents.app',
   description:
-    'Algarve Hub: onde o desporto encontra a natureza. Estágios de padel, sol e hospitalidade portuguesa no sul de Portugal.',
+    'Algarve Hub: onde o desporto encontra a natureza. Pacotes Padel Weekend, Experience e Premium VIP — treino, jogo local e transfers Faro.',
 }
 
 const highlights = [
@@ -16,7 +17,7 @@ const highlights = [
   },
   {
     title: 'A Comunidade Local',
-    text: 'Através da nossa forte rede algarvia, garantimos que as suas tardes são passadas a competir contra jogadores da região, integrando a cultura desportiva local.',
+    text: 'Através da nossa forte rede algarvia e do ecossistema Padel One / APC, as tardes são passadas a competir contra jogadores da região, nivelados ao vosso escalão.',
   },
   {
     title: 'Conveniência Total',
@@ -24,25 +25,9 @@ const highlights = [
   },
 ]
 
-const packages = [
-  {
-    title: 'Padel Weekend',
-    days: '4 Dias',
-    text: 'A escapadinha tática ideal. 10 horas de padel num fim de semana prolongado.',
-  },
-  {
-    title: 'Padel Experience',
-    days: '5 Dias',
-    text: 'O nosso produto estrela. 14 horas de padel, torneio final e a imersão completa no lifestyle algarvio.',
-  },
-  {
-    title: 'Premium VIP Camp',
-    days: '6 Dias',
-    text: 'Para quem procura a derradeira experiência. 18 horas de campo, opção de clínica de golfe e serviço premium.',
-  },
-]
+export default async function AlgarvePage() {
+  const packages = await fetchPublishedPackagesForHub('algarve')
 
-export default function AlgarvePage() {
   return (
     <div className="min-h-screen bg-navy text-app-white">
       <SiteHeader transparent />
@@ -113,51 +98,14 @@ export default function AlgarvePage() {
         </div>
       </section>
 
-      <section className="px-5 md:px-10 py-16 md:py-24">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-extrabold">
-            Os Nossos Pacotes no Algarve
-          </h2>
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {packages.map((p) => (
-              <div
-                key={p.title}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-7"
-              >
-                <p className="text-[11px] font-bold uppercase tracking-wider text-gold">
-                  {p.days}
-                </p>
-                <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold">
-                  {p.title}
-                </h3>
-                <p className="mt-3 text-sm text-app-white/65 leading-relaxed">
-                  {p.text}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-12 flex flex-wrap gap-4">
-            <Link
-              href="/eventos"
-              className="inline-flex rounded-full bg-gold px-6 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
-            >
-              Ver eventos & reservar
-            </Link>
-            <Link
-              href="/destinos/barcelona"
-              className="inline-flex rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-app-white/80 hover:border-cyan/50 hover:text-cyan transition"
-            >
-              Explorar Barcelona →
-            </Link>
-            <Link
-              href="/destinos/marbella"
-              className="inline-flex rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-app-white/80 hover:border-cyan/50 hover:text-cyan transition"
-            >
-              Explorar Marbella →
-            </Link>
-          </div>
-        </div>
-      </section>
+      <HubPackagesSection
+        hubId="algarve"
+        packages={packages}
+        otherLinks={[
+          { href: '/destinos/barcelona', label: 'Explorar Barcelona →' },
+          { href: '/destinos/marbella', label: 'Explorar Marbella →' },
+        ]}
+      />
 
       <SiteFooter />
     </div>

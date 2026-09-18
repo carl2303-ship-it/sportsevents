@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import RentabilidadeTorneios from '@/components/admin/RentabilidadeTorneios'
 import PartnersNetwork from '@/components/admin/PartnersNetwork'
+import { HubPackagesPanel } from '@/components/admin/HubPackagesPanel'
 import {
   CreatePartnerModal,
   CreateLeadModal,
@@ -28,6 +29,7 @@ import type { PartnerTypeValue } from '@/lib/partner-types'
 
 export default function EnterpriseBackoffice() {
   const [activeTab, setActiveTab] = useState<'kpis' | 'pipeline' | 'partners' | 'events' | 'roi'>('kpis')
+  const [eventsSubTab, setEventsSubTab] = useState<'packages' | 'dated'>('packages')
   const [leads, setLeads] = useState<any[]>([])
   const [partners, setPartners] = useState<any[]>([])
   const [events, setEvents] = useState<any[]>([])
@@ -435,16 +437,47 @@ export default function EnterpriseBackoffice() {
 
         {activeTab === 'events' && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center gap-3 flex-wrap">
+            <div className="flex justify-between items-start gap-3 flex-wrap">
               <div>
                 <h2 className="text-lg font-bold text-white">
                   Estágios & Eventos Operacionais
                 </h2>
                 <p className="text-xs text-slate-400">
-                  Fichas completas (hubs Algarve · Marbella · Barcelona) para
-                  publicar no site e receber reservas Stripe.
+                  Pacotes do catálogo (site + construtor) e edições datadas com
+                  Stripe.
                 </p>
               </div>
+              <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setEventsSubTab('packages')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    eventsSubTab === 'packages'
+                      ? 'bg-slate-800 text-white shadow'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Pacotes (catálogo)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEventsSubTab('dated')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    eventsSubTab === 'dated'
+                      ? 'bg-slate-800 text-white shadow'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Edições datadas
+                </button>
+              </div>
+            </div>
+
+            {eventsSubTab === 'packages' ? (
+              <HubPackagesPanel />
+            ) : (
+              <>
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => {
@@ -557,6 +590,8 @@ export default function EnterpriseBackoffice() {
                   </div>
                 ))}
               </div>
+            )}
+              </>
             )}
           </div>
         )}

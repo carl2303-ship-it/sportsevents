@@ -1,18 +1,19 @@
 import Image from 'next/image'
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SiteFooter, SiteHeader } from '@/components/site-chrome'
+import { HubPackagesSection } from '@/components/hub-packages'
+import { fetchPublishedPackagesForHub } from '@/lib/hub-packages.server'
 
 export const metadata: Metadata = {
   title: 'Marbella Hub — SportsEvents.app',
   description:
-    'Marbella Hub: a capital europeia do padel. Costa del Sol, Meliá Hotels e competição de alto nível.',
+    'Marbella Hub: a capital europeia do padel. Pacotes Padel Weekend, Experience e Premium VIP — Costa del Sol e transfers Málaga.',
 }
 
 const highlights = [
   {
-    title: 'Parceria Meliá Hotels',
-    text: 'Alojamento de prestígio com infraestruturas adaptadas para grupos corporativos e desportistas, garantindo um descanso absoluto após treinos intensos.',
+    title: 'Alojamento Premium',
+    text: 'Selecionamos alojamento de prestígio com infraestruturas adaptadas para grupos corporativos e desportistas, garantindo um descanso absoluto após treinos intensos.',
   },
   {
     title: 'A Elite do Padel',
@@ -24,7 +25,9 @@ const highlights = [
   },
 ]
 
-export default function MarbellaPage() {
+export default async function MarbellaPage() {
+  const packages = await fetchPublishedPackagesForHub('marbella')
+
   return (
     <div className="min-h-screen bg-navy text-app-white">
       <SiteHeader transparent />
@@ -50,8 +53,7 @@ export default function MarbellaPage() {
           </h1>
           <p className="mt-5 max-w-2xl text-base md:text-lg text-app-white/75">
             Jogue onde os profissionais jogam. A Costa del Sol oferece o cenário
-            mais vibrante, competitivo e luxuoso para o seu estágio desportivo,
-            com a excelência dos Meliá Hotels.
+            mais vibrante, competitivo e luxuoso para o seu estágio desportivo.
           </p>
         </div>
       </section>
@@ -93,29 +95,17 @@ export default function MarbellaPage() {
               </div>
             ))}
           </div>
-
-          <div className="mt-14 flex flex-wrap gap-4">
-            <Link
-              href="/eventos"
-              className="inline-flex rounded-full bg-gold px-6 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
-            >
-              Ver eventos & reservar
-            </Link>
-            <Link
-              href="/destinos/barcelona"
-              className="inline-flex rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-app-white/80 hover:border-cyan/50 hover:text-cyan transition"
-            >
-              Explorar Barcelona →
-            </Link>
-            <Link
-              href="/destinos/algarve"
-              className="inline-flex rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-app-white/80 hover:border-cyan/50 hover:text-cyan transition"
-            >
-              Explorar Algarve →
-            </Link>
-          </div>
         </div>
       </section>
+
+      <HubPackagesSection
+        hubId="marbella"
+        packages={packages}
+        otherLinks={[
+          { href: '/destinos/barcelona', label: 'Explorar Barcelona →' },
+          { href: '/destinos/algarve', label: 'Explorar Algarve →' },
+        ]}
+      />
 
       <SiteFooter />
     </div>

@@ -5,6 +5,11 @@ import { createClient } from '@/lib/supabase/client'
 import { filterHubDestinations, slugify } from '@/lib/hubs'
 import { Save, X } from 'lucide-react'
 import type { LookupOption } from '@/components/admin/CreateModals'
+import {
+  endDateFromNights,
+  packageToEventPrefill,
+  type HubPackageView,
+} from '@/lib/hub-packages'
 
 const inputCls =
   'w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50'
@@ -15,6 +20,7 @@ export type EventRow = {
   slug?: string | null
   sport_id?: string | null
   destination_id?: string | null
+  hub_package_id?: string | null
   start_date?: string
   end_date?: string
   group_size?: number
@@ -71,6 +77,7 @@ const emptyForm = (padelId = '', destId = ''): EventRow => ({
   slug: '',
   sport_id: padelId,
   destination_id: destId,
+  hub_package_id: null,
   start_date: '',
   end_date: '',
   group_size: 16,
@@ -125,6 +132,18 @@ export function EventFichaModal({
   )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [packages, setPackages] = useState<HubPackageView[]>([])
+  const [packagePick, setPackagePick] = useState('')
+  const [packageNights, setPackageNights] = useState(0)
+
+  useEffect(() => {
+    fetch('/api/admin/packages')
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data.packages)) setPackages(data.packages)
+      })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (!initial?.id) {
@@ -133,14 +152,57 @@ export function EventFichaModal({
         sport_id: f.sport_id || padelSport?.id || '',
         destination_id: f.destination_id || defaultDest,
       }))
+    } else if (initial.hub_package_id) {
+      setPackagePick(initial.hub_package_id)
     }
-  }, [initial?.id, padelSport?.id, defaultDest])
+  }, [initial?.id, initial?.hub_package_id, padelSport?.id, defaultDest])
+
+  const packagesForHub = useMemo(() => {
+    if (!form.destination_id) return packages
+    return packages.filter((p) => p.destinationId === form.destination_id)
+  }, [packages, form.destination_id])
+
+  function applyPackage(pkgId: string) {
+    const pkg = packages.find((p) => p.id === pkgId)
+    if (!pkg) return
+    const prefill = packageToEventPrefill(pkg)
+    setPackageNights(prefill.nights)
+    setForm((prev) => {
+      const next: EventRow = {
+        ...prev,
+        hub_package_id: prefill.hub_package_id,
+        title: prefill.title,
+        destination_id: prefill.destination_id,
+        short_description: prefill.short_description,
+        description: prefill.description,
+        program: prefill.program,
+        includes: prefill.includes,
+        highlights: prefill.highlights,
+        welcome_pack: prefill.welcome_pack,
+        sale_price_per_person: prefill.sale_price_per_person,
+        deposit_amount: prefill.deposit_amount,
+        slug: !prev.id
+          ? slugify(`${prefill.title}-${prev.start_date || 'edicao'}`)
+          : prev.slug,
+      }
+      if (prev.start_date && prefill.nights) {
+        next.end_date = endDateFromNights(prev.start_date, prefill.nights)
+      }
+      const pax = Number(next.max_participants || next.group_size || 0)
+      next.total_revenue = pax * Number(next.sale_price_per_person || 0)
+      return next
+    })
+    setPackagePick(pkgId)
+  }
 
   function set<K extends keyof EventRow>(key: K, value: EventRow[K]) {
     setForm((prev) => {
       const next = { ...prev, [key]: value }
       if (key === 'title' && !initial?.id) {
         next.slug = slugify(String(value || ''))
+      }
+      if (key === 'start_date' && packageNights > 0) {
+        next.end_date = endDateFromNights(String(value || ''), packageNights)
       }
       if (key === 'sale_price_per_person' || key === 'group_size' || key === 'max_participants') {
         const pax = Number(next.max_participants || next.group_size || 0)
@@ -175,6 +237,7 @@ export function EventFichaModal({
       slug,
       sport_id: form.sport_id || null,
       destination_id: form.destination_id,
+      hub_package_id: form.hub_package_id || null,
       start_date: form.start_date,
       end_date: form.end_date,
       group_size: Number(form.group_size) || 1,
@@ -242,6 +305,51 @@ export function EventFichaModal({
         </div>
 
         <div className="p-5 space-y-6">
+          <section className="rounded-xl border border-gold/30 bg-gold/5 p-4 space-y-3">
+            <div>
+              <h4 className="text-[11px] font-bold uppercase tracking-wider text-gold">
+                Importar pacote do catálogo
+              </h4>
+              <p className="text-[11px] text-slate-400 mt-1">
+                Preenche programa, includes, preços e hub. Depois só defines as
+                datas desta edição (a data de fim calcula-se pelas noites do
+                pacote).
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 items-end">
+              <Field label="Pacote">
+                <select
+                  className={inputCls}
+                  value={packagePick}
+                  onChange={(e) => {
+                    const id = e.target.value
+                    setPackagePick(id)
+                    if (id) applyPackage(id)
+                  }}
+                >
+                  <option value="">Sem pacote / manual…</option>
+                  {(form.destination_id ? packagesForHub : packages).map(
+                    (p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.destinationCode} · {p.name} (
+                        {p.duration || `${p.nights}N`})
+                      </option>
+                    )
+                  )}
+                </select>
+              </Field>
+              {packagePick ? (
+                <button
+                  type="button"
+                  onClick={() => applyPackage(packagePick)}
+                  className="h-9 px-3 rounded-xl border border-gold/40 text-[11px] font-bold text-gold hover:bg-gold/10"
+                >
+                  Reimportar
+                </button>
+              ) : null}
+            </div>
+          </section>
+
           <section className="space-y-3">
             <h4 className="text-[11px] font-bold uppercase tracking-wider text-cyan-400">
               1. Identificação & Hub

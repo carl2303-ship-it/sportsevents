@@ -1,18 +1,19 @@
 import Image from 'next/image'
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SiteFooter, SiteHeader } from '@/components/site-chrome'
+import { HubPackagesSection } from '@/components/hub-packages'
+import { fetchPublishedPackagesForHub } from '@/lib/hub-packages.server'
 
 export const metadata: Metadata = {
   title: 'Barcelona Hub — SportsEvents.app',
   description:
-    'Barcelona Hub: epicentro do desporto e da inovação. Corporate teambuilding, padel urbano e Meliá Hotels.',
+    'Barcelona Hub: epicentro do desporto e da inovação. Pacotes Padel Weekend, Experience e Premium VIP — corporate, padel urbano e El Prat.',
 }
 
 const highlights = [
   {
-    title: 'Parceria Meliá Hotels (Urban Premium)',
-    text: 'Alojamento de excelência no centro nevrálgico da cidade. Os hotéis Meliá em Barcelona oferecem as infraestruturas perfeitas para grupos corporativos, incluindo salas de reuniões modernas e espaços executivos para aliar trabalho e lazer.',
+    title: 'Alojamento Urban Premium',
+    text: 'Alojamento de excelência no centro nevrálgico da cidade, com infraestruturas pensadas para grupos corporativos — salas de reuniões modernas e espaços executivos para aliar trabalho e lazer.',
   },
   {
     title: 'A Força da Comunidade Catalã',
@@ -24,25 +25,9 @@ const highlights = [
   },
 ]
 
-const packages = [
-  {
-    title: 'Corporate Weekend',
-    nights: '3 Noites',
-    text: 'O formato ágil para empresas e executivos. Treino de manhã, reuniões ao início da tarde e confrontos locais ao final do dia.',
-  },
-  {
-    title: 'Urban Padel Experience',
-    nights: '4 Noites',
-    text: 'A imersão desportiva citadina. 14 horas de padel e tempo livre otimizado para explorar a cultura e gastronomia catalã.',
-  },
-  {
-    title: 'Premium VIP Camp',
-    nights: '5 Noites',
-    text: 'Alojamento executivo, jantares reservados nos melhores restaurantes da cidade e clínicas exclusivas com treinadores de topo.',
-  },
-]
+export default async function BarcelonaPage() {
+  const packages = await fetchPublishedPackagesForHub('barcelona')
 
-export default function BarcelonaPage() {
   return (
     <div className="min-h-screen bg-navy text-app-white">
       <SiteHeader transparent />
@@ -68,8 +53,8 @@ export default function BarcelonaPage() {
           </h1>
           <p className="mt-5 max-w-2xl text-base md:text-lg text-app-white/75">
             A energia de uma cidade cosmopolita aliada a uma cultura desportiva
-            de elite. A sua equipa no centro da ação, com o conforto e a
-            sofisticação da rede Meliá Hotels.
+            de elite. A sua equipa no centro da ação, com conforto e
+            sofisticação urbana.
           </p>
         </div>
       </section>
@@ -116,51 +101,14 @@ export default function BarcelonaPage() {
         </div>
       </section>
 
-      <section className="px-5 md:px-10 py-16 md:py-24">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-extrabold">
-            Os Nossos Pacotes em Barcelona
-          </h2>
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {packages.map((p) => (
-              <div
-                key={p.title}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-7"
-              >
-                <p className="text-[11px] font-bold uppercase tracking-wider text-gold">
-                  {p.nights}
-                </p>
-                <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold">
-                  {p.title}
-                </h3>
-                <p className="mt-3 text-sm text-app-white/65 leading-relaxed">
-                  {p.text}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-12 flex flex-wrap gap-4">
-            <Link
-              href="/eventos"
-              className="inline-flex rounded-full bg-gold px-6 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
-            >
-              Ver eventos & reservar
-            </Link>
-            <Link
-              href="/destinos/marbella"
-              className="inline-flex rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-app-white/80 hover:border-cyan/50 hover:text-cyan transition"
-            >
-              Explorar Marbella →
-            </Link>
-            <Link
-              href="/destinos/algarve"
-              className="inline-flex rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-app-white/80 hover:border-cyan/50 hover:text-cyan transition"
-            >
-              Explorar Algarve →
-            </Link>
-          </div>
-        </div>
-      </section>
+      <HubPackagesSection
+        hubId="barcelona"
+        packages={packages}
+        otherLinks={[
+          { href: '/destinos/marbella', label: 'Explorar Marbella →' },
+          { href: '/destinos/algarve', label: 'Explorar Algarve →' },
+        ]}
+      />
 
       <SiteFooter />
     </div>

@@ -95,7 +95,7 @@ export const HOTEL_STAR_OPTIONS: {
   {
     value: '5',
     label: 'Hotel 5★',
-    blurb: 'Luxo e serviço VIP · resorts / Meliá premium',
+    blurb: 'Luxo e serviço VIP · resorts premium',
   },
 ]
 

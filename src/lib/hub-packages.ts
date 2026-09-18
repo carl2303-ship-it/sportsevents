@@ -122,6 +122,11 @@ export type HubPackageView = {
   destinationName: string
   /** PT base + EN para edição no admin. */
   translations?: PackageTranslations
+  /** Stripe Connect split (admin / checkout). */
+  hotelPartnerId: string | null
+  transferPartnerId: string | null
+  splitHotelPercent: number
+  splitTransferPercent: number
 }
 
 export type HubPackageRow = {
@@ -152,6 +157,10 @@ export type HubPackageRow = {
   translations?: PackageTranslations | null
   published: boolean
   sort_order: number
+  hotel_partner_id?: string | null
+  transfer_partner_id?: string | null
+  split_hotel_percent?: number | string | null
+  split_transfer_percent?: number | string | null
   destinations?: { id: string; code: string; name: string } | null
 }
 
@@ -250,6 +259,10 @@ export function rowToView(
     destinationCode: dest?.code || '',
     destinationName: dest?.name || '',
     translations: row.translations || {},
+    hotelPartnerId: row.hotel_partner_id || null,
+    transferPartnerId: row.transfer_partner_id || null,
+    splitHotelPercent: Number(row.split_hotel_percent || 0),
+    splitTransferPercent: Number(row.split_transfer_percent || 0),
   }
 }
 
@@ -280,6 +293,10 @@ export type HubPackageWrite = {
   translations?: PackageTranslations
   published: boolean
   sort_order: number
+  hotel_partner_id: string | null
+  transfer_partner_id: string | null
+  split_hotel_percent: number
+  split_transfer_percent: number
 }
 
 /** Prefill de ficha de evento a partir de um pacote catálogo. */

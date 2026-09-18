@@ -79,7 +79,9 @@ function ConstruirEstagioClient() {
   const [selectedPackageKey, setSelectedPackageKey] = useState<PackageKey | null>(
     null
   )
+  const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null)
   const [bootstrapped, setBootstrapped] = useState(false)
+  const [paying, setPaying] = useState(false)
 
   const estimate = useMemo(() => estimateStage(config), [config])
 
@@ -117,7 +119,6 @@ function ConstruirEstagioClient() {
       )
       if (match) {
         applyPackageToConfig(match)
-        setSelectedPackageKey(match.packageKey)
         setStep(1)
       }
     }
@@ -149,6 +150,7 @@ function ConstruirEstagioClient() {
       airportTransfer: true,
     }))
     setSelectedPackageKey(pkg.packageKey)
+    setSelectedPackageId(pkg.id)
   }
 
   function canNext() {
@@ -156,6 +158,50 @@ function ConstruirEstagioClient() {
       return Boolean(config.clientName.trim() && config.clientEmail.trim())
     }
     return true
+  }
+
+  function mealPlanForCheckout(): 'bb' | 'hb' | 'full' {
+    if (config.mealPlan === 'BB') return 'bb'
+    if (config.mealPlan === 'FB') return 'full'
+    return 'hb'
+  }
+
+  async function payWithStripe() {
+    setError(null)
+    if (!selectedPackageId) {
+      setError(b.payNeedPackage)
+      return
+    }
+    setPaying(true)
+    try {
+      const res = await fetch('/api/stripe/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hubPackageId: selectedPackageId,
+          customerName: config.clientName.trim(),
+          customerEmail: config.clientEmail.trim(),
+          customerPhone: config.clientPhone || null,
+          players: config.players,
+          singleRooms: config.singleRooms,
+          mealPlan: mealPlanForCheckout(),
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || t.events.checkoutError)
+        setPaying(false)
+        return
+      }
+      if (data.url) {
+        window.location.href = data.url as string
+        return
+      }
+      setError(t.events.checkoutError)
+    } catch {
+      setError(t.builder.networkError)
+    }
+    setPaying(false)
   }
 
   async function submit() {
@@ -263,6 +309,7 @@ function ConstruirEstagioClient() {
                             onClick={() => {
                               patch('hub', h.value)
                               setSelectedPackageKey(null)
+                              setSelectedPackageId(null)
                             }}
                             title={`${h.flag} ${b.hubs[i].label}`}
                             blurb={b.hubs[i].blurb}
@@ -639,14 +686,32 @@ function ConstruirEstagioClient() {
                         {b.next} <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     ) : (
-                      <button
-                        type="button"
-                        disabled={!canNext() || submitting}
-                        onClick={submit}
-                        className="inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-xs font-bold text-navy disabled:opacity-40"
-                      >
-                        {submitting ? b.submitting : b.submit}
-                      </button>
+                      <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+                        <button
+                          type="button"
+                          disabled={!canNext() || submitting || paying}
+                          onClick={submit}
+                          className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-xs font-bold disabled:opacity-40"
+                        >
+                          {submitting ? b.submitting : b.submit}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={
+                            !canNext() ||
+                            submitting ||
+                            paying ||
+                            !selectedPackageId
+                          }
+                          onClick={payWithStripe}
+                          className="inline-flex items-center justify-center gap-2 rounded-full bg-gold px-5 py-2.5 text-xs font-bold text-navy disabled:opacity-40"
+                          title={
+                            !selectedPackageId ? b.payNeedPackage : undefined
+                          }
+                        >
+                          {paying ? b.paying : b.payBook}
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>

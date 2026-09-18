@@ -3,6 +3,7 @@ import { Syne, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { InstallPrompt } from "@/components/install-prompt";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getLocale } from "@/i18n/get-locale";
+import { LocaleProvider } from "@/i18n/use-locale";
 import "./globals.css";
 
 const syne = Syne({
@@ -64,9 +65,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${syne.variable} ${dmSans.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
-        {children}
-        <InstallPrompt />
+        <LocaleProvider locale={locale}>
+          {children}
+          <InstallPrompt />
+        </LocaleProvider>
       </body>
     </html>
   );
 }
+
+/** Evita HTML estático com locale errado (cookie / prerender). */
+export const dynamic = 'force-dynamic'

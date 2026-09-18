@@ -48,6 +48,31 @@ export default function EnterpriseBackoffice() {
     loadEnterpriseData()
   }, [])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('tab') === 'partners') {
+      setActiveTab('partners')
+    }
+    const stripe = params.get('stripe')
+    const account = params.get('account')
+    if ((stripe === 'return' || stripe === 'refresh') && account) {
+      void (async () => {
+        const { data: partner } = await createClient()
+          .from('partners')
+          .select('id')
+          .eq('stripe_account_id', account)
+          .maybeSingle()
+        if (partner?.id) {
+          await fetch(
+            `/api/stripe/connect-account?partnerId=${encodeURIComponent(partner.id)}`
+          )
+          await loadEnterpriseData()
+        }
+      })()
+    }
+  }, [])
+
   async function loadEnterpriseData() {
     setLoading(true)
 

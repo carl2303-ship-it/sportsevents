@@ -403,12 +403,13 @@ export default function DefinicoesPage() {
                 <h2 className="text-sm font-black">Chaves & integrações</h2>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-[10px]">
                 {[
                   ['Stripe secret (env)', env.stripe_secret_key],
                   ['Stripe publishable (env)', env.stripe_publishable_key],
+                  ['Stripe webhook (env)', env.stripe_webhook_secret],
                   ['Site URL (env)', env.site_url],
-                  ['Service role', env.service_role],
+                  ['Service role (env)', env.service_role],
                 ].map(([label, ok]) => (
                   <div
                     key={String(label)}
@@ -420,15 +421,53 @@ export default function DefinicoesPage() {
                         ok ? 'text-emerald-400 font-bold' : 'text-slate-600'
                       }
                     >
-                      {ok ? 'Configurado' : 'Em falta'}
+                      {ok ? 'No servidor' : 'Só via formulário'}
                     </div>
                   </div>
                 ))}
               </div>
 
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Os badges acima só olham para <strong className="text-slate-400">variáveis de ambiente</strong> (Netlify / .env).
+                Em falta no local é normal se as chaves estão só no formulário abaixo (tabela <code className="text-slate-400">app_settings</code>).
+                O <strong className="text-slate-400">Service role</strong> não se guarda aqui — tem de estar no Netlify; no localhost fica “Só via formulário” até copiares{' '}
+                <code className="text-slate-400">SUPABASE_SERVICE_ROLE_KEY</code> para o{' '}
+                <code className="text-slate-400">.env.local</code>.
+              </p>
+
+              <div className="rounded-xl border border-slate-800 bg-slate-950/80 px-3 py-2 text-[11px] text-slate-400 space-y-1">
+                <div className="text-[10px] uppercase text-slate-500 font-bold">
+                  Estado na base de dados (formulário)
+                </div>
+                <ul className="grid sm:grid-cols-2 gap-1">
+                  {settings.map((s) => (
+                    <li key={s.key} className="flex items-center gap-2">
+                      <span
+                        className={
+                          s.has_value || env[s.key]
+                            ? 'text-emerald-400'
+                            : 'text-amber-400'
+                        }
+                      >
+                        {s.has_value || env[s.key] ? '●' : '○'}
+                      </span>
+                      <span>{s.label || s.key}</span>
+                      <span className="text-slate-600">
+                        {s.has_value
+                          ? s.masked
+                            ? `(${s.masked})`
+                            : '(definido)'
+                          : env[s.key]
+                            ? '(só env)'
+                            : '(vazio)'}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
               <p className="text-[11px] text-slate-500">
-                Variáveis de ambiente têm prioridade. Se estiverem vazias, usamos
-                os valores guardados aqui (útil para Stripe em desenvolvimento).
+                Prioridade: variável de ambiente → valor guardado abaixo.
               </p>
 
               <form onSubmit={saveSettings} className="space-y-3">

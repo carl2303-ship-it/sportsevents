@@ -49,6 +49,13 @@ export type PartnerRow = {
   emailed_at?: string | null
   phoned_at?: string | null
   interest?: 'INTERESSE' | 'SEM_INTERESSE' | null
+  stripe_account_id?: string | null
+  stripe_connect_status?:
+    | 'not_connected'
+    | 'pending_onboarding'
+    | 'active'
+    | 'restricted'
+    | null
   destinations?: { name?: string | null } | null
 }
 
@@ -173,6 +180,7 @@ export default function PartnersNetwork({
   const [translating, setTranslating] = useState(false)
   const [scriptMsg, setScriptMsg] = useState<string | null>(null)
   const [editing, setEditing] = useState<PartnerRow | null>(null)
+  const [connectBusyId, setConnectBusyId] = useState<string | null>(null)
   const [savingPartner, setSavingPartner] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
@@ -435,6 +443,55 @@ export default function PartnersNetwork({
       )
     } finally {
       setTranslating(false)
+    }
+  }
+
+  async function startStripeConnect(partner: PartnerRow) {
+    setConnectBusyId(partner.id)
+    try {
+      const res = await fetch('/api/stripe/connect-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          partnerId: partner.id,
+          country: partner.country_code || 'PT',
+          email: partner.email || undefined,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        alert(data.error || 'Erro ao criar onboarding Stripe Connect')
+        return
+      }
+      if (data.onboardingUrl) {
+        window.location.href = data.onboardingUrl as string
+        return
+      }
+      alert('Link de onboarding não devolvido.')
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Erro de rede')
+    } finally {
+      setConnectBusyId(null)
+    }
+  }
+
+  async function refreshStripeConnect(partner: PartnerRow) {
+    setConnectBusyId(partner.id)
+    try {
+      const res = await fetch(
+        `/api/stripe/connect-account?partnerId=${encodeURIComponent(partner.id)}`
+      )
+      const data = await res.json()
+      if (!res.ok) {
+        alert(data.error || 'Erro ao sincronizar Connect')
+        return
+      }
+      await onRefresh()
+      alert(`Stripe Connect: ${data.status}`)
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Erro de rede')
+    } finally {
+      setConnectBusyId(null)
     }
   }
 
@@ -1084,6 +1141,52 @@ export default function PartnersNetwork({
                             {copiedId === p.id ? 'Copiado ✓' : `Copiar (${lang})`}
                           </button>
                         </div>
+
+                        {(p.type === 'HOTEL' || p.type === 'TRANSPORTES') && (
+                          <div className="pt-1 space-y-1.5">
+                            <div className="text-[10px] text-slate-500">
+                              Stripe Connect:{' '}
+                              <span
+                                className={
+                                  p.stripe_connect_status === 'active'
+                                    ? 'text-emerald-400 font-semibold'
+                                    : p.stripe_connect_status === 'restricted'
+                                      ? 'text-rose-400 font-semibold'
+                                      : 'text-amber-400 font-semibold'
+                                }
+                              >
+                                {p.stripe_connect_status || 'not_connected'}
+                              </span>
+                              {p.stripe_account_id
+                                ? ` · ${p.stripe_account_id}`
+                                : ''}
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                type="button"
+                                disabled={connectBusyId === p.id}
+                                onClick={() => startStripeConnect(p)}
+                                className="inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold rounded-lg border border-violet-500/30 bg-violet-500/10 px-2 py-2 text-violet-200 hover:border-violet-400/50 disabled:opacity-50"
+                              >
+                                {connectBusyId === p.id
+                                  ? '...'
+                                  : p.stripe_account_id
+                                    ? 'Reabrir onboarding'
+                                    : 'Ligar Stripe'}
+                              </button>
+                              <button
+                                type="button"
+                                disabled={
+                                  connectBusyId === p.id || !p.stripe_account_id
+                                }
+                                onClick={() => refreshStripeConnect(p)}
+                                className="inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold rounded-lg border border-slate-700 bg-slate-950 px-2 py-2 text-slate-300 hover:border-emerald-500/40 hover:text-emerald-400 disabled:opacity-40"
+                              >
+                                Sync estado
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </article>
                   )

@@ -6,6 +6,7 @@ import { maskSecret, requireAdminUser } from '@/lib/admin-auth'
 const ALLOWED_KEYS = [
   'stripe_secret_key',
   'stripe_publishable_key',
+  'stripe_webhook_secret',
   'site_url',
   'support_email',
   'company_name',
@@ -13,12 +14,31 @@ const ALLOWED_KEYS = [
 
 type SettingKey = (typeof ALLOWED_KEYS)[number]
 
+const SETTING_META: Record<
+  SettingKey,
+  { label: string; is_secret: boolean }
+> = {
+  stripe_secret_key: { label: 'Stripe Secret Key', is_secret: true },
+  stripe_publishable_key: {
+    label: 'Stripe Publishable Key',
+    is_secret: false,
+  },
+  stripe_webhook_secret: {
+    label: 'Stripe Webhook Secret',
+    is_secret: true,
+  },
+  site_url: { label: 'URL pública do site', is_secret: false },
+  support_email: { label: 'Email de suporte', is_secret: false },
+  company_name: { label: 'Nome da empresa', is_secret: false },
+}
+
 function envStatus() {
   return {
     stripe_secret_key: Boolean(process.env.STRIPE_SECRET_KEY),
     stripe_publishable_key: Boolean(
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
     ),
+    stripe_webhook_secret: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
     site_url: Boolean(
       process.env.NEXT_PUBLIC_SITE_URL || process.env.URL
     ),
@@ -39,15 +59,23 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  const settings = (data || []).map((row) => ({
-    key: row.key,
-    label: row.label,
-    is_secret: row.is_secret,
-    value: row.is_secret ? '' : row.value || '',
-    masked: row.is_secret ? maskSecret(row.value) : null,
-    has_value: Boolean(row.value),
-    updated_at: row.updated_at,
-  }))
+  const byKey = new Map((data || []).map((row) => [row.key as string, row]))
+
+  const settings = ALLOWED_KEYS.map((key) => {
+    const row = byKey.get(key)
+    const meta = SETTING_META[key]
+    const isSecret = row?.is_secret ?? meta.is_secret
+    const value = row?.value || null
+    return {
+      key,
+      label: row?.label || meta.label,
+      is_secret: isSecret,
+      value: isSecret ? '' : value || '',
+      masked: isSecret ? maskSecret(value) : null,
+      has_value: Boolean(value),
+      updated_at: row?.updated_at || null,
+    }
+  })
 
   return NextResponse.json({
     settings,
@@ -68,7 +96,7 @@ export async function PUT(request: Request) {
   const client = createServiceClient() || (await createClient())
   const now = new Date().toISOString()
   const upserts: {
-    key: string
+    key: SettingKey
     value: string | null
     updated_at: string
     updated_by: string
@@ -79,7 +107,9 @@ export async function PUT(request: Request) {
     const raw = values[key]
     // Empty secret field = keep existing (don't wipe accidentally)
     if (
-      (key === 'stripe_secret_key' || key === 'stripe_publishable_key') &&
+      (key === 'stripe_secret_key' ||
+        key === 'stripe_publishable_key' ||
+        key === 'stripe_webhook_secret') &&
       (raw === undefined || raw === '')
     ) {
       continue
@@ -97,23 +127,15 @@ export async function PUT(request: Request) {
   }
 
   for (const row of upserts) {
+    const meta = SETTING_META[row.key]
     const { error } = await client.from('app_settings').upsert(
       {
         key: row.key,
         value: row.value,
         updated_at: row.updated_at,
         updated_by: row.updated_by,
-        is_secret: row.key === 'stripe_secret_key',
-        label:
-          row.key === 'stripe_secret_key'
-            ? 'Stripe Secret Key'
-            : row.key === 'stripe_publishable_key'
-              ? 'Stripe Publishable Key'
-              : row.key === 'site_url'
-                ? 'URL pública do site'
-                : row.key === 'support_email'
-                  ? 'Email de suporte'
-                  : 'Nome da empresa',
+        is_secret: meta.is_secret,
+        label: meta.label,
       },
       { onConflict: 'key' }
     )

@@ -11,6 +11,13 @@ export async function getStripe() {
   })
 }
 
+export async function getStripeWebhookSecret() {
+  return (
+    process.env.STRIPE_WEBHOOK_SECRET ||
+    (await getAppSetting('stripe_webhook_secret'))
+  )
+}
+
 export async function getSiteUrl() {
   return (
     process.env.NEXT_PUBLIC_SITE_URL ||

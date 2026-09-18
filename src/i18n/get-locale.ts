@@ -1,21 +1,18 @@
-import { cookies, headers } from 'next/headers'
+import { headers } from 'next/headers'
 import {
   defaultLocale,
   isLocale,
-  LOCALE_COOKIE,
   LOCALE_HEADER,
   type Locale,
 } from '@/i18n/config'
 
-/** Locale no servidor (header do proxy ou cookie). */
+/**
+ * Locale no servidor — só o header do proxy (nunca cookie).
+ * Cookie antigo (ex.: pt) causava HTML em PT com cliente em EN.
+ */
 export async function getLocale(): Promise<Locale> {
   const h = await headers()
   const fromHeader = h.get(LOCALE_HEADER)
   if (isLocale(fromHeader)) return fromHeader
-
-  const jar = await cookies()
-  const fromCookie = jar.get(LOCALE_COOKIE)?.value
-  if (isLocale(fromCookie)) return fromCookie
-
   return defaultLocale
 }

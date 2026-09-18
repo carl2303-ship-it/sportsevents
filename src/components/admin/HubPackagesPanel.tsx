@@ -27,6 +27,14 @@ const inputCls =
 
 type DestinationOption = { id: string; code: string; name: string }
 
+type ConnectPartnerOption = {
+  id: string
+  name: string
+  type: string | null
+  stripe_account_id?: string | null
+  stripe_connect_status?: string | null
+}
+
 type FormState = {
   destination_id: string
   package_key: PackageKey
@@ -53,6 +61,10 @@ type FormState = {
   routine: PackageRoutineStep[]
   published: boolean
   sort_order: number
+  hotel_partner_id: string
+  transfer_partner_id: string
+  split_hotel_percent: number
+  split_transfer_percent: number
   en_name: string
   en_duration: string
   en_schedule: string
@@ -90,6 +102,10 @@ const emptyForm = (destinationId = ''): FormState => ({
   routine: [{ title: '', text: '' }],
   published: true,
   sort_order: 0,
+  hotel_partner_id: '',
+  transfer_partner_id: '',
+  split_hotel_percent: 60,
+  split_transfer_percent: 10,
   en_name: '',
   en_duration: '',
   en_schedule: '',
@@ -131,6 +147,10 @@ function viewToForm(pkg: HubPackageView): FormState {
     routine: pkg.routine.length ? pkg.routine : [{ title: '', text: '' }],
     published: pkg.published,
     sort_order: pkg.sortOrder,
+    hotel_partner_id: pkg.hotelPartnerId || '',
+    transfer_partner_id: pkg.transferPartnerId || '',
+    split_hotel_percent: pkg.splitHotelPercent ?? 0,
+    split_transfer_percent: pkg.splitTransferPercent ?? 0,
     en_name: en?.name || '',
     en_duration: en?.duration || '',
     en_schedule: en?.schedule || '',
@@ -150,6 +170,9 @@ function viewToForm(pkg: HubPackageView): FormState {
 export function HubPackagesPanel() {
   const [packages, setPackages] = useState<HubPackageView[]>([])
   const [destinations, setDestinations] = useState<DestinationOption[]>([])
+  const [connectPartners, setConnectPartners] = useState<
+    ConnectPartnerOption[]
+  >([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [okMsg, setOkMsg] = useState<string | null>(null)
@@ -171,11 +194,26 @@ export function HubPackagesPanel() {
       }
       setPackages(data.packages || [])
       setDestinations(data.destinations || [])
+      setConnectPartners(data.connectPartners || [])
     } catch {
       setError('Erro de rede ao carregar pacotes.')
     }
     setLoading(false)
   }, [])
+
+  const hotelPartners = useMemo(
+    () => connectPartners.filter((p) => p.type === 'HOTEL'),
+    [connectPartners]
+  )
+  const transferPartners = useMemo(
+    () => connectPartners.filter((p) => p.type === 'TRANSPORTES'),
+    [connectPartners]
+  )
+
+  const platformPercent = Math.max(
+    0,
+    100 - Number(form.split_hotel_percent || 0) - Number(form.split_transfer_percent || 0)
+  )
 
   useEffect(() => {
     load()
@@ -208,6 +246,8 @@ export function HubPackagesPanel() {
 
     const payload = {
       ...form,
+      hotel_partner_id: form.hotel_partner_id || null,
+      transfer_partner_id: form.transfer_partner_id || null,
       inclusions: form.inclusionsText
         .split('\n')
         .map((l) => l.trim())
@@ -630,6 +670,122 @@ export function HubPackagesPanel() {
                     </label>
                   ))}
                 </div>
+              </div>
+
+              <div className="space-y-3 rounded-xl border border-violet-500/25 bg-violet-500/5 p-4">
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-violet-300 font-bold">
+                    Stripe Connect — split automático
+                  </p>
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    No checkout, o total do pacote divide-se por estas %: hotel e
+                    transfer vão para as contas Connect; o resto fica na
+                    plataforma (padel + taxas Stripe).
+                  </p>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <label className="block space-y-1">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      Hotel (parceiro)
+                    </span>
+                    <select
+                      className={inputCls}
+                      value={form.hotel_partner_id}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          hotel_partner_id: e.target.value,
+                        }))
+                      }
+                    >
+                      <option value="">— Selecionar hotel —</option>
+                      {hotelPartners.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                          {p.stripe_connect_status === 'active'
+                            ? ' · Connect OK'
+                            : ' · Connect pendente'}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      Transfers (parceiro)
+                    </span>
+                    <select
+                      className={inputCls}
+                      value={form.transfer_partner_id}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          transfer_partner_id: e.target.value,
+                        }))
+                      }
+                    >
+                      <option value="">— Sem transfers / opcional —</option>
+                      {transferPartners.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                          {p.stripe_connect_status === 'active'
+                            ? ' · Connect OK'
+                            : ' · Connect pendente'}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      % Hotel
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step={0.5}
+                      className={inputCls}
+                      value={form.split_hotel_percent}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          split_hotel_percent: Number(e.target.value) || 0,
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      % Transfers
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step={0.5}
+                      className={inputCls}
+                      value={form.split_transfer_percent}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          split_transfer_percent: Number(e.target.value) || 0,
+                        }))
+                      }
+                    />
+                  </label>
+                </div>
+                <p className="text-[11px] text-slate-300">
+                  Plataforma (padel):{' '}
+                  <strong className="text-emerald-400">{platformPercent}%</strong>
+                  {' · '}
+                  Hotel: {form.split_hotel_percent}% · Transfer:{' '}
+                  {form.split_transfer_percent}%
+                </p>
+                {hotelPartners.length === 0 && (
+                  <p className="text-[11px] text-amber-400">
+                    Ainda não há parceiros tipo HOTEL. Cria-os em Parceiros e
+                    completa o onboarding Stripe Connect.
+                  </p>
+                )}
               </div>
 
               <div className="grid sm:grid-cols-2 gap-3">

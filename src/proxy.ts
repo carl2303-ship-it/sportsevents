@@ -55,6 +55,16 @@ function rewriteWithLocale(
   return applyLocaleHeaders(request, locale, response)
 }
 
+function nextWithLocale(request: NextRequest, locale: Locale): NextResponse {
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set(LOCALE_HEADER, locale)
+
+  let response = NextResponse.next({
+    request: { headers: requestHeaders },
+  })
+  return applyLocaleHeaders(request, locale, response)
+}
+
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
@@ -69,18 +79,14 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
-
   const isAdminRoute = pathname.startsWith('/admin')
   const isLoginRoute =
     pathname === '/admin/login' || pathname.startsWith('/admin/login/')
 
-  // Public routes without prefix default to English
-  if (!isAdminRoute) {
-    applyLocaleHeaders(request, 'en', supabaseResponse)
-  }
+  // Public routes without prefix → English (set request header so SSR matches)
+  let supabaseResponse = isAdminRoute
+    ? NextResponse.next({ request })
+    : nextWithLocale(request, 'en')
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -94,8 +100,12 @@ export async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value)
           })
+          const requestHeaders = new Headers(request.headers)
+          if (!isAdminRoute) {
+            requestHeaders.set(LOCALE_HEADER, 'en')
+          }
           supabaseResponse = NextResponse.next({
-            request,
+            request: { headers: requestHeaders },
           })
           cookiesToSet.forEach(({ name, value, options }) => {
             supabaseResponse.cookies.set(name, value, options)

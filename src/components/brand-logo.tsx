@@ -33,6 +33,7 @@ export function BrandLogo({
       width={size.width}
       height={size.height}
       priority={priority}
+      loading={priority ? 'eager' : undefined}
       sizes="(max-width: 768px) 96vw, 1100px"
       quality={95}
       className={cn(size.className, 'object-contain', className)}

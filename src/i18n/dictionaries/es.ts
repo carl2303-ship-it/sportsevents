@@ -449,6 +449,17 @@ export const es: typeof pt = {
     downloadContact: 'Descargar contacto',
     brochures: 'Folletos B2B',
   },
+  install: {
+    title: 'Instalar SportsEvents',
+    body: 'Añade la app a la pantalla de inicio para acceder rápido a hubs, paquetes y presupuestos.',
+    iosBody:
+      'Instala SportsEvents en el iPhone: abre el menú Compartir y elige “Añadir a la pantalla de inicio”.',
+    iosHint: 'Safari → Compartir → Añadir a la pantalla de inicio',
+    cta: 'Instalar app',
+    gotIt: 'Entendido',
+    later: 'Ahora no',
+    dismiss: 'Cerrar',
+  },
   privacy: {
     metaTitle: 'Política de privacidad — SportsEvents.app',
     metaDescription:

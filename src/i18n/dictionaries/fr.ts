@@ -449,6 +449,17 @@ export const fr: typeof pt = {
     downloadContact: 'Télécharger le contact',
     brochures: 'Brochures B2B',
   },
+  install: {
+    title: 'Installer SportsEvents',
+    body: 'Ajoutez l’app à l’écran d’accueil pour accéder vite aux hubs, forfaits et devis.',
+    iosBody:
+      'Installez SportsEvents sur iPhone : ouvrez le menu Partager et choisissez « Sur l’écran d’accueil ».',
+    iosHint: 'Safari → Partager → Sur l’écran d’accueil',
+    cta: 'Installer l’app',
+    gotIt: 'Compris',
+    later: 'Pas maintenant',
+    dismiss: 'Fermer',
+  },
   privacy: {
     metaTitle: 'Politique de confidentialité — SportsEvents.app',
     metaDescription:

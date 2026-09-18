@@ -449,6 +449,17 @@ export const en: typeof pt = {
     downloadContact: 'Download Contact',
     brochures: 'B2B Brochures',
   },
+  install: {
+    title: 'Install SportsEvents',
+    body: 'Add the app to your home screen for quick access to hubs, packages and quotes.',
+    iosBody:
+      'Install SportsEvents on iPhone: open the Share menu and choose “Add to Home Screen”.',
+    iosHint: 'Safari → Share → Add to Home Screen',
+    cta: 'Install app',
+    gotIt: 'Got it',
+    later: 'Not now',
+    dismiss: 'Close',
+  },
   privacy: {
     metaTitle: 'Privacy Policy — SportsEvents.app',
     metaDescription:

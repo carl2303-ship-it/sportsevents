@@ -449,6 +449,17 @@ export const de: typeof pt = {
     downloadContact: 'Kontakt herunterladen',
     brochures: 'B2B-Broschüren',
   },
+  install: {
+    title: 'SportsEvents installieren',
+    body: 'Füge die App zum Home-Bildschirm hinzu für schnellen Zugriff auf Hubs, Pakete und Angebote.',
+    iosBody:
+      'Installiere SportsEvents auf dem iPhone: öffne das Teilen-Menü und wähle „Zum Home-Bildschirm“.',
+    iosHint: 'Safari → Teilen → Zum Home-Bildschirm',
+    cta: 'App installieren',
+    gotIt: 'Verstanden',
+    later: 'Nicht jetzt',
+    dismiss: 'Schließen',
+  },
   privacy: {
     metaTitle: 'Datenschutzerklärung — SportsEvents.app',
     metaDescription:

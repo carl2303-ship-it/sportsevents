@@ -1,6 +1,8 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
+import { fillTemplate } from '@/i18n/dictionaries'
+import { useDictionary } from '@/i18n/use-locale'
 
 export function BookingForm({
   eventId,
@@ -13,6 +15,9 @@ export function BookingForm({
   depositAmount: number
   maxParticipants: number
 }) {
+  const { locale, t } = useDictionary()
+  const e = t.events
+  const numberLocale = locale === 'en' ? 'en-GB' : 'pt-PT'
   const [customerName, setCustomerName] = useState('')
   const [customerEmail, setCustomerEmail] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
@@ -26,8 +31,8 @@ export function BookingForm({
   const unit = paymentType === 'FULL' ? salePrice : depositAmount || salePrice
   const total = unit * participants
 
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault()
+  async function onSubmit(ev: FormEvent) {
+    ev.preventDefault()
     setError(null)
     setLoading(true)
     try {
@@ -45,13 +50,13 @@ export function BookingForm({
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || 'Não foi possível iniciar o pagamento.')
+        setError(data.error || e.checkoutError)
         setLoading(false)
         return
       }
       window.location.href = data.url
     } catch {
-      setError('Erro de rede ao contactar o checkout.')
+      setError(e.networkError)
       setLoading(false)
     }
   }
@@ -62,10 +67,8 @@ export function BookingForm({
       className="rounded-2xl border border-slate-800 bg-slate-900 p-5 space-y-4"
     >
       <div>
-        <h2 className="text-lg font-black text-white">Reservar agora</h2>
-        <p className="text-xs text-slate-500 mt-1">
-          Pagamento seguro via Stripe — reserva ou valor completo.
-        </p>
+        <h2 className="text-lg font-black text-white">{e.bookTitle}</h2>
+        <p className="text-xs text-slate-500 mt-1">{e.bookLead}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
@@ -79,9 +82,9 @@ export function BookingForm({
               : 'bg-slate-950 text-slate-400 border-slate-700'
           } disabled:opacity-40`}
         >
-          Só reserva
+          {e.depositOnly}
           <div className="text-[10px] font-semibold opacity-80">
-            {depositAmount > 0 ? `${depositAmount} € / pax` : 'N/D'}
+            {depositAmount > 0 ? `${depositAmount} € / pax` : 'N/A'}
           </div>
         </button>
         <button
@@ -93,7 +96,7 @@ export function BookingForm({
               : 'bg-slate-950 text-slate-400 border-slate-700'
           }`}
         >
-          Valor completo
+          {e.fullAmount}
           <div className="text-[10px] font-semibold opacity-80">
             {salePrice} € / pax
           </div>
@@ -102,40 +105,40 @@ export function BookingForm({
 
       <label className="block space-y-1 text-xs">
         <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
-          Nome completo
+          {e.fullName}
         </span>
         <input
           required
           value={customerName}
-          onChange={(e) => setCustomerName(e.target.value)}
+          onChange={(ev) => setCustomerName(ev.target.value)}
           className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white"
         />
       </label>
       <label className="block space-y-1 text-xs">
         <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
-          Email
+          {e.email}
         </span>
         <input
           required
           type="email"
           value={customerEmail}
-          onChange={(e) => setCustomerEmail(e.target.value)}
+          onChange={(ev) => setCustomerEmail(ev.target.value)}
           className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white"
         />
       </label>
       <label className="block space-y-1 text-xs">
         <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
-          Telefone
+          {e.phone}
         </span>
         <input
           value={customerPhone}
-          onChange={(e) => setCustomerPhone(e.target.value)}
+          onChange={(ev) => setCustomerPhone(ev.target.value)}
           className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white"
         />
       </label>
       <label className="block space-y-1 text-xs">
         <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
-          Nº participantes (máx. {maxParticipants})
+          {fillTemplate(e.participants, { n: String(maxParticipants) })}
         </span>
         <input
           required
@@ -143,15 +146,15 @@ export function BookingForm({
           min={1}
           max={maxParticipants}
           value={participants}
-          onChange={(e) => setParticipants(Number(e.target.value))}
+          onChange={(ev) => setParticipants(Number(ev.target.value))}
           className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white"
         />
       </label>
 
       <div className="rounded-xl bg-slate-950 border border-slate-800 px-3 py-3 flex justify-between items-center">
-        <span className="text-xs text-slate-400">Total a pagar agora</span>
+        <span className="text-xs text-slate-400">{e.totalNow}</span>
         <span className="text-xl font-black text-emerald-400">
-          {total.toLocaleString('pt-PT')} €
+          {total.toLocaleString(numberLocale)} €
         </span>
       </div>
 
@@ -166,7 +169,7 @@ export function BookingForm({
         disabled={loading}
         className="w-full rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-bold text-sm py-3"
       >
-        {loading ? 'A redirecionar para Stripe...' : 'Pagar com Stripe'}
+        {loading ? e.redirecting : e.payStripe}
       </button>
     </form>
   )

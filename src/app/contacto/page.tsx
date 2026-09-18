@@ -4,11 +4,15 @@ import { FormEvent, useState } from 'react'
 import Link from 'next/link'
 import { CheckCircle2, Mail, MapPin, Phone } from 'lucide-react'
 import { SiteFooter, SiteHeader } from '@/components/site-chrome'
+import { withLocale } from '@/i18n/config'
+import { useDictionary } from '@/i18n/use-locale'
 
 const inputCls =
   'w-full bg-navy/80 border border-white/15 rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-app-white/35 focus:outline-none focus:border-cyan/50'
 
 export default function ContactoPage() {
+  const { locale, t } = useDictionary()
+  const c = t.contact
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -31,11 +35,11 @@ export default function ContactoPage() {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: body.toString(),
       })
-      if (!res.ok) throw new Error('Falha no envio')
+      if (!res.ok) throw new Error('send failed')
       setDone(true)
       form.reset()
     } catch {
-      setError('Não foi possível enviar a mensagem. Tenta novamente ou escreve para info@sportsevents.app.')
+      setError(c.error)
     }
     setSubmitting(false)
   }
@@ -47,14 +51,13 @@ export default function ContactoPage() {
       <main className="flex-1 px-5 md:px-10 py-10 md:py-14">
         <div className="mx-auto max-w-6xl">
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
-            Contactos
+            {c.eyebrow}
           </p>
           <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl md:text-5xl font-extrabold">
-            Fala connosco
+            {c.title}
           </h1>
           <p className="mt-3 max-w-2xl text-app-white/65 text-sm md:text-base">
-            Pedidos de orçamento, parcerias ou dúvidas — a equipa SportsEvents
-            responde a partir de{' '}
+            {c.lead}{' '}
             <a
               href="mailto:info@sportsevents.app"
               className="text-cyan hover:underline"
@@ -69,17 +72,13 @@ export default function ContactoPage() {
               {done ? (
                 <div className="space-y-4 py-6">
                   <CheckCircle2 className="w-10 h-10 text-emerald-400" />
-                  <h2 className="text-2xl font-black">Mensagem enviada</h2>
-                  <p className="text-sm text-app-white/70">
-                    Obrigado. Recebemos o teu contacto e respondemos em breve
-                    para o email indicado.
-                  </p>
+                  <h2 className="text-2xl font-black">{c.success}</h2>
                   <button
                     type="button"
                     onClick={() => setDone(false)}
                     className="rounded-full border border-white/20 px-4 py-2 text-xs font-semibold hover:border-cyan/40 hover:text-cyan"
                   >
-                    Enviar outra mensagem
+                    {c.send}
                   </button>
                 </div>
               ) : (
@@ -94,7 +93,7 @@ export default function ContactoPage() {
                   <input type="hidden" name="form-name" value="contacto" />
                   <p className="hidden">
                     <label>
-                      Não preencher:{' '}
+                      bot:{' '}
                       <input name="bot-field" tabIndex={-1} autoComplete="off" />
                     </label>
                   </p>
@@ -102,58 +101,42 @@ export default function ContactoPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <label className="block space-y-1.5 sm:col-span-2">
                       <span className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                        Nome *
+                        {c.name} *
                       </span>
-                      <input
-                        required
-                        name="name"
-                        className={inputCls}
-                        placeholder="O teu nome"
-                      />
+                      <input required name="name" className={inputCls} />
                     </label>
                     <label className="block space-y-1.5">
                       <span className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                        Email *
+                        {c.email} *
                       </span>
                       <input
                         required
                         type="email"
                         name="email"
                         className={inputCls}
-                        placeholder="email@empresa.com"
                       />
                     </label>
                     <label className="block space-y-1.5">
                       <span className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                        Telefone
+                        {c.phone}
                       </span>
-                      <input
-                        type="tel"
-                        name="phone"
-                        className={inputCls}
-                        placeholder="+351..."
-                      />
+                      <input type="tel" name="phone" className={inputCls} />
                     </label>
                     <label className="block space-y-1.5 sm:col-span-2">
                       <span className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                        Assunto
+                        {c.club}
                       </span>
-                      <input
-                        name="subject"
-                        className={inputCls}
-                        placeholder="Orçamento, parceria, dúvida..."
-                      />
+                      <input name="subject" className={inputCls} />
                     </label>
                     <label className="block space-y-1.5 sm:col-span-2">
                       <span className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                        Mensagem *
+                        {c.message} *
                       </span>
                       <textarea
                         required
                         name="message"
                         rows={5}
                         className={inputCls}
-                        placeholder="Conta-nos o que precisas..."
                       />
                     </label>
                   </div>
@@ -169,7 +152,7 @@ export default function ContactoPage() {
                     disabled={submitting}
                     className="rounded-full bg-gold px-6 py-2.5 text-sm font-bold text-navy hover:brightness-110 disabled:opacity-50"
                   >
-                    {submitting ? 'A enviar...' : 'Enviar mensagem'}
+                    {submitting ? c.sending : c.send}
                   </button>
                 </form>
               )}
@@ -195,7 +178,7 @@ export default function ContactoPage() {
                   <Phone className="w-4 h-4 text-gold shrink-0 mt-0.5" />
                   <div className="space-y-1">
                     <p className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                      Telefone
+                      {c.phone}
                     </p>
                     <p className="text-sm text-white">
                       POR{' '}
@@ -238,10 +221,10 @@ export default function ContactoPage() {
                 </div>
               </div>
               <Link
-                href="/construir"
+                href={withLocale('/construir', locale)}
                 className="inline-flex rounded-full bg-cyan px-5 py-2.5 text-xs font-bold text-navy hover:brightness-110"
               >
-                Preferes construir o estágio?
+                {t.nav.build}
               </Link>
             </aside>
           </div>

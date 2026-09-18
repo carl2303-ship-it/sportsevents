@@ -53,6 +53,15 @@ type FormState = {
   routine: PackageRoutineStep[]
   published: boolean
   sort_order: number
+  en_name: string
+  en_duration: string
+  en_schedule: string
+  en_concept: string
+  en_airport_label: string
+  en_local_network: string
+  en_inclusionsText: string
+  en_itinerary: PackageItineraryStep[]
+  en_routine: PackageRoutineStep[]
 }
 
 const emptyForm = (destinationId = ''): FormState => ({
@@ -81,9 +90,19 @@ const emptyForm = (destinationId = ''): FormState => ({
   routine: [{ title: '', text: '' }],
   published: true,
   sort_order: 0,
+  en_name: '',
+  en_duration: '',
+  en_schedule: '',
+  en_concept: '',
+  en_airport_label: '',
+  en_local_network: '',
+  en_inclusionsText: '',
+  en_itinerary: [{ day: '', detail: '' }],
+  en_routine: [{ title: '', text: '' }],
 })
 
 function viewToForm(pkg: HubPackageView): FormState {
+  const en = pkg.translations?.en
   return {
     destination_id: pkg.destinationId,
     package_key: pkg.packageKey,
@@ -112,6 +131,19 @@ function viewToForm(pkg: HubPackageView): FormState {
     routine: pkg.routine.length ? pkg.routine : [{ title: '', text: '' }],
     published: pkg.published,
     sort_order: pkg.sortOrder,
+    en_name: en?.name || '',
+    en_duration: en?.duration || '',
+    en_schedule: en?.schedule || '',
+    en_concept: en?.concept || '',
+    en_airport_label: en?.airport_label || '',
+    en_local_network: en?.local_network || '',
+    en_inclusionsText: (en?.inclusions || []).join('\n'),
+    en_itinerary: en?.itinerary?.length
+      ? en.itinerary
+      : [{ day: '', detail: '' }],
+    en_routine: en?.routine?.length
+      ? en.routine
+      : [{ title: '', text: '' }],
   }
 }
 
@@ -182,6 +214,26 @@ export function HubPackagesPanel() {
         .filter(Boolean),
       itinerary: form.itinerary.filter((s) => s.day.trim() || s.detail.trim()),
       routine: form.routine.filter((s) => s.title.trim() || s.text.trim()),
+      translations: {
+        en: {
+          name: form.en_name.trim(),
+          duration: form.en_duration.trim(),
+          schedule: form.en_schedule.trim(),
+          concept: form.en_concept.trim(),
+          airport_label: form.en_airport_label.trim(),
+          local_network: form.en_local_network.trim(),
+          inclusions: form.en_inclusionsText
+            .split('\n')
+            .map((l) => l.trim())
+            .filter(Boolean),
+          itinerary: form.en_itinerary.filter(
+            (s) => s.day.trim() || s.detail.trim()
+          ),
+          routine: form.en_routine.filter(
+            (s) => s.title.trim() || s.text.trim()
+          ),
+        },
+      },
     }
 
     try {
@@ -401,7 +453,7 @@ export function HubPackagesPanel() {
                 </label>
                 <label className="block space-y-1 sm:col-span-2">
                   <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-                    Conceito
+                    Conceito (PT)
                   </span>
                   <textarea
                     className={`${inputCls} min-h-[72px]`}
@@ -411,6 +463,107 @@ export function HubPackagesPanel() {
                     }
                   />
                 </label>
+              </div>
+
+              <div className="space-y-3 rounded-xl border border-cyan/20 bg-cyan/5 p-4">
+                <p className="text-[10px] uppercase tracking-wider text-cyan font-bold">
+                  Tradução EN (site principal /)
+                </p>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <label className="block space-y-1 sm:col-span-2">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      Name (EN)
+                    </span>
+                    <input
+                      className={inputCls}
+                      value={form.en_name}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, en_name: e.target.value }))
+                      }
+                    />
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      Duration (EN)
+                    </span>
+                    <input
+                      className={inputCls}
+                      value={form.en_duration}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, en_duration: e.target.value }))
+                      }
+                    />
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      Schedule (EN)
+                    </span>
+                    <input
+                      className={inputCls}
+                      value={form.en_schedule}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, en_schedule: e.target.value }))
+                      }
+                    />
+                  </label>
+                  <label className="block space-y-1 sm:col-span-2">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      Concept (EN)
+                    </span>
+                    <textarea
+                      className={`${inputCls} min-h-[72px]`}
+                      value={form.en_concept}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, en_concept: e.target.value }))
+                      }
+                    />
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      Airport (EN)
+                    </span>
+                    <input
+                      className={inputCls}
+                      value={form.en_airport_label}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          en_airport_label: e.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="block space-y-1">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      Local network (EN)
+                    </span>
+                    <input
+                      className={inputCls}
+                      value={form.en_local_network}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          en_local_network: e.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="block space-y-1 sm:col-span-2">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      Inclusions EN (one per line)
+                    </span>
+                    <textarea
+                      className={`${inputCls} min-h-[80px]`}
+                      value={form.en_inclusionsText}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          en_inclusionsText: e.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

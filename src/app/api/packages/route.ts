@@ -6,11 +6,14 @@ import {
   type HubId,
   type HubPackageRow,
 } from '@/lib/hub-packages'
+import { isLocale, type Locale } from '@/i18n/config'
 
-/** Public list of published packages (optional ?hub=algarve|barcelona|marbella). */
+/** Public list of published packages (optional ?hub=&locale=). */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const hub = searchParams.get('hub') as HubId | null
+  const localeParam = searchParams.get('locale')
+  const locale: Locale = isLocale(localeParam) ? localeParam : 'en'
   const supabase = await createClient()
 
   let query = supabase
@@ -29,6 +32,8 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json({
-    packages: ((data || []) as HubPackageRow[]).map(rowToView),
+    packages: ((data || []) as HubPackageRow[]).map((row) =>
+      rowToView(row, locale)
+    ),
   })
 }

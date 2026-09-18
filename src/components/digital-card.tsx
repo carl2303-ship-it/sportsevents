@@ -12,8 +12,11 @@ import {
 } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
 import type { CardProfile } from '@/lib/cards'
+import { withLocale } from '@/i18n/config'
+import { useDictionary } from '@/i18n/use-locale'
 
 export function DigitalCard({ profile }: { profile: CardProfile }) {
+  const { locale, t } = useDictionary()
   const [photoOk, setPhotoOk] = useState(Boolean(profile.photoSrc))
   const initial = (profile.firstName || profile.fullName || '?')
     .charAt(0)
@@ -27,7 +30,7 @@ export function DigitalCard({ profile }: { profile: CardProfile }) {
       <main className="relative z-10 mx-auto flex min-h-[100svh] max-w-md flex-col justify-center px-5 py-10">
         <div className="animate-fade-up flex justify-center mb-8">
           <BrandLogo
-            href="/"
+            href={withLocale('/', locale)}
             variant="full"
             className="h-14 w-auto drop-shadow-[0_4px_20px_rgba(0,0,0,0.45)]"
           />
@@ -105,14 +108,14 @@ export function DigitalCard({ profile }: { profile: CardProfile }) {
             className="animate-cta-glow mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-gold px-5 py-3.5 text-sm font-bold text-navy hover:brightness-110 transition"
           >
             <Download className="w-4 h-4" />
-            Transferir Contacto
+            {t.card.downloadContact}
           </a>
 
           {profile.brochures.length > 0 ? (
             <div className="mt-8">
               <p className="text-[10px] uppercase tracking-[0.2em] text-app-white/40 font-bold mb-3 flex items-center gap-2">
                 <FileText className="w-3.5 h-3.5" />
-                Brochuras B2B
+                {t.card.brochures}
               </p>
               <div className="space-y-2">
                 {profile.brochures.map((b, i) => {

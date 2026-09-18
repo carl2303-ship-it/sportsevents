@@ -35,6 +35,9 @@ import {
   type HubPackageView,
   type PackageKey,
 } from '@/lib/hub-packages'
+import { withLocale } from '@/i18n/config'
+import { fillTemplate } from '@/i18n/dictionaries'
+import { useDictionary } from '@/i18n/use-locale'
 
 function hubIdFromQuery(raw: string | null): StageHub | null {
   if (!raw) return null
@@ -47,11 +50,12 @@ function hubIdFromQuery(raw: string | null): StageHub | null {
 }
 
 export default function ConstruirEstagioPage() {
+  const { t } = useDictionary()
   return (
     <Suspense
       fallback={
         <div className="min-h-screen bg-navy text-app-white flex items-center justify-center text-sm text-app-white/60">
-          A carregar construtor…
+          {t.builder.loading}
         </div>
       }
     >
@@ -61,6 +65,9 @@ export default function ConstruirEstagioPage() {
 }
 
 function ConstruirEstagioClient() {
+  const { locale, t } = useDictionary()
+  const b = t.builder
+  const numberLocale = locale === 'en' ? 'en-GB' : 'pt-PT'
   const searchParams = useSearchParams()
   const [step, setStep] = useState(0)
   const [config, setConfig] = useState<StageBuilderConfig>(DEFAULT_STAGE_CONFIG)
@@ -85,13 +92,13 @@ function ConstruirEstagioClient() {
   }, [packages, config.hub])
 
   useEffect(() => {
-    fetch('/api/packages')
+    fetch(`/api/packages?locale=${locale}`)
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data.packages)) setPackages(data.packages)
       })
       .catch(() => {})
-  }, [])
+  }, [locale])
 
   useEffect(() => {
     if (bootstrapped || packages.length === 0) return
@@ -165,14 +172,14 @@ function ConstruirEstagioClient() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || 'Não foi possível enviar o pedido.')
+        setError(data.error || t.builder.submitError)
         setSubmitting(false)
         return
       }
       setLeadId(data.leadId)
       setDone(true)
     } catch {
-      setError('Erro de rede. Tenta novamente.')
+      setError(t.builder.networkError)
     }
     setSubmitting(false)
   }
@@ -184,50 +191,42 @@ function ConstruirEstagioClient() {
       <main className="flex-1 px-5 md:px-10 py-10 md:py-14">
         <div className="mx-auto max-w-6xl">
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
-            App Builder
+            {b.eyebrow}
           </p>
           <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl md:text-5xl font-extrabold">
-            Construir o Meu Estágio
+            {t.builder.title}
           </h1>
           <p className="mt-3 max-w-2xl text-app-white/65 text-sm md:text-base">
-            Escolhe um pacote pronto ou configura o teu camp à medida. Recebes
-            uma estimativa indicativa e a nossa equipa confirma o orçamento
-            final.
+            {t.builder.lead}
           </p>
 
           {done ? (
             <div className="mt-12 max-w-xl rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-8 space-y-4">
               <CheckCircle2 className="w-10 h-10 text-emerald-400" />
-              <h2 className="text-2xl font-black">Pedido enviado</h2>
+              <h2 className="text-2xl font-black">{b.sentTitle}</h2>
               <p className="text-sm text-app-white/70">
-                Obrigado{config.clientName ? `, ${config.clientName}` : ''}. A
-                estimativa ficou em cerca de{' '}
-                <strong className="text-emerald-300">
-                  {estimate.pricePerPlayerDouble.toLocaleString('pt-PT')} €
-                </strong>{' '}
-                / jogador (quarto duplo) ou{' '}
-                <strong className="text-emerald-300">
-                  {estimate.pricePerPlayerSingle.toLocaleString('pt-PT')} €
-                </strong>{' '}
-                / jogador (single). Total grupo:{' '}
-                {estimate.grandTotal.toLocaleString('pt-PT')} €. Entramos em
-                contacto em breve.
+                {fillTemplate(b.sentBody, {
+                  name: config.clientName ? `, ${config.clientName}` : '',
+                  double: estimate.pricePerPlayerDouble.toLocaleString(numberLocale),
+                  single: estimate.pricePerPlayerSingle.toLocaleString(numberLocale),
+                  total: estimate.grandTotal.toLocaleString(numberLocale),
+                })}
               </p>
               {leadId && (
                 <p className="text-[11px] text-app-white/40">Ref. {leadId}</p>
               )}
               <div className="flex flex-wrap gap-3 pt-2">
                 <Link
-                  href="/eventos"
+                  href={withLocale("/eventos", locale)}
                   className="rounded-full bg-gold px-5 py-2.5 text-sm font-bold text-navy"
                 >
-                  Ver eventos publicados
+                  {b.seeEvents}
                 </Link>
                 <Link
-                  href="/"
+                  href={withLocale("/", locale)}
                   className="rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold"
                 >
-                  Voltar à home
+                  {b.backHome}
                 </Link>
               </div>
             </div>
@@ -247,7 +246,7 @@ function ConstruirEstagioClient() {
                             : 'border-white/15 text-app-white/45'
                       }`}
                     >
-                      {i + 1}. {s.label}
+                      {i + 1}. {b.steps[i]}
                     </button>
                   ))}
                 </div>
@@ -255,9 +254,9 @@ function ConstruirEstagioClient() {
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 md:p-7 space-y-5">
                   {step === 0 && (
                     <>
-                      <SectionTitle title="Onde queres jogar?" />
+                      <SectionTitle title={b.wherePlay} />
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {HUB_OPTIONS.map((h) => (
+                        {HUB_OPTIONS.map((h, i) => (
                           <ChoiceCard
                             key={h.value}
                             active={config.hub === h.value}
@@ -265,18 +264,17 @@ function ConstruirEstagioClient() {
                               patch('hub', h.value)
                               setSelectedPackageKey(null)
                             }}
-                            title={`${h.flag} ${h.label}`}
-                            blurb={h.blurb}
+                            title={`${h.flag} ${b.hubs[i].label}`}
+                            blurb={b.hubs[i].blurb}
                           />
                         ))}
                       </div>
 
                       {hubPackages.length > 0 ? (
                         <>
-                          <SectionTitle title="Pacotes prontos deste hub" />
+                          <SectionTitle title={b.readyPackages} />
                           <p className="text-xs text-app-white/50 -mt-2">
-                            Pré-preenche noites, horas de treino/jogo e torneio.
-                            Podes ajustar nos passos seguintes.
+                            {b.readyPackagesHint}
                           </p>
                           <div className="grid grid-cols-1 gap-3">
                             {hubPackages.map((pkg) => (
@@ -296,19 +294,19 @@ function ConstruirEstagioClient() {
                                       {pkg.name}
                                       {pkg.featured ? (
                                         <span className="ml-2 text-[10px] text-gold uppercase tracking-wider">
-                                          Estrela
+                                          {b.featured}
                                         </span>
                                       ) : null}
                                     </p>
                                     <p className="text-[11px] text-app-white/50 mt-0.5">
-                                      {pkg.duration} · {pkg.courtHours}h campo
+                                      {pkg.duration} · {pkg.courtHours}{b.courtHoursShort}
                                       {lowestAvailablePrice(pkg.prices) != null
-                                        ? ` · desde ${formatEuro(lowestAvailablePrice(pkg.prices)!)}`
+                                        ? ` · ${b.fromPrice} ${formatEuro(lowestAvailablePrice(pkg.prices)!)}`
                                         : ''}
                                     </p>
                                   </div>
                                   <span className="text-[11px] font-bold text-cyan">
-                                    Usar este
+                                    {b.useThis}
                                   </span>
                                 </div>
                               </button>
@@ -317,30 +315,30 @@ function ConstruirEstagioClient() {
                         </>
                       ) : null}
 
-                      <SectionTitle title="Tipo de grupo" />
+                      <SectionTitle title={b.groupType} />
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {GROUP_TYPE_OPTIONS.map((g) => (
+                        {GROUP_TYPE_OPTIONS.map((g, i) => (
                           <ChoiceCard
                             key={g.value}
                             active={config.groupType === g.value}
                             onClick={() => patch('groupType', g.value)}
-                            title={g.label}
-                            blurb={g.blurb}
+                            title={b.groupTypes[i].label}
+                            blurb={b.groupTypes[i].blurb}
                           />
                         ))}
                       </div>
                       <label className="block space-y-1.5">
                         <span className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                          Mês preferido
+                          {b.preferredMonth}
                         </span>
                         <select
                           className={inputCls}
                           value={config.month}
                           onChange={(e) => patch('month', e.target.value)}
                         >
-                          {MONTH_OPTIONS.map((m) => (
+                          {MONTH_OPTIONS.map((m, i) => (
                             <option key={m} value={m}>
-                              {m}
+                              {b.months[i]}
                             </option>
                           ))}
                         </select>
@@ -351,40 +349,40 @@ function ConstruirEstagioClient() {
                   {step === 1 && (
                     <>
                       <SectionTitle
-                        title="Dimensão do grupo"
+                        title={b.groupSize}
                         icon={<Users className="w-4 h-4 text-cyan" />}
                       />
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <NumberField
-                          label="Jogadores de padel"
+                          label={b.players}
                           value={config.players}
                           min={4}
                           max={40}
                           onChange={(v) => patch('players', v)}
                         />
                         <NumberField
-                          label="Acompanhantes (não jogam)"
+                          label={b.companions}
                           value={config.companions}
                           min={0}
                           max={20}
                           onChange={(v) => patch('companions', v)}
                         />
                         <NumberField
-                          label="Noites"
+                          label={b.nights}
                           value={config.nights}
                           min={2}
                           max={10}
                           onChange={(v) => patch('nights', v)}
                         />
                       </div>
-                      <SectionTitle title="Nível de jogo" />
+                      <SectionTitle title={b.playLevel} />
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        {LEVEL_OPTIONS.map((l) => (
+                        {LEVEL_OPTIONS.map((l, i) => (
                           <ChoiceCard
                             key={l.value}
                             active={config.playLevel === l.value}
                             onClick={() => patch('playLevel', l.value)}
-                            title={l.label}
+                            title={b.levels[i]}
                             compact
                           />
                         ))}
@@ -395,19 +393,19 @@ function ConstruirEstagioClient() {
                   {step === 2 && (
                     <>
                       <SectionTitle
-                        title="Programa desportivo"
+                        title={b.sportsProgram}
                         icon={<Trophy className="w-4 h-4 text-gold" />}
                       />
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <NumberField
-                          label="Horas de treino (total)"
+                          label={b.trainingHours}
                           value={config.trainingHours}
                           min={0}
                           max={30}
                           onChange={(v) => patch('trainingHours', v)}
                         />
                         <NumberField
-                          label="Horas de jogo / confrontos"
+                          label={b.matchHours}
                           value={config.matchHours}
                           min={0}
                           max={30}
@@ -415,12 +413,14 @@ function ConstruirEstagioClient() {
                         />
                       </div>
                       <ToggleRow
-                        label="Torneio final"
-                        description="Formato competitivo no último dia com rankings e prémios"
+                        label={b.tournament}
+                        description={b.tournamentDesc}
                         value={config.tournament}
                         onChange={(v) => patch('tournament', v)}
+                        yesLabel={b.yes}
+                        noLabel={b.no}
                       />
-                      <SectionTitle title="Língua das aulas" />
+                      <SectionTitle title={b.lessonLang} />
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         {LANG_OPTIONS.map((l) => (
                           <ChoiceCard
@@ -438,60 +438,63 @@ function ConstruirEstagioClient() {
                   {step === 3 && (
                     <>
                       <SectionTitle
-                        title="Hospitality"
+                        title={b.hospitality}
                         icon={<Plane className="w-4 h-4 text-cyan" />}
                       />
-                      <SectionTitle title="Regime de refeições" />
+                      <SectionTitle title={b.mealPlan} />
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {MEAL_OPTIONS.map((m) => (
+                        {MEAL_OPTIONS.map((m, i) => (
                           <ChoiceCard
                             key={m.value}
                             active={config.mealPlan === m.value}
                             onClick={() => patch('mealPlan', m.value)}
-                            title={m.label}
-                            blurb={m.blurb}
+                            title={b.meals[i].label}
+                            blurb={b.meals[i].blurb}
                           />
                         ))}
                       </div>
-                      <SectionTitle title="Categoria de hotel" />
+                      <SectionTitle title={b.hotelCategory} />
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {HOTEL_STAR_OPTIONS.map((h) => (
+                        {HOTEL_STAR_OPTIONS.map((h, i) => (
                           <ChoiceCard
                             key={h.value}
                             active={config.hotelStars === h.value}
                             onClick={() => patch('hotelStars', h.value)}
-                            title={h.label}
-                            blurb={h.blurb}
+                            title={b.hotels[i].label}
+                            blurb={b.hotels[i].blurb}
                           />
                         ))}
                       </div>
                       <ToggleRow
-                        label="Transfers aeroporto"
-                        description="VIP 24/7 aeroporto ↔ hotel (ida e volta)"
+                        label={b.airportTransfer}
+                        description={b.airportTransferDesc}
                         value={config.airportTransfer}
                         onChange={(v) => patch('airportTransfer', v)}
+                        yesLabel={b.yes}
+                        noLabel={b.no}
                       />
                       <NumberField
-                        label="Nº de quartos single"
+                        label={b.singleRooms}
                         value={config.singleRooms}
                         min={0}
                         max={config.players}
                         onChange={(v) => patch('singleRooms', v)}
                       />
                       <p className="text-[11px] text-app-white/45 -mt-2">
-                        Os restantes jogadores ficam em quarto duplo (
-                        {Math.max(0, config.players - config.singleRooms)} pax).
+                        {fillTemplate(b.doubleRoomsNote, {
+                          n: String(Math.max(0, config.players - config.singleRooms)),
+                        })}
                       </p>
                       <label className="block space-y-1.5">
                         <span className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                          Notas / pedidos especiais
+                          {b.notes}
                         </span>
                         <textarea
                           className={inputCls}
                           rows={3}
                           value={config.notes}
                           onChange={(e) => patch('notes', e.target.value)}
-                          placeholder="Ex.: preferência de hotel, aniversário no grupo, salas de reunião..."
+                          placeholder={b.notesPlaceholder}
                         />
                       </label>
                     </>
@@ -499,10 +502,10 @@ function ConstruirEstagioClient() {
 
                   {step === 4 && (
                     <>
-                      <SectionTitle title="Resumo do estágio" />
+                      <SectionTitle title={b.summary} />
                       <div className="rounded-2xl border border-gold/30 bg-gradient-to-b from-gold/10 to-transparent p-5 md:p-6 space-y-4">
                         <p className="text-[10px] uppercase tracking-wider text-gold font-bold">
-                          As tuas escolhas
+                          {b.yourChoices}
                         </p>
                         <div className="text-[11px] text-app-white/65 space-y-1">
                           <p>
@@ -511,49 +514,48 @@ function ConstruirEstagioClient() {
                             Hotel {config.hotelStars}★ · {config.month}
                           </p>
                           <p>
-                            {config.players} jogadores
+                            {config.players} {b.playersWord}
                             {config.companions
-                              ? ` + ${config.companions} acompanhantes`
+                              ? ` + ${config.companions} ${b.companionsWord}`
                               : ''}{' '}
-                            · {config.nights} noites · {config.singleRooms} quarto(s)
-                            single
+                            · {config.nights} {b.nightsWord} · {config.singleRooms}{' '}
+                            {b.singleRoomsWord}
                           </p>
                           <p>
-                            {config.trainingHours}h treino · {config.matchHours}h jogo ·{' '}
-                            {config.mealPlan}
-                            {config.tournament ? ' · torneio' : ''}
-                            {config.airportTransfer ? ' · transfer' : ''}
+                            {config.trainingHours}{b.trainingShort} · {config.matchHours}
+                            {b.matchShort} · {config.mealPlan}
+                            {config.tournament ? ` · ${b.tournamentShort}` : ''}
+                            {config.airportTransfer ? ` · ${b.transferShort}` : ''}
                           </p>
                         </div>
 
                         <div className="pt-3 border-t border-white/10 space-y-3">
                           <div>
                             <p className="text-[10px] uppercase tracking-wider text-app-white/55">
-                              Preço por jogador (duplo)
+                              {b.priceDouble}
                             </p>
                             <p className="text-3xl md:text-4xl font-black text-gold leading-none mt-1">
-                              {estimate.pricePerPlayerDouble.toLocaleString('pt-PT')} €
+                              {estimate.pricePerPlayerDouble.toLocaleString(numberLocale)} €
                             </p>
                           </div>
                           <div className="flex justify-between items-end gap-3">
                             <p className="text-sm text-app-white/60">
-                              Preço por jogador (single)
+                              {b.priceSingle}
                             </p>
                             <p className="text-xl font-black text-white">
-                              {estimate.pricePerPlayerSingle.toLocaleString('pt-PT')} €
+                              {estimate.pricePerPlayerSingle.toLocaleString(numberLocale)} €
                             </p>
                           </div>
                           <div className="flex justify-between items-end gap-3">
-                            <p className="text-sm text-app-white/60">Total do grupo</p>
+                            <p className="text-sm text-app-white/60">{b.groupTotal}</p>
                             <p className="text-2xl font-black text-white">
-                              {estimate.grandTotal.toLocaleString('pt-PT')} €
+                              {estimate.grandTotal.toLocaleString(numberLocale)} €
                             </p>
                           </div>
                         </div>
 
                         <p className="text-[11px] text-app-white/55 pt-1">
-                          Estes valores são estimativos. O orçamento definitivo será
-                          comunicado por email após o envio do formulário.
+                          {b.estimateNote}
                         </p>
                       </div>
                     </>
@@ -561,11 +563,11 @@ function ConstruirEstagioClient() {
 
                   {step === 5 && (
                     <>
-                      <SectionTitle title="Os teus dados" />
+                      <SectionTitle title={b.yourDetails} />
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <label className="block space-y-1.5 sm:col-span-2">
                           <span className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                            Nome completo *
+                            {b.fullName}
                           </span>
                           <input
                             className={inputCls}
@@ -576,7 +578,7 @@ function ConstruirEstagioClient() {
                         </label>
                         <label className="block space-y-1.5">
                           <span className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                            Email *
+                            {b.email}
                           </span>
                           <input
                             className={inputCls}
@@ -588,7 +590,7 @@ function ConstruirEstagioClient() {
                         </label>
                         <label className="block space-y-1.5">
                           <span className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                            Telefone
+                            {b.phone}
                           </span>
                           <input
                             className={inputCls}
@@ -598,7 +600,7 @@ function ConstruirEstagioClient() {
                         </label>
                         <label className="block space-y-1.5 sm:col-span-2">
                           <span className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                            Clube / empresa
+                            {b.clubCompany}
                           </span>
                           <input
                             className={inputCls}
@@ -625,7 +627,7 @@ function ConstruirEstagioClient() {
                       onClick={() => setStep((s) => Math.max(0, s - 1))}
                       className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-xs font-semibold disabled:opacity-30"
                     >
-                      <ArrowLeft className="w-3.5 h-3.5" /> Anterior
+                      <ArrowLeft className="w-3.5 h-3.5" /> {b.back}
                     </button>
                     {step < BUILDER_STEPS.length - 1 ? (
                       <button
@@ -634,7 +636,7 @@ function ConstruirEstagioClient() {
                         onClick={() => setStep((s) => s + 1)}
                         className="inline-flex items-center gap-2 rounded-full bg-cyan px-4 py-2 text-xs font-bold text-navy disabled:opacity-40"
                       >
-                        Seguinte <ArrowRight className="w-3.5 h-3.5" />
+                        {b.next} <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     ) : (
                       <button
@@ -643,7 +645,7 @@ function ConstruirEstagioClient() {
                         onClick={submit}
                         className="inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-xs font-bold text-navy disabled:opacity-40"
                       >
-                        {submitting ? 'A enviar...' : 'Pedir orçamento'}
+                        {submitting ? b.submitting : b.submit}
                       </button>
                     )}
                   </div>
@@ -749,11 +751,15 @@ function ToggleRow({
   description,
   value,
   onChange,
+  yesLabel = 'Sim',
+  noLabel = 'Não',
 }: {
   label: string
   description: string
   value: boolean
   onChange: (v: boolean) => void
+  yesLabel?: string
+  noLabel?: string
 }) {
   return (
     <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-navy/40 px-4 py-3">
@@ -769,7 +775,7 @@ function ToggleRow({
             value ? 'bg-emerald-500 text-navy' : 'bg-white/5 text-app-white/50'
           }`}
         >
-          Sim
+          {yesLabel}
         </button>
         <button
           type="button"
@@ -778,7 +784,7 @@ function ToggleRow({
             !value ? 'bg-rose-500/80 text-white' : 'bg-white/5 text-app-white/50'
           }`}
         >
-          Não
+          {noLabel}
         </button>
       </div>
     </div>

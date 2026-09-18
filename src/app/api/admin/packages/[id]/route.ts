@@ -47,6 +47,10 @@ function sanitizePayload(body: Partial<HubPackageWrite>): HubPackageWrite | { er
       ? body.inclusions.map(String)
       : [],
     routine: Array.isArray(body.routine) ? body.routine : [],
+    translations:
+      body.translations && typeof body.translations === 'object'
+        ? body.translations
+        : {},
     published: body.published !== false,
     sort_order: Number(body.sort_order) || 0,
   }

@@ -5,17 +5,30 @@ import {
   availableMealPlans,
   isPriceAvailable,
   mealPlanPrices,
-  MEAL_PLAN_LABELS,
   type HubId,
   type HubPackageView,
+  type MealPlanKey,
 } from '@/lib/hub-packages'
+import { withLocale, type Locale } from '@/i18n/config'
+import { fillTemplate, getDictionary } from '@/i18n/dictionaries'
 
-function Specs({ pkg }: { pkg: HubPackageView }) {
+function Specs({
+  pkg,
+  labels,
+}: {
+  pkg: HubPackageView
+  labels: {
+    courtTotal: string
+    coachHours: string
+    localMatch: string
+    tournament: string
+  }
+}) {
   const items = [
-    { label: 'Total em campo', value: `${pkg.courtHours}h` },
-    { label: 'Treino com treinador', value: `${pkg.coachHours}h` },
-    { label: 'Jogo vs. locais', value: `${pkg.localMatchHours}h` },
-    { label: 'Torneio', value: `${pkg.tournamentHours}h` },
+    { label: labels.courtTotal, value: `${pkg.courtHours}h` },
+    { label: labels.coachHours, value: `${pkg.coachHours}h` },
+    { label: labels.localMatch, value: `${pkg.localMatchHours}h` },
+    { label: labels.tournament, value: `${pkg.tournamentHours}h` },
   ]
   return (
     <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -33,14 +46,17 @@ function Specs({ pkg }: { pkg: HubPackageView }) {
   )
 }
 
-function PriceTable({ pkg }: { pkg: HubPackageView }) {
+function PriceTable({
+  pkg,
+  locale,
+}: {
+  pkg: HubPackageView
+  locale: Locale
+}) {
+  const t = getDictionary(locale).packages
   const plans = availableMealPlans(pkg.prices)
   if (plans.length === 0) {
-    return (
-      <p className="text-sm text-app-white/50">
-        Preços sob consulta — contacta-nos para orçamento.
-      </p>
-    )
+    return <p className="text-sm text-app-white/50">{t.pricesOnRequest}</p>
   }
 
   return (
@@ -48,15 +64,15 @@ function PriceTable({ pkg }: { pkg: HubPackageView }) {
       <table className="w-full min-w-[420px] text-left text-sm">
         <thead>
           <tr className="border-b border-white/10 text-[10px] uppercase tracking-wider text-app-white/45">
-            <th className="py-2 pr-3 font-semibold">Alojamento</th>
-            <th className="py-2 px-3 font-semibold">Duplo</th>
-            <th className="py-2 pl-3 font-semibold">Individual</th>
+            <th className="py-2 pr-3 font-semibold">{t.lodging}</th>
+            <th className="py-2 px-3 font-semibold">{t.double}</th>
+            <th className="py-2 pl-3 font-semibold">{t.single}</th>
           </tr>
         </thead>
         <tbody className="text-app-white/80">
-          {plans.map((plan) => {
+          {plans.map((plan: MealPlanKey) => {
             const { double, single } = mealPlanPrices(pkg.prices, plan)
-            const meta = MEAL_PLAN_LABELS[plan]
+            const meta = t.mealPlans[plan]
             const accent = plan === 'full' ? 'text-gold' : 'text-white'
             return (
               <tr
@@ -80,9 +96,7 @@ function PriceTable({ pkg }: { pkg: HubPackageView }) {
           })}
         </tbody>
       </table>
-      <p className="mt-2 text-[11px] text-app-white/40">
-        Preços por pessoa. Transfers e Welcome Pack incluídos.
-      </p>
+      <p className="mt-2 text-[11px] text-app-white/40">{t.pricesNote}</p>
     </div>
   )
 }
@@ -91,11 +105,14 @@ export function HubPackagesSection({
   hubId,
   packages,
   otherLinks,
+  locale = 'en',
 }: {
   hubId: HubId
   packages: HubPackageView[]
   otherLinks: { href: string; label: string }[]
+  locale?: Locale
 }) {
+  const t = getDictionary(locale).packages
   const hubLabel = HUB_LABELS[hubId]
   const meta = packages[0]
   const airport = meta?.airportLabel || ''
@@ -108,12 +125,9 @@ export function HubPackagesSection({
       <section className="px-5 md:px-10 py-16 md:py-24 border-t border-white/10">
         <div className="mx-auto max-w-7xl">
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold">
-            Pacotes em {hubLabel}
+            {fillTemplate(t.emptyTitle, { hub: hubLabel })}
           </h2>
-          <p className="mt-3 text-app-white/60 text-sm">
-            Ainda não há pacotes publicados para este hub. Configura-os no
-            backoffice em Staff → Pacotes de estágio.
-          </p>
+          <p className="mt-3 text-app-white/60 text-sm">{t.emptyText}</p>
         </div>
       </section>
     )
@@ -124,20 +138,29 @@ export function HubPackagesSection({
       <div className="mx-auto max-w-7xl space-y-16 md:space-y-20">
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-gold">
-            Pacotes · {hubLabel}
+            {t.sectionEyebrow} · {hubLabel}
           </p>
           <h2 className="mt-3 font-[family-name:var(--font-display)] text-3xl md:text-4xl font-extrabold max-w-3xl">
-            Programa desportivo & social
+            {t.sectionTitle}
           </h2>
           <p className="mt-4 max-w-2xl text-app-white/65 text-sm md:text-base leading-relaxed">
-            Em todos os pacotes, a rotina diária segue a mesma estrutura
+            {t.sectionLeadBefore}
             {airport ? (
               <>
-                . Em {hubLabel}, os transfers são desde o {airport}
+                .{' '}
+                {fillTemplate(t.sectionLeadAirport, {
+                  hub: hubLabel,
+                  airport,
+                })}
               </>
             ) : null}
             {localNetwork ? (
-              <>. Os jogos da tarde usam {localNetwork}</>
+              <>
+                .{' '}
+                {fillTemplate(t.sectionLeadNetwork, {
+                  network: localNetwork,
+                })}
+              </>
             ) : null}
             .
           </p>
@@ -148,15 +171,17 @@ export function HubPackagesSection({
             {routine.length > 0 ? (
               <div>
                 <h3 className="font-[family-name:var(--font-display)] text-xl font-bold text-cyan">
-                  Rotina diária
+                  {t.dailyRoutine}
                 </h3>
                 <ul className="mt-6 space-y-5">
                   {routine.map((item) => (
                     <li key={item.title} className="border-l border-gold/40 pl-4">
                       <p className="text-sm font-bold text-white">{item.title}</p>
                       <p className="mt-1 text-sm text-app-white/60 leading-relaxed">
-                        {item.title.startsWith('Tarde') && localNetwork
-                          ? `2 horas de jogo / confronto contra jogadores locais (${localNetwork}).`
+                        {/^(Tarde|Afternoon)/i.test(item.title) && localNetwork
+                          ? fillTemplate(t.afternoonLocal, {
+                              network: localNetwork,
+                            })
                           : item.text}
                       </p>
                     </li>
@@ -167,7 +192,7 @@ export function HubPackagesSection({
             {inclusions.length > 0 ? (
               <div>
                 <h3 className="font-[family-name:var(--font-display)] text-xl font-bold text-cyan">
-                  Inclusões de base
+                  {t.baseInclusions}
                 </h3>
                 <ul className="mt-6 space-y-3">
                   {inclusions.map((line) => (
@@ -177,8 +202,10 @@ export function HubPackagesSection({
                     >
                       <span className="text-gold shrink-0">▸</span>
                       <span>
-                        {airport && line.toLowerCase().includes('aeroporto')
-                          ? `Transfers In/Out (${airport} ⇄ hotel/resort) via parceria exclusiva 24/7`
+                        {airport &&
+                        /aeroporto|airport/i.test(line) &&
+                        /transfer/i.test(line)
+                          ? fillTemplate(t.transferLine, { airport })
                           : line}
                       </span>
                     </li>
@@ -191,7 +218,7 @@ export function HubPackagesSection({
 
         <div className="space-y-10">
           <h3 className="font-[family-name:var(--font-display)] text-2xl md:text-3xl font-extrabold">
-            Os pacotes em {hubLabel}
+            {fillTemplate(t.packagesInHub, { hub: hubLabel })}
           </h3>
 
           {packages.map((pkg) => (
@@ -213,7 +240,7 @@ export function HubPackagesSection({
                     </p>
                     {pkg.featured ? (
                       <span className="rounded-full border border-gold/40 bg-gold/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold">
-                        Produto estrela
+                        {t.featured}
                       </span>
                     ) : null}
                   </div>
@@ -225,25 +252,39 @@ export function HubPackagesSection({
                   </p>
                 </div>
                 <Link
-                  href={`/construir?hub=${hubId}&package=${pkg.packageKey}`}
+                  href={withLocale(
+                    `/construir?hub=${hubId}&package=${pkg.packageKey}`,
+                    locale
+                  )}
                   className="inline-flex rounded-full bg-gold px-5 py-2.5 text-xs font-bold text-navy hover:brightness-110 transition shrink-0"
                 >
-                  Pedir orçamento
+                  {t.requestQuote}
                 </Link>
               </div>
 
               <div className="mt-8">
-                <Specs pkg={pkg} />
+                <Specs
+                  pkg={pkg}
+                  labels={{
+                    courtTotal: t.courtTotal,
+                    coachHours: t.coachHours,
+                    localMatch: t.localMatch,
+                    tournament: t.tournament,
+                  }}
+                />
               </div>
 
               <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.2em] text-app-white/40 font-bold mb-3">
-                    Itinerário
+                    {t.itinerary}
                   </p>
                   <ol className="space-y-3">
                     {pkg.itinerary.map((step) => (
-                      <li key={`${step.day}-${step.detail.slice(0, 24)}`} className="text-sm">
+                      <li
+                        key={`${step.day}-${step.detail.slice(0, 24)}`}
+                        className="text-sm"
+                      >
                         <span className="font-bold text-cyan">{step.day}</span>
                         <span className="text-app-white/60">
                           {' '}
@@ -255,9 +296,9 @@ export function HubPackagesSection({
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.2em] text-app-white/40 font-bold mb-3">
-                    Preços (por pessoa)
+                    {t.pricesPerPerson}
                   </p>
-                  <PriceTable pkg={pkg} />
+                  <PriceTable pkg={pkg} locale={locale} />
                 </div>
               </div>
             </article>
@@ -266,16 +307,16 @@ export function HubPackagesSection({
 
         <div className="flex flex-wrap gap-4">
           <Link
-            href="/construir"
+            href={withLocale('/construir', locale)}
             className="inline-flex rounded-full bg-gold px-6 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
           >
-            Construir o meu estágio
+            {t.buildStage}
           </Link>
           <Link
-            href="/contacto"
+            href={withLocale('/contacto', locale)}
             className="inline-flex rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-app-white/80 hover:border-cyan/50 hover:text-cyan transition"
           >
-            Falar connosco
+            {t.talkToUs}
           </Link>
           {otherLinks.map((link) => (
             <Link

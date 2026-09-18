@@ -13,6 +13,9 @@ import {
   Users,
   Utensils,
 } from 'lucide-react'
+import { withLocale } from '@/i18n/config'
+import { fillTemplate, getDictionary } from '@/i18n/dictionaries'
+import { getLocale } from '@/i18n/get-locale'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,6 +25,9 @@ export default async function EventoDetailPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  const locale = await getLocale()
+  const t = getDictionary(locale).events
+  const numberLocale = locale === 'en' ? 'en-GB' : 'pt-PT'
   const supabase = await createClient()
 
   const { data: bySlug } = await supabase
@@ -52,12 +58,16 @@ export default async function EventoDetailPage({
     <div className="min-h-screen bg-slate-950 text-white">
       <header className="border-b border-slate-800 px-5 md:px-10 py-4">
         <div className="mx-auto max-w-6xl flex items-center justify-between gap-4">
-          <BrandLogo variant="full" className="h-12 w-auto" />
+          <BrandLogo
+            variant="full"
+            href={withLocale('/', locale)}
+            className="h-12 w-auto"
+          />
           <Link
-            href="/eventos"
+            href={withLocale('/eventos', locale)}
             className="text-xs text-slate-400 hover:text-cyan-400"
           >
-            ← Todos os eventos
+            {t.allEvents}
           </Link>
         </div>
       </header>
@@ -90,7 +100,9 @@ export default async function EventoDetailPage({
               {event.title}
             </h1>
             {event.short_description && (
-              <p className="mt-3 text-slate-300 text-base">{event.short_description}</p>
+              <p className="mt-3 text-slate-300 text-base">
+                {event.short_description}
+              </p>
             )}
             <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-400">
               <span className="inline-flex items-center gap-1.5">
@@ -99,24 +111,32 @@ export default async function EventoDetailPage({
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5" />
-                Até {max} participantes
+                {fillTemplate(t.upTo, { n: String(max) })}
               </span>
             </div>
           </div>
 
           {event.description && (
-            <Section title="Sobre o evento">
+            <Section title={t.about}>
               <p className="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
                 {event.description}
               </p>
             </Section>
           )}
 
-          <Section title="Campos de padel">
+          <Section title={t.courts}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-center max-w-md">
-              <Stat label="Campos padel" value={event.courts_padel || 0} icon={<Trophy className="w-4 h-4" />} />
+              <Stat
+                label={t.courtsPadel}
+                value={event.courts_padel || 0}
+                icon={<Trophy className="w-4 h-4" />}
+              />
               {(event.courts_other || 0) > 0 && (
-                <Stat label="Outros" value={event.courts_other || 0} icon={<Building2 className="w-4 h-4" />} />
+                <Stat
+                  label={t.courtsOther}
+                  value={event.courts_other || 0}
+                  icon={<Building2 className="w-4 h-4" />}
+                />
               )}
             </div>
             {event.courts_notes && (
@@ -125,13 +145,15 @@ export default async function EventoDetailPage({
           </Section>
 
           {(event.hotel_name || event.restaurants || event.coaches) && (
-            <Section title="Operações & hospitality">
+            <Section title={t.ops}>
               <div className="space-y-3 text-sm text-slate-300">
                 {event.hotel_name && (
                   <div className="flex gap-2">
                     <Hotel className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                     <div>
-                      <div className="font-semibold text-white">{event.hotel_name}</div>
+                      <div className="font-semibold text-white">
+                        {event.hotel_name}
+                      </div>
                       {event.hotel_details && (
                         <div className="text-xs text-slate-400 mt-0.5">
                           {event.hotel_details}
@@ -157,7 +179,7 @@ export default async function EventoDetailPage({
           )}
 
           {event.welcome_pack && (
-            <Section title="Welcome pack">
+            <Section title={t.welcome}>
               <div className="flex gap-2 text-sm text-slate-300">
                 <Gift className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <p className="whitespace-pre-wrap">{event.welcome_pack}</p>
@@ -166,7 +188,7 @@ export default async function EventoDetailPage({
           )}
 
           {event.program && (
-            <Section title="Programa completo">
+            <Section title={t.program}>
               <p className="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
                 {event.program}
               </p>
@@ -174,7 +196,7 @@ export default async function EventoDetailPage({
           )}
 
           {event.highlights && (
-            <Section title="Destaques">
+            <Section title={t.highlights}>
               <p className="text-sm text-slate-300 whitespace-pre-wrap">
                 {event.highlights}
               </p>
@@ -182,7 +204,7 @@ export default async function EventoDetailPage({
           )}
 
           {event.includes && (
-            <Section title="Inclui">
+            <Section title={t.includes}>
               <p className="text-sm text-slate-300 whitespace-pre-wrap">
                 {event.includes}
               </p>
@@ -193,14 +215,16 @@ export default async function EventoDetailPage({
         <aside className="lg:col-span-2 lg:sticky lg:top-6 h-fit space-y-4">
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
             <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-              Preço / pessoa
+              {t.pricePerPerson}
             </div>
             <div className="text-3xl font-black text-emerald-400 mt-1">
-              {sale.toLocaleString('pt-PT')} €
+              {sale.toLocaleString(numberLocale)} €
             </div>
             {deposit > 0 && (
               <p className="text-xs text-amber-400 mt-2">
-                Ou reserva agora por {deposit.toLocaleString('pt-PT')} € / pessoa
+                {fillTemplate(t.orDeposit, {
+                  n: deposit.toLocaleString(numberLocale),
+                })}
               </p>
             )}
           </div>

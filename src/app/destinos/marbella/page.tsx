@@ -3,30 +3,21 @@ import type { Metadata } from 'next'
 import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 import { HubPackagesSection } from '@/components/hub-packages'
 import { fetchPublishedPackagesForHub } from '@/lib/hub-packages.server'
+import { withLocale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
+import { getLocale } from '@/i18n/get-locale'
 
-export const metadata: Metadata = {
-  title: 'Marbella Hub — SportsEvents.app',
-  description:
-    'Marbella Hub: a capital europeia do padel. Pacotes Padel Weekend, Experience e Premium VIP — Costa del Sol e transfers Málaga.',
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale()
+  const t = getDictionary(locale).destMarbella
+  return { title: t.metaTitle, description: t.metaDescription }
 }
 
-const highlights = [
-  {
-    title: 'Alojamento Premium',
-    text: 'Selecionamos alojamento de prestígio com infraestruturas adaptadas para grupos corporativos e desportistas, garantindo um descanso absoluto após treinos intensos.',
-  },
-  {
-    title: 'A Elite do Padel',
-    text: 'Acesso a clubes icónicos e possibilidade de treino com técnicos experientes no circuito espanhol, elevando a componente tática do seu grupo.',
-  },
-  {
-    title: 'Pós-Match de Luxo',
-    text: 'Desde a zona histórica aos clubes de praia e restauração de topo, Marbella oferece o melhor ambiente de socialização da Europa.',
-  },
-]
-
 export default async function MarbellaPage() {
-  const packages = await fetchPublishedPackagesForHub('marbella')
+  const locale = await getLocale()
+  const t = getDictionary(locale)
+  const d = t.destMarbella
+  const packages = await fetchPublishedPackagesForHub('marbella', locale)
 
   return (
     <div className="min-h-screen bg-navy text-app-white">
@@ -36,7 +27,7 @@ export default async function MarbellaPage() {
         <div className="absolute inset-0">
           <Image
             src="/destinos/marbella.jpg"
-            alt="Marbella Hub — campos de padel na Costa del Sol"
+            alt={d.imageAlt}
             fill
             priority
             className="object-cover"
@@ -46,14 +37,13 @@ export default async function MarbellaPage() {
         </div>
         <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-10 pt-36 md:pt-44 pb-20">
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
-            🇪🇸 España · Costa del Sol
+            {d.eyebrow}
           </p>
           <h1 className="mt-4 max-w-4xl font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight">
-            Marbella Hub: A Capital Europeia do Padel.
+            {d.heroTitle}
           </h1>
           <p className="mt-5 max-w-2xl text-base md:text-lg text-app-white/75">
-            Jogue onde os profissionais jogam. A Costa del Sol oferece o cenário
-            mais vibrante, competitivo e luxuoso para o seu estágio desportivo.
+            {d.heroText}
           </p>
         </div>
       </section>
@@ -62,18 +52,14 @@ export default async function MarbellaPage() {
         <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.25em] text-gold">
-              A Experiência Marbella
+              {d.experienceEyebrow}
             </p>
             <h2 className="mt-3 font-[family-name:var(--font-display)] text-3xl md:text-4xl font-extrabold">
-              Desempenho Desportivo. Exclusividade e Glamour.
+              {d.experienceTitle}
             </h2>
           </div>
           <p className="text-app-white/70 text-base md:text-lg leading-relaxed">
-            Marbella não é apenas um destino; é a verdadeira casa do Padel na
-            Europa. O nosso hub na Costa del Sol foi criado para grupos que
-            procuram elevar o seu nível de jogo enfrentando a forte armada
-            espanhola, enquanto desfrutam do lifestyle incomparável do
-            Mediterrâneo.
+            {d.experienceText}
           </p>
         </div>
       </section>
@@ -81,10 +67,10 @@ export default async function MarbellaPage() {
       <section className="border-t border-white/10 px-5 md:px-10 py-16 md:py-24 bg-[#071525]">
         <div className="mx-auto max-w-7xl">
           <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-extrabold">
-            O Que Torna Marbella Única?
+            {d.uniqueTitle}
           </h2>
           <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-10">
-            {highlights.map((h) => (
+            {d.highlights.map((h) => (
               <div key={h.title} className="border-t border-cyan/30 pt-5">
                 <h3 className="font-[family-name:var(--font-display)] text-lg font-bold text-cyan">
                   {h.title}
@@ -101,9 +87,16 @@ export default async function MarbellaPage() {
       <HubPackagesSection
         hubId="marbella"
         packages={packages}
+        locale={locale}
         otherLinks={[
-          { href: '/destinos/barcelona', label: 'Explorar Barcelona →' },
-          { href: '/destinos/algarve', label: 'Explorar Algarve →' },
+          {
+            href: withLocale('/destinos/barcelona', locale),
+            label: t.common.exploreBarcelona,
+          },
+          {
+            href: withLocale('/destinos/algarve', locale),
+            label: t.common.exploreAlgarve,
+          },
         ]}
       />
 

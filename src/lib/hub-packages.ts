@@ -75,6 +75,22 @@ export function lowestAvailablePrice(prices: PackagePrice): number | null {
   return Math.min(...vals)
 }
 
+export type PackageLocaleFields = {
+  name?: string
+  duration?: string
+  schedule?: string
+  concept?: string
+  airport_label?: string
+  local_network?: string
+  itinerary?: PackageItineraryStep[]
+  inclusions?: string[]
+  routine?: PackageRoutineStep[]
+}
+
+export type PackageTranslations = {
+  en?: PackageLocaleFields
+}
+
 export type HubPackageView = {
   id: string
   packageKey: PackageKey
@@ -99,6 +115,8 @@ export type HubPackageView = {
   destinationId: string
   destinationCode: string
   destinationName: string
+  /** PT base + EN para edição no admin. */
+  translations?: PackageTranslations
 }
 
 export type HubPackageRow = {
@@ -126,6 +144,7 @@ export type HubPackageRow = {
   local_network: string | null
   inclusions: string[] | null
   routine: PackageRoutineStep[] | null
+  translations?: PackageTranslations | null
   published: boolean
   sort_order: number
   destinations?: { id: string; code: string; name: string } | null
@@ -163,22 +182,33 @@ function num(v: number | string | null | undefined): number {
   return Number(v || 0)
 }
 
-export function rowToView(row: HubPackageRow): HubPackageView {
+export function rowToView(
+  row: HubPackageRow,
+  locale: 'pt' | 'en' = 'en'
+): HubPackageView {
   const dest = row.destinations
+  const en = row.translations?.en
+  const useEn = locale === 'en' && Boolean(en)
+
   return {
     id: row.id,
     packageKey: row.package_key,
-    name: row.name,
-    duration: row.duration,
-    schedule: row.schedule,
-    concept: row.concept,
+    name: (useEn && en?.name) || row.name,
+    duration: (useEn && en?.duration) || row.duration,
+    schedule: (useEn && en?.schedule) || row.schedule,
+    concept: (useEn && en?.concept) || row.concept,
     featured: row.featured,
     courtHours: row.court_hours,
     coachHours: row.coach_hours,
     localMatchHours: row.local_match_hours,
     tournamentHours: row.tournament_hours,
     nights: row.nights,
-    itinerary: Array.isArray(row.itinerary) ? row.itinerary : [],
+    itinerary:
+      useEn && Array.isArray(en?.itinerary)
+        ? en!.itinerary!
+        : Array.isArray(row.itinerary)
+          ? row.itinerary
+          : [],
     prices: {
       bbDouble: num(row.price_bb_double),
       bbSingle: num(row.price_bb_single),
@@ -187,15 +217,26 @@ export function rowToView(row: HubPackageRow): HubPackageView {
       fullDouble: num(row.price_full_double),
       fullSingle: num(row.price_full_single),
     },
-    airportLabel: row.airport_label || '',
-    localNetwork: row.local_network || '',
-    inclusions: Array.isArray(row.inclusions) ? row.inclusions : [],
-    routine: Array.isArray(row.routine) ? row.routine : [],
+    airportLabel: (useEn && en?.airport_label) || row.airport_label || '',
+    localNetwork: (useEn && en?.local_network) || row.local_network || '',
+    inclusions:
+      useEn && Array.isArray(en?.inclusions)
+        ? en!.inclusions!
+        : Array.isArray(row.inclusions)
+          ? row.inclusions
+          : [],
+    routine:
+      useEn && Array.isArray(en?.routine)
+        ? en!.routine!
+        : Array.isArray(row.routine)
+          ? row.routine
+          : [],
     published: row.published,
     sortOrder: row.sort_order,
     destinationId: row.destination_id,
     destinationCode: dest?.code || '',
     destinationName: dest?.name || '',
+    translations: row.translations || {},
   }
 }
 
@@ -223,6 +264,7 @@ export type HubPackageWrite = {
   local_network: string
   inclusions: string[]
   routine: PackageRoutineStep[]
+  translations?: PackageTranslations
   published: boolean
   sort_order: number
 }

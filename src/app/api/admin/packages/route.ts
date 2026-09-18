@@ -45,6 +45,10 @@ function sanitizePayload(body: Partial<HubPackageWrite>): HubPackageWrite | { er
       ? body.inclusions.map(String)
       : [],
     routine: Array.isArray(body.routine) ? body.routine : [],
+    translations:
+      body.translations && typeof body.translations === 'object'
+        ? body.translations
+        : {},
     published: body.published !== false,
     sort_order: Number(body.sort_order) || 0,
   }
@@ -74,7 +78,9 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    packages: ((packages || []) as HubPackageRow[]).map(rowToView),
+    packages: ((packages || []) as HubPackageRow[]).map((row) =>
+      rowToView(row, 'pt')
+    ),
     destinations: destinations || [],
   })
 }

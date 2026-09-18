@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Syne, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { getDictionary } from "@/i18n/dictionaries";
+import { getLocale } from "@/i18n/get-locale";
 import "./globals.css";
 
 const syne = Syne({
@@ -20,29 +22,32 @@ const jetbrains = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://sportsevents.app"
-  ),
-  title: "SportsEvents.app — Turismo e Estágios Desportivos Ibéricos",
-  description:
-    "A Plataforma Ibérica de Turismo e Estágios Desportivos. Experiências de alto rendimento em Padel em Portugal e Espanha.",
-  icons: {
-    icon: [{ url: "/brand/icon.png", type: "image/png" }],
-    apple: [{ url: "/brand/icon.png", type: "image/png" }],
-  },
-  openGraph: {
-    title: "SportsEvents.app — Turismo e Estágios Desportivos Ibéricos",
-    description:
-      "Experiências de alto rendimento em Padel. Treino profissional, competição local e alojamento premium.",
-    images: [{ url: "/brand/logo.png" }],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = getDictionary(locale).meta;
+  return {
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_SITE_URL ?? "https://sportsevents.app"
+    ),
+    title: t.siteTitle,
+    description: t.siteDescription,
+    icons: {
+      icon: [{ url: "/brand/icon.png", type: "image/png" }],
+      apple: [{ url: "/brand/icon.png", type: "image/png" }],
+    },
+    openGraph: {
+      title: t.siteTitle,
+      description: t.siteDescription,
+      images: [{ url: "/brand/logo.png" }],
+    },
+  };
+}
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const locale = await getLocale();
   return (
     <html
-      lang="pt"
+      lang={locale}
       className={`${syne.variable} ${dmSans.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">{children}</body>

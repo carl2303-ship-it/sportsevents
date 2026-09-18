@@ -6,10 +6,12 @@ import {
   type HubPackageRow,
   type HubPackageView,
 } from '@/lib/hub-packages'
+import type { Locale } from '@/i18n/config'
 
 /** Server-only: uses next/headers via Supabase SSR client. */
 export async function fetchPublishedPackagesForHub(
-  hubId: HubId
+  hubId: HubId,
+  locale: Locale = 'en'
 ): Promise<HubPackageView[]> {
   const code = HUB_ID_TO_CODE[hubId]
   const supabase = await createClient()
@@ -29,7 +31,7 @@ export async function fetchPublishedPackagesForHub(
     .order('sort_order', { ascending: true })
 
   if (error || !data) return []
-  return (data as HubPackageRow[]).map(rowToView)
+  return (data as HubPackageRow[]).map((row) => rowToView(row, locale))
 }
 
 export async function fetchAllPackagesAdmin(): Promise<HubPackageView[]> {
@@ -40,5 +42,5 @@ export async function fetchAllPackagesAdmin(): Promise<HubPackageView[]> {
     .order('sort_order', { ascending: true })
 
   if (error || !data) return []
-  return (data as HubPackageRow[]).map(rowToView)
+  return (data as HubPackageRow[]).map((row) => rowToView(row, 'pt'))
 }

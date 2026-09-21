@@ -8,5 +8,14 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(fetch(event.request))
+  // Network-only; never leave an unhandled rejection (HMR / offline / aborted).
+  event.respondWith(
+    fetch(event.request).catch(
+      () =>
+        new Response('', {
+          status: 503,
+          statusText: 'Service Unavailable',
+        })
+    )
+  )
 })

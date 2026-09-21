@@ -76,3 +76,58 @@ body {
   color: var(--app-white);
   font-family: var(--font-body), system-ui, sans-serif;
 }
+
+/* Blog article body (admin HTML) */
+.blog-prose h2 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--app-white);
+  line-height: 1.25;
+}
+
+.blog-prose h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--app-white);
+}
+
+.blog-prose p {
+  margin-bottom: 1.1rem;
+}
+
+.blog-prose ul,
+.blog-prose ol {
+  margin: 0 0 1.1rem 1.25rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.blog-prose ul {
+  list-style: disc;
+}
+
+.blog-prose ol {
+  list-style: decimal;
+}
+
+.blog-prose a {
+  color: var(--cyan);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.blog-prose a:hover {
+  color: var(--gold);
+}
+
+.blog-prose strong {
+  color: var(--app-white);
+  font-weight: 700;
+}

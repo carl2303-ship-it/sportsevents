@@ -13,10 +13,12 @@ import {
   Calculator,
   IdCard,
   Settings,
+  Newspaper,
 } from 'lucide-react'
 import RentabilidadeTorneios from '@/components/admin/RentabilidadeTorneios'
 import PartnersNetwork from '@/components/admin/PartnersNetwork'
 import { HubPackagesPanel } from '@/components/admin/HubPackagesPanel'
+import { BlogAdminPanel } from '@/components/admin/BlogAdminPanel'
 import {
   CreatePartnerModal,
   CreateLeadModal,
@@ -28,7 +30,9 @@ import { BrandLogo } from '@/components/brand-logo'
 import type { PartnerTypeValue } from '@/lib/partner-types'
 
 export default function EnterpriseBackoffice() {
-  const [activeTab, setActiveTab] = useState<'kpis' | 'pipeline' | 'partners' | 'events' | 'roi'>('kpis')
+  const [activeTab, setActiveTab] = useState<
+    'kpis' | 'pipeline' | 'partners' | 'events' | 'blog' | 'roi'
+  >('kpis')
   const [eventsSubTab, setEventsSubTab] = useState<'packages' | 'dated'>('packages')
   const [leads, setLeads] = useState<any[]>([])
   const [partners, setPartners] = useState<any[]>([])
@@ -53,6 +57,9 @@ export default function EnterpriseBackoffice() {
     const params = new URLSearchParams(window.location.search)
     if (params.get('tab') === 'partners') {
       setActiveTab('partners')
+    }
+    if (params.get('tab') === 'blog') {
+      setActiveTab('blog')
     }
     const stripe = params.get('stripe')
     const account = params.get('account')
@@ -201,6 +208,12 @@ export default function EnterpriseBackoffice() {
           className={`py-3 flex items-center gap-2 border-b-2 transition-all ${activeTab === 'partners' ? 'border-cyan-400 text-cyan-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
         >
           <Building2 className="w-4 h-4" /> Rede de Parceiros (ERP)
+        </button>
+        <button
+          onClick={() => setActiveTab('blog')}
+          className={`py-3 flex items-center gap-2 border-b-2 transition-all ${activeTab === 'blog' ? 'border-cyan-400 text-cyan-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+        >
+          <Newspaper className="w-4 h-4" /> Blog SEO
         </button>
         <button
           onClick={() => setActiveTab('roi')}
@@ -363,6 +376,8 @@ export default function EnterpriseBackoffice() {
             }}
           />
         )}
+
+        {activeTab === 'blog' && <BlogAdminPanel />}
 
         {activeTab === 'pipeline' && (
           <div className="space-y-4">

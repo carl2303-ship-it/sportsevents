@@ -10,6 +10,7 @@ export const fr: typeof pt = {
     destinations: 'Destinations',
     about: 'À propos',
     events: 'Événements',
+    blog: 'Blog',
     build: 'Créer votre stage',
     contact: 'Contact',
     staff: 'Staff',
@@ -400,6 +401,27 @@ export const fr: typeof pt = {
     backHome: 'Retour à l’accueil',
     submitError: 'Impossible d’envoyer la demande.',
     networkError: 'Erreur réseau. Veuillez réessayer.',
+  },
+  blog: {
+    metaTitle:
+      'Padel Camps Blog — Spain, Algarve & Club Training | SportsEvents',
+    metaDescription:
+      'Guides on padel camps in Spain, padel holidays in the Algarve and padel training for clubs. Tips for coaches and academies.',
+    eyebrow: 'Insights & guides',
+    title: 'Blog',
+    lead:
+      'Stages de padel, destinations ibériques et playbooks coaching — pour clubs, académies et organisateurs de groupes.',
+    allCategories: 'Tous',
+    searchPlaceholder: 'Rechercher des articles…',
+    searchLabel: 'Rechercher dans le blog',
+    empty: 'Aucun article ne correspond à vos filtres.',
+    readMore: 'Lire l’article →',
+    relatedTitle: 'Articles liés',
+    ctaEyebrow: 'Pour clubs & coaches',
+    ctaTitle: 'Un stage de padel sur mesure pour votre club ?',
+    ctaText:
+      'Indiquez dates, taille du groupe et niveau. Nous envoyons une proposition gratuite (coaching, hôtels, transfers).',
+    ctaButton: 'Demander une proposition gratuite',
   },
   events: {
     backSite: '← Retour au site',

@@ -12,6 +12,9 @@ export async function POST(request: Request) {
       customerPhone,
       participants,
       paymentType,
+      customerCountry,
+      ageBand,
+      genderMix,
     } = body as {
       eventId: string
       customerName: string
@@ -19,6 +22,9 @@ export async function POST(request: Request) {
       customerPhone?: string
       participants: number
       paymentType: 'DEPOSIT' | 'FULL'
+      customerCountry?: string
+      ageBand?: string
+      genderMix?: string
     }
 
     if (!eventId || !customerName || !customerEmail || !participants) {
@@ -87,6 +93,11 @@ export async function POST(request: Request) {
         amount,
         currency: currency.toUpperCase(),
         status: 'PENDING',
+        customer_country: customerCountry
+          ? String(customerCountry).trim().toUpperCase().slice(0, 2)
+          : null,
+        age_band: ageBand || null,
+        gender_mix: genderMix || null,
       })
       .select('id')
       .single()

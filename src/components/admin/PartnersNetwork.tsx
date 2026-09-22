@@ -614,11 +614,11 @@ export default function PartnersNetwork({
 
   const modeHelp =
     listMode === 'A_CONTACTAR'
-      ? 'Ainda sem email nem telefone — próximos a contactar.'
+      ? 'Ainda sem contacto marcado (email ou telefone) — próximos a contactar.'
       : listMode === 'EMAIL'
-        ? 'Já enviaste email — aguardam follow-up ou resposta.'
+        ? 'Já marcaste envio de email — aguardam follow-up ou resposta.'
         : listMode === 'TELEFONE'
-          ? 'Já contactaste por telefone.'
+          ? 'Já marcaste contacto por telefone.'
           : listMode === 'RESPONDIDO'
             ? 'Responderam — classifica com interesse ou sem interesse.'
             : listMode === 'INTERESSE'
@@ -881,8 +881,8 @@ export default function PartnersNetwork({
 
       {grouped.length === 0 ? (
         <div className="bg-slate-900 border border-slate-800 p-8 text-center rounded-2xl text-xs text-slate-500">
-          Nenhum parceiro nesta lista. Usa os botões na ficha para marcar email,
-          telefone, interesse ou sem interesse.
+          Nenhum parceiro nesta lista. Usa os botões na ficha para marcar contacto
+          por email ou telefone, interesse ou sem interesse.
         </div>
       ) : (
         <div className="space-y-8">
@@ -950,11 +950,16 @@ export default function PartnersNetwork({
                               ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
                               : 'bg-slate-950 text-slate-600 border-slate-800'
                           }`}
+                          title={
+                            p.emailed_at
+                              ? 'Contacto por email já marcado'
+                              : 'Ainda não marcaste envio de email (os dados de contacto podem já existir abaixo)'
+                          }
                         >
                           <Mail className="w-3 h-3" />
                           {p.emailed_at
-                            ? `Email ${formatContactDate(p.emailed_at)}`
-                            : 'Sem email'}
+                            ? `Email ✓ ${formatContactDate(p.emailed_at)}`
+                            : 'Email por marcar'}
                         </span>
                         <span
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${
@@ -962,11 +967,16 @@ export default function PartnersNetwork({
                               ? 'bg-violet-500/15 text-violet-300 border-violet-500/30'
                               : 'bg-slate-950 text-slate-600 border-slate-800'
                           }`}
+                          title={
+                            p.phoned_at
+                              ? 'Contacto por telefone já marcado'
+                              : 'Ainda não marcaste chamada (o número pode já existir abaixo)'
+                          }
                         >
                           <Phone className="w-3 h-3" />
                           {p.phoned_at
-                            ? `Tel. ${formatContactDate(p.phoned_at)}`
-                            : 'Sem tel.'}
+                            ? `Tel. ✓ ${formatContactDate(p.phoned_at)}`
+                            : 'Tel. por marcar'}
                         </span>
                         {interestMeta && (
                           <span

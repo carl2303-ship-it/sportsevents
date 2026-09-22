@@ -23,6 +23,9 @@ export function BookingForm({
   const [customerEmail, setCustomerEmail] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
   const [participants, setParticipants] = useState(2)
+  const [customerCountry, setCustomerCountry] = useState('')
+  const [ageBand, setAgeBand] = useState('')
+  const [genderMix, setGenderMix] = useState('')
   const [paymentType, setPaymentType] = useState<'DEPOSIT' | 'FULL'>(
     depositAmount > 0 ? 'DEPOSIT' : 'FULL'
   )
@@ -47,6 +50,9 @@ export function BookingForm({
           customerPhone,
           participants,
           paymentType,
+          customerCountry: customerCountry || undefined,
+          ageBand: ageBand || undefined,
+          genderMix: genderMix || undefined,
         }),
       })
       const data = await res.json()
@@ -151,6 +157,70 @@ export function BookingForm({
           className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white"
         />
       </label>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <label className="block space-y-1 text-xs">
+          <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
+            {e.customerCountry}
+          </span>
+          <select
+            required
+            value={customerCountry}
+            onChange={(ev) => setCustomerCountry(ev.target.value)}
+            className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white"
+          >
+            <option value="">{e.selectOption}</option>
+            <option value="PT">Portugal</option>
+            <option value="ES">España / Espanha</option>
+            <option value="FR">France</option>
+            <option value="GB">United Kingdom</option>
+            <option value="DE">Deutschland</option>
+            <option value="IT">Italia</option>
+            <option value="BE">België / Belgique</option>
+            <option value="CH">Schweiz / Suisse</option>
+            <option value="NL">Nederland</option>
+            <option value="IE">Ireland</option>
+            <option value="BR">Brasil</option>
+            <option value="US">USA</option>
+          </select>
+        </label>
+        <label className="block space-y-1 text-xs">
+          <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
+            {e.ageBand}
+          </span>
+          <select
+            required
+            value={ageBand}
+            onChange={(ev) => setAgeBand(ev.target.value)}
+            className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white"
+          >
+            <option value="">{e.selectOption}</option>
+            <option value="U18">{e.ageU18}</option>
+            <option value="18-25">18–25</option>
+            <option value="26-35">26–35</option>
+            <option value="36-45">36–45</option>
+            <option value="46-55">46–55</option>
+            <option value="55+">{e.age55plus}</option>
+          </select>
+        </label>
+        <label className="block space-y-1 text-xs">
+          <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
+            {e.genderMix}
+          </span>
+          <select
+            required
+            value={genderMix}
+            onChange={(ev) => setGenderMix(ev.target.value)}
+            className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white"
+          >
+            <option value="">{e.selectOption}</option>
+            <option value="MALE">{e.genderMale}</option>
+            <option value="FEMALE">{e.genderFemale}</option>
+            <option value="MIXED">{e.genderMixed}</option>
+            <option value="OTHER">{e.genderOther}</option>
+          </select>
+        </label>
+      </div>
 
       <div className="rounded-xl bg-slate-950 border border-slate-800 px-3 py-3 flex justify-between items-center">
         <span className="text-xs text-slate-400">{e.totalNow}</span>

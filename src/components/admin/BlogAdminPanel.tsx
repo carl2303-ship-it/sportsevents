@@ -11,6 +11,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { BLOG_CATEGORIES, type BlogCategory } from '@/lib/blog-shared'
+import { ImageUploadField } from '@/components/admin/ImageUploadField'
 
 const inputCls =
   'w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50'
@@ -91,7 +92,6 @@ export function BlogAdminPanel() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(emptyForm())
   const [saving, setSaving] = useState(false)
-  const [uploadingCover, setUploadingCover] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -176,32 +176,6 @@ export function BlogAdminPanel() {
     }
     if (editingId === id) startCreate()
     await load()
-  }
-
-  async function onCoverFileChange(file: File | null) {
-    if (!file) return
-    setUploadingCover(true)
-    setError(null)
-    try {
-      const fd = new FormData()
-      fd.set('file', file)
-      fd.set('slug', form.slug || slugify(form.title) || 'draft')
-      const res = await fetch('/api/admin/blog/upload', {
-        method: 'POST',
-        body: fd,
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.error || 'Erro no upload da imagem')
-        setUploadingCover(false)
-        return
-      }
-      setForm((f) => ({ ...f, cover_image: data.url as string }))
-      setOkMsg('Imagem de capa carregada.')
-    } catch {
-      setError('Erro de rede no upload.')
-    }
-    setUploadingCover(false)
   }
 
   return (
@@ -370,69 +344,18 @@ export function BlogAdminPanel() {
                 }
               />
             </label>
-            <div className="sm:col-span-2 space-y-2">
-              <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-                Imagem de capa
-              </span>
-              <div className="flex flex-wrap items-start gap-4">
-                <div className="relative h-28 w-44 overflow-hidden rounded-xl border border-slate-700 bg-slate-950">
-                  {form.cover_image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={form.cover_image}
-                      alt="Capa"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-[10px] text-slate-600">
-                      Sem imagem
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2 min-w-[200px] flex-1">
-                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300 hover:border-cyan-400/50">
-                    {uploadingCover ? 'A carregar…' : 'Escolher ficheiro'}
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,image/gif"
-                      className="hidden"
-                      disabled={uploadingCover}
-                      onChange={(e) => {
-                        const f = e.target.files?.[0] || null
-                        void onCoverFileChange(f)
-                        e.target.value = ''
-                      }}
-                    />
-                  </label>
-                  <p className="text-[10px] text-slate-500">
-                    JPG, PNG, WebP ou GIF · máx. 10 MB
-                  </p>
-                  <label className="block space-y-1">
-                    <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-                      Ou cola URL
-                    </span>
-                    <input
-                      className={inputCls}
-                      value={form.cover_image}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, cover_image: e.target.value }))
-                      }
-                      placeholder="https://…"
-                    />
-                  </label>
-                  {form.cover_image && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setForm((f) => ({ ...f, cover_image: '' }))
-                      }
-                      className="text-[10px] text-rose-400 hover:underline"
-                    >
-                      Remover imagem
-                    </button>
-                  )}
-                </div>
-              </div>
+            <div className="sm:col-span-2">
+              <ImageUploadField
+                label="Imagem de capa"
+                value={form.cover_image}
+                onChange={(url) => {
+                  setForm((f) => ({ ...f, cover_image: url }))
+                  if (url) setOkMsg('Imagem de capa carregada.')
+                }}
+                kind="blog"
+                slug={form.slug || 'draft'}
+                allowUrlFallback
+              />
             </div>
             <label className="block space-y-1 sm:col-span-2">
               <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">

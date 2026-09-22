@@ -9,7 +9,6 @@ import {
   Briefcase,
   Calendar,
   Plus,
-  BarChart3,
   Calculator,
   IdCard,
   Settings,
@@ -19,6 +18,7 @@ import RentabilidadeTorneios from '@/components/admin/RentabilidadeTorneios'
 import PartnersNetwork from '@/components/admin/PartnersNetwork'
 import { HubPackagesPanel } from '@/components/admin/HubPackagesPanel'
 import { BlogAdminPanel } from '@/components/admin/BlogAdminPanel'
+import { StagesCalendar } from '@/components/admin/StagesCalendar'
 import {
   CreatePartnerModal,
   CreateLeadModal,
@@ -28,6 +28,15 @@ import { EventFichaModal, type EventRow } from '@/components/admin/EventFichaMod
 import { LogoutButton } from '@/components/admin/logout-button'
 import { BrandLogo } from '@/components/brand-logo'
 import type { PartnerTypeValue } from '@/lib/partner-types'
+import {
+  computeStageMetrics,
+  formatEur,
+  type BookingLite,
+} from '@/lib/stage-metrics'
+import type {
+  PackageBookingLite,
+  TransferLogLite,
+} from '@/lib/stage-analytics'
 
 export default function EnterpriseBackoffice() {
   const [activeTab, setActiveTab] = useState<
@@ -37,6 +46,11 @@ export default function EnterpriseBackoffice() {
   const [leads, setLeads] = useState<any[]>([])
   const [partners, setPartners] = useState<any[]>([])
   const [events, setEvents] = useState<any[]>([])
+  const [bookings, setBookings] = useState<BookingLite[]>([])
+  const [packageBookings, setPackageBookings] = useState<PackageBookingLite[]>(
+    []
+  )
+  const [transferLogs, setTransferLogs] = useState<TransferLogLite[]>([])
   const [destinations, setDestinations] = useState<LookupOption[]>([])
   const [sports, setSports] = useState<LookupOption[]>([])
   const [loading, setLoading] = useState(true)
@@ -94,6 +108,9 @@ export default function EnterpriseBackoffice() {
       { data: leadsData },
       { data: partnersData },
       { data: eventsData },
+      { data: bookingsData },
+      { data: packageBookingsData },
+      { data: transferLogsData },
       { data: destinationsData },
       { data: sportsData },
     ] = await Promise.all([
@@ -108,8 +125,23 @@ export default function EnterpriseBackoffice() {
         .order('name', { ascending: true }),
       supabase
         .from('events')
-        .select('*, destinations(name), sports(name)')
+        .select(
+          '*, destinations(name, code, country), sports(name), hub_packages(name, package_key)'
+        )
         .order('start_date', { ascending: true }),
+      supabase.from('event_bookings').select('*'),
+      supabase
+        .from('package_bookings')
+        .select(
+          'id, status, padel_service_amount_cents, hotel_amount_cents, transfer_amount_cents, total_amount_cents, paid_at, created_at, hotel_partner_id, transfer_partner_id, hub_package_id, hotel:partners!hotel_partner_id(name, type), transfer:partners!transfer_partner_id(name, type), hub_packages(name, package_key, destination_id)'
+        )
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('payment_transfer_logs')
+        .select(
+          'id, role, amount_cents, status, created_at, error_message, partner_id, partners(name, type, country_code)'
+        )
+        .order('created_at', { ascending: false }),
       supabase.from('destinations').select('id, name, code').order('name'),
       supabase.from('sports').select('id, name').order('name'),
     ])
@@ -117,29 +149,16 @@ export default function EnterpriseBackoffice() {
     if (leadsData) setLeads(leadsData)
     if (partnersData) setPartners(partnersData)
     if (eventsData) setEvents(eventsData)
+    if (bookingsData) setBookings(bookingsData as BookingLite[])
+    if (packageBookingsData)
+      setPackageBookings(packageBookingsData as unknown as PackageBookingLite[])
+    if (transferLogsData)
+      setTransferLogs(transferLogsData as unknown as TransferLogLite[])
     if (destinationsData) setDestinations(destinationsData)
     if (sportsData) setSports(sportsData)
 
     setLoading(false)
   }
-
-  const totalRevenueWon = events.reduce(
-    (acc, curr) => acc + Number(curr.total_revenue || 0),
-    0
-  )
-  const totalMarginWon = events.reduce(
-    (acc, curr) => acc + Number(curr.margin || 0),
-    0
-  )
-  const pipelineForecast = leads
-    .filter((l) => l.status !== 'PERDIDO' && l.status !== 'GANHO')
-    .reduce(
-      (acc, curr) =>
-        acc +
-        Number(curr.estimated_revenue || 0) *
-          (Number(curr.probability || 50) / 100),
-      0
-    )
 
   return (
     <div className="min-h-screen bg-navy text-app-white font-sans flex flex-col">
@@ -189,7 +208,7 @@ export default function EnterpriseBackoffice() {
           onClick={() => setActiveTab('kpis')}
           className={`py-3 flex items-center gap-2 border-b-2 transition-all ${activeTab === 'kpis' ? 'border-cyan-400 text-cyan-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
         >
-          <BarChart3 className="w-4 h-4" /> Dashboard Executive & Previsões
+          <Calendar className="w-4 h-4" /> Calendário de Estágios
         </button>
         <button
           onClick={() => setActiveTab('pipeline')}
@@ -243,126 +262,24 @@ export default function EnterpriseBackoffice() {
 
       <main className="p-6 flex-1 overflow-y-auto">
         {activeTab === 'kpis' && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Faturação Executada
-                </span>
-                <div className="text-3xl font-black text-white mt-1">
-                  {totalRevenueWon.toLocaleString('pt-PT')} €
-                </div>
-                <span className="text-[11px] text-emerald-400 font-medium">
-                  Contratos Fechados & Eventos
-                </span>
+          <div className="space-y-4">
+            {loading ? (
+              <div className="bg-slate-900 border border-slate-800 p-8 text-center rounded-2xl text-xs text-slate-500">
+                A carregar calendário...
               </div>
-
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Margem Líquida Realizada
-                </span>
-                <div className="text-3xl font-black text-emerald-400 mt-1">
-                  {totalMarginWon.toLocaleString('pt-PT')} €
-                </div>
-                <span className="text-[11px] text-slate-400 font-medium">
-                  Margem Operacional Média ~35%
-                </span>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Previsão Pipeline (Weighted Forecast)
-                </span>
-                <div className="text-3xl font-black text-amber-400 mt-1">
-                  {pipelineForecast.toLocaleString('pt-PT')} €
-                </div>
-                <span className="text-[11px] text-amber-400/80 font-medium">
-                  Ajustado por probabilidade de fecho
-                </span>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Rede de Parceiros Ativos
-                </span>
-                <div className="text-3xl font-black text-cyan-400 mt-1">
-                  {partners.length}
-                </div>
-                <span className="text-[11px] text-slate-400 font-medium">
-                  Hotéis, Clubes, Treinadores, Sponsors
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                <h3 className="font-bold text-sm text-white mb-4 flex items-center justify-between">
-                  <span>Próximos Estágios Confirmados</span>
-                  <span className="text-xs text-cyan-400 font-normal">Ver Todos</span>
-                </h3>
-                <div className="space-y-3">
-                  {events.slice(0, 4).map((e) => (
-                    <div
-                      key={e.id}
-                      className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 flex justify-between items-center"
-                    >
-                      <div>
-                        <div className="font-bold text-xs text-white">{e.title}</div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">
-                          {e.destinations?.name} · {e.group_size} pessoas
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-xs font-bold text-emerald-400">
-                          {e.total_revenue} €
-                        </div>
-                        <div className="text-[10px] text-slate-500 uppercase">
-                          {e.status}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  {events.length === 0 && (
-                    <p className="text-xs text-slate-500">
-                      Sem eventos operacionais agendados.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                <h3 className="font-bold text-sm text-white mb-4">
-                  Distribuição do Pipeline de Vendas
-                </h3>
-                <div className="space-y-4 text-xs">
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-slate-400">Propostas Enviadas</span>
-                      <span className="font-bold text-amber-400">
-                        {leads.filter((l) => l.status === 'PROPOSTA_ENVIADA').length}{' '}
-                        Negócios
-                      </span>
-                    </div>
-                    <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
-                      <div className="bg-amber-400 h-full w-2/3"></div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-slate-400">Em Negociação Directa</span>
-                      <span className="font-bold text-cyan-400">
-                        {leads.filter((l) => l.status === 'EM_NEGOCIACAO').length}{' '}
-                        Negócios
-                      </span>
-                    </div>
-                    <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
-                      <div className="bg-cyan-400 h-full w-1/2"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ) : (
+              <StagesCalendar
+                events={events}
+                bookings={bookings}
+                packageBookings={packageBookings}
+                transferLogs={transferLogs}
+                managerFilter={managerFilter}
+                onEditEvent={(event) => {
+                  setEditingEvent(event as EventRow)
+                  setShowEventModal(true)
+                }}
+              />
+            )}
           </div>
         )}
 
@@ -541,7 +458,9 @@ export default function EnterpriseBackoffice() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {events.map((e) => (
+                {events.map((e) => {
+                  const m = computeStageMetrics(e, bookings)
+                  return (
                   <div
                     key={e.id}
                     className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3"
@@ -580,20 +499,34 @@ export default function EnterpriseBackoffice() {
                       <div>
                         <span className="text-slate-500">Preço / pax</span>
                         <div className="text-emerald-400 font-bold">
-                          {Number(e.sale_price_per_person || 0).toLocaleString('pt-PT')} €
+                          {formatEur(m.pricePerPerson)}
                         </div>
                       </div>
                       <div>
-                        <span className="text-slate-500">Campos</span>
-                        <div className="text-slate-200">
-                          P{e.courts_padel || 0} · F{e.courts_football || 0} · O
-                          {e.courts_other || 0}
+                        <span className="text-slate-500">Clientes / vagas</span>
+                        <div className="text-slate-200 font-semibold">
+                          {m.bookedPax} / {m.maxPax}{' '}
+                          <span className="text-cyan-400">({m.spotsLeft} livres)</span>
                         </div>
                       </div>
                       <div>
-                        <span className="text-slate-500">Reserva Stripe</span>
-                        <div className="text-amber-400 font-semibold">
-                          {Number(e.deposit_amount || 0).toLocaleString('pt-PT')} €
+                        <span className="text-slate-500">Lucro planeado</span>
+                        <div
+                          className={`font-bold ${
+                            m.plannedProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                          }`}
+                        >
+                          {formatEur(m.plannedProfit)}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-slate-500">Custo</span>
+                        <div className="text-slate-200">{formatEur(m.totalCost)}</div>
+                      </div>
+                      <div>
+                        <span className="text-slate-500">Cobrado</span>
+                        <div className="text-cyan-400 font-semibold">
+                          {formatEur(m.bookedAmount)}
                         </div>
                       </div>
                     </div>
@@ -628,7 +561,8 @@ export default function EnterpriseBackoffice() {
                       )}
                     </div>
                   </div>
-                ))}
+                  )
+                })}
               </div>
             )}
               </>

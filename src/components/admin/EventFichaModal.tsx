@@ -5,11 +5,9 @@ import { createClient } from '@/lib/supabase/client'
 import { filterHubDestinations, slugify } from '@/lib/hubs'
 import { Save, X } from 'lucide-react'
 import type { LookupOption } from '@/components/admin/CreateModals'
-import {
-  endDateFromNights,
-  packageToEventPrefill,
-  type HubPackageView,
-} from '@/lib/hub-packages'
+import { endDateFromNights, packageToEventPrefill, type HubPackageView } from '@/lib/hub-packages'
+import { MiniDateRangePicker } from '@/components/admin/MiniDateRangePicker'
+import { ImageUploadField } from '@/components/admin/ImageUploadField'
 
 const inputCls =
   'w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50'
@@ -421,22 +419,30 @@ export function EventFichaModal({
                   <option value="FILHO">Comercial / Espanha (Filho)</option>
                 </select>
               </Field>
-              <Field label="Data início *">
-                <input
-                  className={inputCls}
-                  type="date"
-                  value={form.start_date || ''}
-                  onChange={(e) => set('start_date', e.target.value)}
+              <div className="sm:col-span-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1.5">
+                  Datas do estágio *
+                </span>
+                <MiniDateRangePicker
+                  className="max-w-sm"
+                  startDate={form.start_date || ''}
+                  endDate={form.end_date || ''}
+                  fixedNights={packageNights}
+                  onChange={({ startDate, endDate }) => {
+                    setForm((prev) => {
+                      const next = {
+                        ...prev,
+                        start_date: startDate,
+                        end_date:
+                          packageNights > 0 && startDate
+                            ? endDateFromNights(startDate, packageNights)
+                            : endDate,
+                      }
+                      return next
+                    })
+                  }}
                 />
-              </Field>
-              <Field label="Data fim *">
-                <input
-                  className={inputCls}
-                  type="date"
-                  value={form.end_date || ''}
-                  onChange={(e) => set('end_date', e.target.value)}
-                />
-              </Field>
+              </div>
               <Field label="Resumo curto (site)" className="sm:col-span-2">
                 <input
                   className={inputCls}
@@ -453,14 +459,16 @@ export function EventFichaModal({
                   onChange={(e) => set('description', e.target.value)}
                 />
               </Field>
-              <Field label="URL imagem de capa" className="sm:col-span-2">
-                <input
-                  className={inputCls}
+              <div className="sm:col-span-2">
+                <ImageUploadField
+                  label="Imagem de capa"
                   value={form.cover_image_url || ''}
-                  onChange={(e) => set('cover_image_url', e.target.value)}
-                  placeholder="https://..."
+                  onChange={(url) => set('cover_image_url', url)}
+                  kind="events"
+                  slug={form.slug || form.title || 'evento'}
+                  allowUrlFallback
                 />
-              </Field>
+              </div>
             </div>
           </section>
 
@@ -647,6 +655,41 @@ export function EventFichaModal({
                   onChange={(e) => set('total_revenue', Number(e.target.value))}
                 />
               </Field>
+              <div className="sm:col-span-2 rounded-xl border border-slate-800 bg-slate-950 px-3 py-2.5 flex flex-wrap gap-4 text-xs">
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">
+                    Lucro planeado
+                  </span>
+                  <span
+                    className={`text-sm font-black ${
+                      Number(form.total_revenue || 0) - Number(form.total_cost || 0) >= 0
+                        ? 'text-emerald-400'
+                        : 'text-rose-400'
+                    }`}
+                  >
+                    {(
+                      Number(form.total_revenue || 0) - Number(form.total_cost || 0)
+                    ).toLocaleString('pt-PT')}{' '}
+                    €
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">
+                    Margem
+                  </span>
+                  <span className="text-sm font-black text-cyan-300">
+                    {Number(form.total_revenue || 0) > 0
+                      ? (
+                          ((Number(form.total_revenue || 0) -
+                            Number(form.total_cost || 0)) /
+                            Number(form.total_revenue || 0)) *
+                          100
+                        ).toLocaleString('pt-PT', { maximumFractionDigits: 0 })
+                      : 0}
+                    %
+                  </span>
+                </div>
+              </div>
               <Field label="Publicar no site" className="sm:col-span-2">
                 <label className="flex items-center gap-3 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 cursor-pointer">
                   <input

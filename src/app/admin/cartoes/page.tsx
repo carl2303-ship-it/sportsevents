@@ -29,6 +29,7 @@ import {
   type CardBrochure,
   type DigitalCardRow,
 } from '@/lib/cards'
+import { ImageUploadField } from '@/components/admin/ImageUploadField'
 
 const inputCls =
   'w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50'
@@ -83,7 +84,6 @@ export default function CartoesAdminPage() {
   const [saving, setSaving] = useState(false)
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
   const [qrSlug, setQrSlug] = useState<string | null>(null)
-  const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [uploadingBrochureIndex, setUploadingBrochureIndex] = useState<
     number | null
   >(null)
@@ -250,17 +250,6 @@ export default function CartoesAdminPage() {
       return null
     }
     return { url: data.url as string, fileName: data.fileName as string }
-  }
-
-  async function onPhotoSelected(file: File | null) {
-    if (!file) return
-    setError(null)
-    setUploadingPhoto(true)
-    const result = await uploadAsset(file, 'photo')
-    setUploadingPhoto(false)
-    if (!result) return
-    updateField('photo_url', result.url)
-    setOkMsg('Foto carregada. Não te esqueças de Guardar o cartão.')
   }
 
   async function onBrochurePdfSelected(index: number, file: File | null) {
@@ -505,50 +494,24 @@ export default function CartoesAdminPage() {
                     }
                   />
                 </label>
-                <div className="sm:col-span-2 space-y-2 rounded-xl border border-slate-800 p-3">
-                  <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-                    Foto
-                  </span>
-                  <div className="flex flex-wrap items-center gap-3">
-                    {form.photo_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={form.photo_url}
-                        alt="Pré-visualização"
-                        className="h-16 w-16 rounded-full object-cover border border-cyan/30"
-                      />
-                    ) : (
-                      <div className="h-16 w-16 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-[10px] text-slate-500">
-                        sem foto
-                      </div>
-                    )}
-                    <label className="inline-flex items-center gap-1.5 rounded-lg border border-cyan/40 bg-cyan/10 px-3 py-2 text-[11px] font-bold text-cyan cursor-pointer hover:bg-cyan/20">
-                      <Upload className="w-3.5 h-3.5" />
-                      {uploadingPhoto ? 'A carregar…' : 'Upload foto'}
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp,image/gif"
-                        className="hidden"
-                        disabled={uploadingPhoto}
-                        onChange={(e) => {
-                          const f = e.target.files?.[0] || null
-                          e.target.value = ''
-                          void onPhotoSelected(f)
-                        }}
-                      />
-                    </label>
-                  </div>
-                  <label className="block space-y-1">
-                    <span className="text-[10px] text-slate-500">
-                      URL da foto (preenchida pelo upload ou manual)
-                    </span>
-                    <input
-                      className={inputCls}
-                      placeholder="https://… ou /cards/nome.jpg"
-                      value={form.photo_url}
-                      onChange={(e) => updateField('photo_url', e.target.value)}
-                    />
-                  </label>
+                <div className="sm:col-span-2">
+                  <ImageUploadField
+                    label="Foto"
+                    value={form.photo_url}
+                    onChange={(url) => {
+                      updateField('photo_url', url)
+                      if (url)
+                        setOkMsg(
+                          'Foto carregada. Não te esqueças de Guardar o cartão.'
+                        )
+                    }}
+                    kind="cards"
+                    slug={normalizeSlug(form.slug) || 'draft'}
+                    uploadUrl="/api/admin/cards/upload"
+                    extraFormFields={{ kind: 'photo' }}
+                    previewAspect="square"
+                    allowUrlFallback
+                  />
                 </div>
                 <label className="block space-y-1 sm:col-span-2">
                   <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">

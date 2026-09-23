@@ -12,6 +12,17 @@ import {
 } from 'lucide-react'
 import { BLOG_CATEGORIES, type BlogCategory } from '@/lib/blog-shared'
 import { ImageUploadField } from '@/components/admin/ImageUploadField'
+import { ensureBlogHtml } from '@/lib/blog-html'
+
+function BlogContentPreview({ content }: { content: string }) {
+  const html = ensureBlogHtml(content)
+  return (
+    <div
+      className="blog-prose text-sm leading-relaxed text-slate-300 max-h-[320px] overflow-y-auto"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
+}
 
 const inputCls =
   'w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50'
@@ -395,17 +406,34 @@ export function BlogAdminPanel() {
             </label>
             <label className="block space-y-1 sm:col-span-2">
               <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-                Conteúdo (HTML)
+                Conteúdo do artigo
               </span>
+              <p className="text-[10px] text-slate-500 leading-relaxed">
+                Podes colar texto normal (parágrafos separados por linha em
+                branco). Títulos como &quot;1. Spring Stage…&quot; ou linhas com{' '}
+                <code className="text-cyan-400">##</code> viram headings. Também
+                podes usar HTML (&lt;p&gt;, &lt;h2&gt;, &lt;ul&gt;). Ao guardar,
+                o layout é formatado automaticamente.
+              </p>
               <textarea
                 className={`${inputCls} min-h-[280px] font-mono text-[11px] leading-relaxed`}
                 value={form.content}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, content: e.target.value }))
                 }
-                placeholder="<p>Intro…</p>\n<h2>Heading</h2>\n<ul><li>…</li></ul>"
+                placeholder={
+                  'Intro paragraph…\n\n1. First section title\nDetails here…\n\n## Another heading\nMore text…'
+                }
               />
             </label>
+            {form.content.trim() && (
+              <div className="sm:col-span-2 rounded-xl border border-slate-800 bg-slate-950/80 p-4">
+                <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold block mb-3">
+                  Pré-visualização do layout
+                </span>
+                <BlogContentPreview content={form.content} />
+              </div>
+            )}
           </div>
 
           <label className="inline-flex items-center gap-2 text-xs text-slate-300">

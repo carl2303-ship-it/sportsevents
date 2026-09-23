@@ -13,7 +13,7 @@ import { withLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { getLocale } from '@/i18n/get-locale'
 
-export const revalidate = 3600
+export const revalidate = 60
 
 type PageProps = {
   searchParams: Promise<{ category?: string; q?: string }>

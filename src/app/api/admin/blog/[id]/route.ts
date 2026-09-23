@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { requireStaffUser } from '@/lib/admin-auth'
 import { BLOG_CATEGORIES, isBlogCategory } from '@/lib/blog-shared'
+import { ensureBlogHtml } from '@/lib/blog-html'
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -41,7 +42,7 @@ function sanitizeBody(body: Record<string, unknown>) {
     title,
     slug,
     excerpt: String(body.excerpt || '').trim(),
-    content: String(body.content || '').trim(),
+    content: ensureBlogHtml(String(body.content || '').trim()),
     cover_image: String(body.cover_image || '').trim() || null,
     category,
     meta_title: String(body.meta_title || '').trim() || null,

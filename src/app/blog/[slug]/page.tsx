@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { SiteFooter, SiteHeader } from '@/components/site-chrome'
@@ -19,7 +18,7 @@ import { withLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { getLocale } from '@/i18n/get-locale'
 
-export const revalidate = 3600
+export const revalidate = 60
 export const dynamicParams = true
 
 type PageProps = {
@@ -127,14 +126,12 @@ export default async function BlogPostPage({ params }: PageProps) {
               </div>
 
               {post.cover_image && (
-                <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-white/10">
-                  <Image
+                <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={post.cover_image}
                     alt={post.title}
-                    fill
-                    priority
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 768px"
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
                 </div>
               )}

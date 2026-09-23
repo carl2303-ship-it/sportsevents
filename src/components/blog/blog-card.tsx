@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import {
   formatPostDate,
@@ -24,12 +23,11 @@ export function BlogCard({
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition hover:border-cyan/35 hover:bg-white/[0.05]">
       <Link href={href} className="relative block aspect-[16/10] overflow-hidden bg-navy">
         {post.cover_image ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={post.cover_image}
             alt={post.title}
-            fill
-            className="object-cover transition duration-500 group-hover:scale-[1.03]"
-            sizes="(max-width: 768px) 100vw, 33vw"
+            className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-cyan/20 to-navy" />

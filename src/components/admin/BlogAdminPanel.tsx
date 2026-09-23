@@ -103,6 +103,12 @@ export function BlogAdminPanel() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(emptyForm())
   const [saving, setSaving] = useState(false)
+  const [aiTopic, setAiTopic] = useState('')
+  const [aiDestination, setAiDestination] = useState<
+    'Marbella' | 'Algarve' | 'Barcelona'
+  >('Algarve')
+  const [aiSocial, setAiSocial] = useState(false)
+  const [aiBusy, setAiBusy] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -189,6 +195,58 @@ export function BlogAdminPanel() {
     await load()
   }
 
+  async function runAiGenerate() {
+    if (!aiTopic.trim()) {
+      setError('Indica um topic para a IA.')
+      return
+    }
+    setAiBusy(true)
+    setError(null)
+    setOkMsg(null)
+    try {
+      const res = await fetch('/api/content/generate-and-publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: aiTopic.trim(),
+          target_destination: aiDestination,
+          auto_publish_social: aiSocial,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok && !data.success) {
+        setError(
+          data.error ||
+            data.errors?.generation ||
+            data.errors?.blog ||
+            'Falha na geração automática'
+        )
+        setAiBusy(false)
+        return
+      }
+      const bits = [
+        data.blog_post_url ? `Blog: ${data.blog_post_url}` : null,
+        data.instagram_published ? 'Instagram OK' : null,
+        data.facebook_published ? 'Facebook OK' : null,
+        data.errors?.instagram ? `IG: ${data.errors.instagram}` : null,
+        data.errors?.facebook ? `FB: ${data.errors.facebook}` : null,
+      ].filter(Boolean)
+      setOkMsg(bits.join(' · ') || 'Artigo gerado.')
+      await load()
+      if (data.slug) {
+        const listRes = await fetch('/api/admin/blog')
+        const listData = await listRes.json()
+        const found = (listData.posts || []).find(
+          (p: AdminPost) => p.slug === data.slug
+        )
+        if (found) startEdit(found)
+      }
+    } catch {
+      setError('Erro de rede na geração automática.')
+    }
+    setAiBusy(false)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -222,6 +280,66 @@ export function BlogAdminPanel() {
           <CheckCircle2 className="w-3.5 h-3.5" /> {okMsg}
         </p>
       )}
+
+      <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4 space-y-3">
+        <div>
+          <h3 className="text-xs font-black uppercase tracking-wider text-cyan-300">
+            Gerar com IA + redes sociais
+          </h3>
+          <p className="text-[11px] text-slate-500 mt-1">
+            Cria artigo no blog (OpenAI / Netlify AI Gateway) e, opcionalmente,
+            publica caption no Instagram e link no Facebook via Meta Graph API.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-[1fr_160px_auto] gap-2 items-end">
+          <label className="block space-y-1">
+            <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+              Topic
+            </span>
+            <input
+              className={inputCls}
+              value={aiTopic}
+              onChange={(e) => setAiTopic(e.target.value)}
+              placeholder="e.g. Best time for padel camps in Marbella"
+            />
+          </label>
+          <label className="block space-y-1">
+            <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+              Hub
+            </span>
+            <select
+              className={inputCls}
+              value={aiDestination}
+              onChange={(e) =>
+                setAiDestination(
+                  e.target.value as 'Marbella' | 'Algarve' | 'Barcelona'
+                )
+              }
+            >
+              <option value="Algarve">Algarve</option>
+              <option value="Marbella">Marbella</option>
+              <option value="Barcelona">Barcelona</option>
+            </select>
+          </label>
+          <button
+            type="button"
+            disabled={aiBusy}
+            onClick={() => void runAiGenerate()}
+            className="rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-bold text-xs px-4 py-2.5"
+          >
+            {aiBusy ? 'A gerar…' : 'Gerar & publicar'}
+          </button>
+        </div>
+        <label className="inline-flex items-center gap-2 text-xs text-slate-300">
+          <input
+            type="checkbox"
+            checked={aiSocial}
+            onChange={(e) => setAiSocial(e.target.checked)}
+            className="rounded border-slate-600"
+          />
+          Também publicar no Instagram + Facebook (Meta)
+        </label>
+      </div>
 
       <div className="grid lg:grid-cols-[280px_minmax(0,1fr)] gap-6">
         <aside className="rounded-2xl border border-slate-800 bg-slate-900/60 p-3 max-h-[70vh] overflow-y-auto space-y-1">

@@ -97,6 +97,7 @@ function tryTable(block: string): string | null {
 function preprocessPlainText(raw: string): string {
   return raw
     .replace(/\r\n/g, '\n')
+    .replace(/\n(?=#{1,3}\s+\S)/g, '\n\n')
     .replace(/\n(?=\d+\.\s+\S)/g, '\n\n')
     .replace(
       /\n(?=(Weather Conditions|Best For|Top Destinations|Booking Window):)/gi,

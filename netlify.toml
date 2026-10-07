@@ -2,5 +2,10 @@
   command = "npm run build"
   publish = ".next"
 
+# Next.js embute env server-side em .next/server — o scan trata isso como leak.
+# O site público não serve esses chunks como ficheiros estáticos.
+[build.environment]
+  SECRETS_SCAN_OMIT_PATHS = ".next"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"

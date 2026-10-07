@@ -13,7 +13,7 @@
  *   npx tsx scripts/get-meta-ids.ts
  *
  * Opcional (salta o browser se já tiveres um User token curto/longo):
- *   META_USER_ACCESS_TOKEN=EAAB... npx tsx scripts/get-meta-ids.ts
+ *   META_USER_ACCESS_TOKEN=<user_token> npx tsx scripts/get-meta-ids.ts
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'http'

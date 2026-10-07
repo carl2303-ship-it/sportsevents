@@ -14,7 +14,7 @@ const PHOTO_MIME = new Set([
   'image/gif',
 ])
 
-const FOLDERS = new Set(['events', 'blog', 'cards', 'general'])
+const FOLDERS = new Set(['events', 'blog', 'cards', 'general', 'social'])
 
 function safeFileName(name: string): string {
   return name

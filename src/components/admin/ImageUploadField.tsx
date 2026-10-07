@@ -7,8 +7,8 @@ type Props = {
   label?: string
   value: string
   onChange: (url: string) => void
-  /** Pasta no storage: events | blog | cards | general */
-  kind?: 'events' | 'blog' | 'cards' | 'general'
+  /** Pasta no storage: events | blog | cards | general | social */
+  kind?: 'events' | 'blog' | 'cards' | 'general' | 'social'
   /** Subpasta (slug do evento/post/cartão) */
   slug?: string
   className?: string

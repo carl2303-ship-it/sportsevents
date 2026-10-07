@@ -8,6 +8,11 @@ import {
   publicShareUrl,
 } from '@/lib/content-automation/meta-publish'
 import { siteOrigin } from '@/lib/content-automation/covers'
+import {
+  FACEBOOK_CAPTION_MAX,
+  INSTAGRAM_CAPTION_MAX,
+  buildSocialCaption,
+} from '@/lib/content-automation/social-caption'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -42,7 +47,7 @@ export async function POST(request: Request) {
 
   let query = client
     .from('posts')
-    .select('id, slug, title, excerpt, cover_image, meta_description')
+    .select('id, slug, title, excerpt, content, cover_image, meta_description')
   if (body.post_id) query = query.eq('id', body.post_id)
   else if (body.slug) query = query.eq('slug', String(body.slug).trim())
   else {
@@ -75,12 +80,22 @@ export async function POST(request: Request) {
     imageUrl = `https://sportsevents.app/brand/logo.png`
   }
 
-  const captionRaw =
-    String(body.caption || '').trim() ||
-    `${post.title}\n\n${post.excerpt || post.meta_description || ''}\n\nRead more: ${shareUrl}\n\n#padel #Sportsevents #padelcamp`
-  const caption = captionRaw.includes(blogUrl)
-    ? captionRaw.split(blogUrl).join(shareUrl)
-    : captionRaw
+  const captionBase = {
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    meta_description: post.meta_description,
+    blogUrl: shareUrl,
+    preferredCaption: body.caption,
+  }
+  const igCaption = buildSocialCaption({
+    ...captionBase,
+    maxLength: INSTAGRAM_CAPTION_MAX,
+  })
+  const fbCaption = buildSocialCaption({
+    ...captionBase,
+    maxLength: FACEBOOK_CAPTION_MAX,
+  })
 
   const missing: string[] = []
   if (!process.env.META_PAGE_ACCESS_TOKEN?.trim()) {
@@ -119,7 +134,7 @@ export async function POST(request: Request) {
 
   if (wantIg) {
     try {
-      const ig = await publishToInstagram({ imageUrl, caption })
+      const ig = await publishToInstagram({ imageUrl, caption: igCaption })
       instagram_published = true
       instagram_media_id = ig.mediaId
     } catch (e) {
@@ -131,7 +146,7 @@ export async function POST(request: Request) {
   if (wantFb) {
     try {
       const fb = await publishToFacebook({
-        message: caption,
+        message: fbCaption,
         link: shareUrl,
         imageUrl,
       })

@@ -13,11 +13,13 @@ import {
   IdCard,
   Settings,
   Newspaper,
+  Megaphone,
 } from 'lucide-react'
 import RentabilidadeTorneios from '@/components/admin/RentabilidadeTorneios'
 import PartnersNetwork from '@/components/admin/PartnersNetwork'
 import { HubPackagesPanel } from '@/components/admin/HubPackagesPanel'
 import { BlogAdminPanel } from '@/components/admin/BlogAdminPanel'
+import { SocialAdminPanel } from '@/components/admin/SocialAdminPanel'
 import { StagesCalendar } from '@/components/admin/StagesCalendar'
 import {
   CreatePartnerModal,
@@ -40,7 +42,7 @@ import type {
 
 export default function EnterpriseBackoffice() {
   const [activeTab, setActiveTab] = useState<
-    'kpis' | 'pipeline' | 'partners' | 'events' | 'blog' | 'roi'
+    'kpis' | 'pipeline' | 'partners' | 'events' | 'blog' | 'social' | 'roi'
   >('kpis')
   const [eventsSubTab, setEventsSubTab] = useState<'packages' | 'dated'>('packages')
   const [leads, setLeads] = useState<any[]>([])
@@ -235,6 +237,12 @@ export default function EnterpriseBackoffice() {
           <Newspaper className="w-4 h-4" /> Blog SEO
         </button>
         <button
+          onClick={() => setActiveTab('social')}
+          className={`py-3 flex items-center gap-2 border-b-2 transition-all ${activeTab === 'social' ? 'border-cyan-400 text-cyan-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+        >
+          <Megaphone className="w-4 h-4" /> Redes sociais
+        </button>
+        <button
           onClick={() => setActiveTab('roi')}
           className={`py-3 flex items-center gap-2 border-b-2 transition-all ${activeTab === 'roi' ? 'border-cyan-400 text-cyan-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
         >
@@ -295,6 +303,8 @@ export default function EnterpriseBackoffice() {
         )}
 
         {activeTab === 'blog' && <BlogAdminPanel />}
+
+        {activeTab === 'social' && <SocialAdminPanel />}
 
         {activeTab === 'pipeline' && (
           <div className="space-y-4">

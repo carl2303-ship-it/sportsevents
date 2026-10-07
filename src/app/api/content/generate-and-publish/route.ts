@@ -3,6 +3,11 @@ import { requireStaffUser } from '@/lib/admin-auth'
 import { generateArticleContent } from '@/lib/content-automation/generate'
 import { saveGeneratedPost } from '@/lib/content-automation/save-post'
 import { publishSocialBundle } from '@/lib/content-automation/meta-publish'
+import {
+  FACEBOOK_CAPTION_MAX,
+  INSTAGRAM_CAPTION_MAX,
+  buildSocialCaption,
+} from '@/lib/content-automation/social-caption'
 import { siteOrigin } from '@/lib/content-automation/covers'
 import {
   isContentDestination,
@@ -134,10 +139,27 @@ export async function POST(request: Request) {
       result.errors!.instagram = 'Sem cover_image para Instagram.'
     }
 
+    const captionBase = {
+      title: article.title,
+      excerpt: article.excerpt,
+      content: article.content,
+      meta_description: article.meta_description,
+      blogUrl,
+      preferredCaption: article.social_caption,
+    }
+    const socialCaption = buildSocialCaption({
+      ...captionBase,
+      maxLength: INSTAGRAM_CAPTION_MAX,
+    })
+    const facebookCaption = buildSocialCaption({
+      ...captionBase,
+      maxLength: FACEBOOK_CAPTION_MAX,
+    })
+    result.social_caption = socialCaption
+
     const social = await publishSocialBundle({
-      caption:
-        article.social_caption ||
-        `${article.title}\n\nRead more: ${blogUrl}`,
+      caption: socialCaption,
+      facebookCaption,
       imageUrl: cover || `${origin}/brand/logo.png`,
       blogUrl,
     })

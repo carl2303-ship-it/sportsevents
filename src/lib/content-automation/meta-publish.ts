@@ -260,6 +260,8 @@ export async function publishSocialBundle(opts: {
   caption: string
   imageUrl: string
   blogUrl: string
+  /** Caption mais longa só para Facebook (opcional). */
+  facebookCaption?: string
 }): Promise<MetaPublishResult> {
   const result: MetaPublishResult = {
     instagram_published: false,
@@ -271,15 +273,16 @@ export async function publishSocialBundle(opts: {
   }
 
   const shareUrl = publicShareUrl(opts.blogUrl)
-  // Caption do IG pode ter localhost — corrige para o share público
-  const caption = opts.caption.includes(opts.blogUrl)
-    ? opts.caption.split(opts.blogUrl).join(shareUrl)
-    : opts.caption
+  const fixUrl = (text: string) =>
+    text.includes(opts.blogUrl) ? text.split(opts.blogUrl).join(shareUrl) : text
+
+  const igCaption = fixUrl(opts.caption)
+  const fbCaption = fixUrl(opts.facebookCaption || opts.caption)
 
   try {
     const ig = await publishToInstagram({
       imageUrl: opts.imageUrl,
-      caption,
+      caption: igCaption,
     })
     result.instagram_published = true
     result.instagram_media_id = ig.mediaId
@@ -290,7 +293,7 @@ export async function publishSocialBundle(opts: {
 
   try {
     const fb = await publishToFacebook({
-      message: caption,
+      message: fbCaption,
       link: shareUrl,
       imageUrl: opts.imageUrl,
     })

@@ -15,3 +15,15 @@ export {
   publicShareUrl,
 } from '@/lib/content-automation/meta-publish'
 export { coverImageForDestination, siteOrigin } from '@/lib/content-automation/covers'
+export {
+  FACEBOOK_CAPTION_MAX,
+  INSTAGRAM_CAPTION_MAX,
+  buildSocialCaption,
+  htmlOrMarkdownToPlain,
+} from '@/lib/content-automation/social-caption'
+export {
+  SOCIAL_HUBS,
+  buildSloganCaption,
+  isSocialHub,
+  type SocialHub,
+} from '@/lib/content-automation/social-hubs'

@@ -15,7 +15,7 @@ Write the article in English (SEO). Return ONLY valid JSON with these keys:
 - content (string, long-form Markdown: ## headings, paragraphs, lists; no H1; include a clear CTA to /construir or /contacto)
 - meta_title (string, ≤60 chars ideal)
 - meta_description (string, ≤155 chars)
-- social_caption (string for Instagram/Facebook: brand voice, 1–3 emojis max, line breaks, 8–15 padel/travel hashtags at the end)
+- social_caption (string for Instagram/Facebook: long-form caption ≈1500–2100 characters — not a teaser. Brand voice, 1–3 emojis max, several short paragraphs from the article angle, CTA, then 8–15 padel/travel hashtags at the end)
 - category (one of: Destinations, Guides, Coaching, Case Studies)
 
 Do not wrap JSON in markdown fences.`
@@ -28,7 +28,7 @@ Constraints:
 - Anchor the piece in ${destination} while staying useful for European club coaches.
 - Mention SportsEvents.app immersion model without sounding spammy.
 - content must be substantial (800–1400 words equivalent in Markdown).
-- social_caption must stand alone (no need to open a link in the caption body; hashtags at the end).`
+- social_caption must stand alone and be substantial (aim for ~1800 characters, max 2200): hook + 3–6 short paragraphs of value from the article + soft CTA + hashtags at the end.`
 }
 
 function slugify(input: string): string {

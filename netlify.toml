@@ -2,10 +2,11 @@
   command = "npm run build"
   publish = ".next"
 
-# Next.js embute env server-side em .next/server — o scan trata isso como leak.
-# O site público não serve esses chunks como ficheiros estáticos.
+# Next 16 / Turbopack guarda valores de env no cache (.sst); o scan trata isso como leak.
+# NEXT_PUBLIC_* também aparece no bundle cliente (de propósito).
 [build.environment]
-  SECRETS_SCAN_OMIT_PATHS = ".next"
+  SECRETS_SCAN_OMIT_PATHS = ".next/**,.netlify/**,.next/cache/**,.netlify/.next/cache/**"
+  SECRETS_SCAN_OMIT_KEYS = "META_PAGE_ACCESS_TOKEN,SUPABASE_SERVICE_ROLE_KEY,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_GA_MEASUREMENT_ID,NEXT_PUBLIC_SITE_URL,NETLIFY_AUTH_TOKEN,INSTAGRAM_BUSINESS_ACCOUNT_ID,META_PAGE_ID"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

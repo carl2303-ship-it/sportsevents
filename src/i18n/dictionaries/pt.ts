@@ -24,7 +24,29 @@ export const pt = {
     addressAlgarve: 'Morada Algarve',
     addressBarcelona: 'Morada Barcelona',
     privacy: 'Privacidade',
+    cookies: 'Cookies',
     terms: 'Termos',
+  },
+  cookies: {
+    title: 'A sua privacidade',
+    description:
+      'Utilizamos cookies essenciais para o site funcionar e, com o seu consentimento, cookies de análise e marketing (incl. Google). Pode aceitar, recusar ou personalizar.',
+    privacyLink: 'Política de privacidade',
+    acceptAll: 'Aceitar tudo',
+    reject: 'Recusar não essenciais',
+    customize: 'Personalizar',
+    save: 'Guardar preferências',
+    back: 'Voltar',
+    close: 'Fechar',
+    necessaryTitle: 'Essenciais',
+    necessaryDesc:
+      'Necessários ao funcionamento (idioma, sessão, segurança). Sempre activos.',
+    analyticsTitle: 'Análise',
+    analyticsDesc:
+      'Ajudam-nos a perceber como o site é usado (ex.: Google Analytics), de forma agregada.',
+    marketingTitle: 'Marketing',
+    marketingDesc:
+      'Permitem medir campanhas e personalizar anúncios (ex.: Google Ads), apenas com o seu consentimento.',
   },
   common: {
     learnMore: 'Saber mais →',
@@ -533,7 +555,9 @@ export const pt = {
       {
         title: '7. Cookies',
         paragraphs: [
-          'Utilizamos cookies e tecnologias semelhantes necessárias ao funcionamento do site e, quando aplicável, para análise agregada. Pode gerir preferências no navegador.',
+          'Utilizamos cookies e tecnologias semelhantes em três categorias: (1) Essenciais — necessários ao funcionamento do site (idioma, autenticação, segurança), sempre activos; (2) Análise — medição agregada de utilização (ex.: Google Analytics), apenas com consentimento; (3) Marketing — campanhas e publicidade (ex.: Google Ads), apenas com consentimento.',
+          'Pode aceitar, recusar ou personalizar as categorias não essenciais através do banner de cookies, ou reabrir as preferências em qualquer momento através da hiperligação «Cookies» no rodapé. Utilizamos o Google Consent Mode v2: enquanto não houver consentimento, as tags de medição/publicidade permanecem em modo restrito (denied).',
+          'Também pode controlar cookies nas definições do seu navegador; bloquear cookies essenciais pode afectar o funcionamento do site.',
         ],
       },
       {

@@ -26,7 +26,29 @@ export const es: typeof pt = {
     addressAlgarve: 'Dirección Algarve',
     addressBarcelona: 'Dirección Barcelona',
     privacy: 'Privacidad',
+    cookies: 'Cookies',
     terms: 'Términos',
+  },
+  cookies: {
+    title: 'Su privacidad',
+    description:
+      'Utilizamos cookies esenciales para que el sitio funcione y, con su consentimiento, cookies de análisis y marketing (incl. Google). Puede aceptar, rechazar o personalizar.',
+    privacyLink: 'Política de privacidad',
+    acceptAll: 'Aceptar todo',
+    reject: 'Rechazar no esenciales',
+    customize: 'Personalizar',
+    save: 'Guardar preferencias',
+    back: 'Volver',
+    close: 'Cerrar',
+    necessaryTitle: 'Esenciales',
+    necessaryDesc:
+      'Necesarias para el funcionamiento (idioma, sesión, seguridad). Siempre activas.',
+    analyticsTitle: 'Análisis',
+    analyticsDesc:
+      'Nos ayudan a entender cómo se usa el sitio (p. ej. Google Analytics), de forma agregada.',
+    marketingTitle: 'Marketing',
+    marketingDesc:
+      'Permiten medir campañas y personalizar anuncios (p. ej. Google Ads), solo con su consentimiento.',
   },
   common: {
     learnMore: 'Saber más →',
@@ -551,7 +573,9 @@ export const es: typeof pt = {
       {
         title: '7. Cookies',
         paragraphs: [
-          'Utilizamos cookies y tecnologías similares necesarias para el funcionamiento del sitio y, cuando corresponda, para analítica agregada. Puede gestionar las preferencias en su navegador.',
+          'Utilizamos cookies y tecnologías similares en tres categorías: (1) Esenciales — necesarias para el funcionamiento del sitio (idioma, autenticación, seguridad), siempre activas; (2) Análisis — medición agregada de uso (p. ej. Google Analytics), solo con consentimiento; (3) Marketing — campañas y publicidad (p. ej. Google Ads), solo con consentimiento.',
+          'Puede aceptar, rechazar o personalizar las categorías no esenciales mediante el banner de cookies, o reabrir las preferencias en cualquier momento a través del enlace «Cookies» del pie de página. Utilizamos Google Consent Mode v2: mientras no haya consentimiento, las etiquetas de medición/publicidad permanecen en modo restringido (denied).',
+          'También puede controlar las cookies en la configuración de su navegador; bloquear cookies esenciales puede afectar al funcionamiento del sitio.',
         ],
       },
       {

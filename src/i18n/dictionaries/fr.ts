@@ -26,7 +26,29 @@ export const fr: typeof pt = {
     addressAlgarve: 'Adresse Algarve',
     addressBarcelona: 'Adresse Barcelona',
     privacy: 'Confidentialité',
+    cookies: 'Cookies',
     terms: 'Conditions',
+  },
+  cookies: {
+    title: 'Votre vie privée',
+    description:
+      'Nous utilisons des cookies essentiels pour le site et, avec votre consentement, des cookies d’analyse et marketing (y compris Google). Vous pouvez accepter, refuser ou personnaliser.',
+    privacyLink: 'Politique de confidentialité',
+    acceptAll: 'Tout accepter',
+    reject: 'Refuser les non essentiels',
+    customize: 'Personnaliser',
+    save: 'Enregistrer les préférences',
+    back: 'Retour',
+    close: 'Fermer',
+    necessaryTitle: 'Essentiels',
+    necessaryDesc:
+      'Nécessaires au fonctionnement (langue, session, sécurité). Toujours actifs.',
+    analyticsTitle: 'Analyse',
+    analyticsDesc:
+      'Nous aident à comprendre l’usage du site (ex. Google Analytics), de façon agrégée.',
+    marketingTitle: 'Marketing',
+    marketingDesc:
+      'Permettent de mesurer les campagnes et de personnaliser les annonces (ex. Google Ads), uniquement avec votre consentement.',
   },
   common: {
     learnMore: 'En savoir plus →',
@@ -551,7 +573,9 @@ export const fr: typeof pt = {
       {
         title: '7. Cookies',
         paragraphs: [
-          'Nous utilisons des cookies et technologies similaires nécessaires au fonctionnement du site et, le cas échéant, à des analyses agrégées. Vous pouvez gérer vos préférences dans votre navigateur.',
+          'Nous utilisons des cookies et technologies similaires en trois catégories : (1) Essentiels — nécessaires au fonctionnement du site (langue, authentification, sécurité), toujours actifs ; (2) Analyse — mesure d’usage agrégée (ex. Google Analytics), uniquement avec consentement ; (3) Marketing — campagnes et publicité (ex. Google Ads), uniquement avec consentement.',
+          'Vous pouvez accepter, refuser ou personnaliser les catégories non essentielles via le bandeau cookies, ou rouvrir les préférences à tout moment via le lien « Cookies » du pied de page. Nous utilisons Google Consent Mode v2 : sans consentement, les balises de mesure/publicité restent en mode restreint (denied).',
+          'Vous pouvez aussi contrôler les cookies dans les paramètres du navigateur ; bloquer les cookies essentiels peut affecter le fonctionnement du site.',
         ],
       },
       {

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "meta:ids": "npx tsx scripts/get-meta-ids.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

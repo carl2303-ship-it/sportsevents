@@ -12,5 +12,6 @@ export {
   publishSocialBundle,
   publishToFacebook,
   publishToInstagram,
+  publicShareUrl,
 } from '@/lib/content-automation/meta-publish'
 export { coverImageForDestination, siteOrigin } from '@/lib/content-automation/covers'

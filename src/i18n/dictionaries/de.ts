@@ -26,7 +26,29 @@ export const de: typeof pt = {
     addressAlgarve: 'Adresse Algarve',
     addressBarcelona: 'Adresse Barcelona',
     privacy: 'Datenschutz',
+    cookies: 'Cookies',
     terms: 'AGB',
+  },
+  cookies: {
+    title: 'Ihre Privatsphäre',
+    description:
+      'Wir verwenden essentielle Cookies für den Betrieb der Website und, mit Ihrer Einwilligung, Analyse- und Marketing-Cookies (inkl. Google). Sie können akzeptieren, ablehnen oder anpassen.',
+    privacyLink: 'Datenschutzerklärung',
+    acceptAll: 'Alle akzeptieren',
+    reject: 'Nicht notwendige ablehnen',
+    customize: 'Anpassen',
+    save: 'Einstellungen speichern',
+    back: 'Zurück',
+    close: 'Schließen',
+    necessaryTitle: 'Essenziell',
+    necessaryDesc:
+      'Für den Betrieb erforderlich (Sprache, Sitzung, Sicherheit). Immer aktiv.',
+    analyticsTitle: 'Analyse',
+    analyticsDesc:
+      'Helfen uns zu verstehen, wie die Website genutzt wird (z. B. Google Analytics), in aggregierter Form.',
+    marketingTitle: 'Marketing',
+    marketingDesc:
+      'Ermöglichen Kampagnenmessung und Anzeigenpersonalisierung (z. B. Google Ads), nur mit Ihrer Einwilligung.',
   },
   common: {
     learnMore: 'Mehr erfahren →',
@@ -551,7 +573,9 @@ export const de: typeof pt = {
       {
         title: '7. Cookies',
         paragraphs: [
-          'Wir verwenden Cookies und ähnliche Technologien, die für den Betrieb der Website erforderlich sind, und ggf. für aggregierte Analysen. Einstellungen können Sie im Browser verwalten.',
+          'Wir verwenden Cookies und ähnliche Technologien in drei Kategorien: (1) Essenziell — für den Betrieb der Website erforderlich (Sprache, Authentifizierung, Sicherheit), immer aktiv; (2) Analyse — aggregierte Nutzungsmessung (z. B. Google Analytics), nur mit Einwilligung; (3) Marketing — Kampagnen und Werbung (z. B. Google Ads), nur mit Einwilligung.',
+          'Sie können nicht essenzielle Kategorien über das Cookie-Banner akzeptieren, ablehnen oder anpassen, oder die Einstellungen jederzeit über den Link «Cookies» in der Fußzeile erneut öffnen. Wir nutzen Google Consent Mode v2: ohne Einwilligung bleiben Mess-/Werbe-Tags im eingeschränkten Modus (denied).',
+          'Cookies können Sie auch in den Browsereinstellungen steuern; das Blockieren essenzieller Cookies kann die Funktionalität der Website beeinträchtigen.',
         ],
       },
       {

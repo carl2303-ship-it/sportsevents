@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Syne, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { InstallPrompt } from "@/components/install-prompt";
+import { ConsentProvider } from "@/components/consent/ConsentProvider";
+import { CONSENT_DEFAULT_SCRIPT } from "@/lib/consent";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getLocale } from "@/i18n/get-locale";
 import { LocaleProvider } from "@/i18n/use-locale";
@@ -65,9 +68,16 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${syne.variable} ${dmSans.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
+        <Script
+          id="consent-defaults"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: CONSENT_DEFAULT_SCRIPT }}
+        />
         <LocaleProvider locale={locale}>
-          {children}
-          <InstallPrompt />
+          <ConsentProvider>
+            {children}
+            <InstallPrompt />
+          </ConsentProvider>
         </LocaleProvider>
       </body>
     </html>

@@ -110,10 +110,28 @@ export async function POST(request: Request) {
   result.slug = saved.slug
 
   if (autoPublish) {
+    const missing: string[] = []
+    if (!process.env.META_PAGE_ACCESS_TOKEN?.trim()) {
+      missing.push('META_PAGE_ACCESS_TOKEN')
+    }
+    if (!process.env.META_PAGE_ID?.trim()) missing.push('META_PAGE_ID')
+    if (!process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID?.trim()) {
+      missing.push('INSTAGRAM_BUSINESS_ACCOUNT_ID')
+    }
+    if (missing.length) {
+      const where =
+        process.env.NODE_ENV === 'development'
+          ? 'no .env.local (reinicia o next dev)'
+          : 'no Netlify Environment variables'
+      result.errors!.instagram = `Env em falta ${where}: ${missing.join(', ')}`
+      result.errors!.facebook = `Env em falta ${where}: ${missing.join(', ')}`
+      result.success = true
+      return NextResponse.json(result, { status: 207 })
+    }
+
     const cover = saved.cover_image
     if (!cover) {
       result.errors!.instagram = 'Sem cover_image para Instagram.'
-      result.errors!.facebook = 'Sem cover_image (Facebook feed usa caption+link).'
     }
 
     const social = await publishSocialBundle({
@@ -128,6 +146,9 @@ export async function POST(request: Request) {
     result.facebook_published = social.facebook_published
     if (social.instagram_error) result.errors!.instagram = social.instagram_error
     if (social.facebook_error) result.errors!.facebook = social.facebook_error
+  } else {
+    result.errors!.instagram = 'auto_publish_social=false — redes não pedidas.'
+    result.errors!.facebook = 'auto_publish_social=false — redes não pedidas.'
   }
 
   result.success = true

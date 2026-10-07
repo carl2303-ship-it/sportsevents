@@ -26,7 +26,29 @@ export const en: typeof pt = {
     addressAlgarve: 'Algarve address',
     addressBarcelona: 'Barcelona address',
     privacy: 'Privacy',
+    cookies: 'Cookies',
     terms: 'Terms',
+  },
+  cookies: {
+    title: 'Your privacy',
+    description:
+      'We use essential cookies for the site to work and, with your consent, analytics and marketing cookies (including Google). You can accept, reject or customise.',
+    privacyLink: 'Privacy policy',
+    acceptAll: 'Accept all',
+    reject: 'Reject non-essential',
+    customize: 'Customise',
+    save: 'Save preferences',
+    back: 'Back',
+    close: 'Close',
+    necessaryTitle: 'Essential',
+    necessaryDesc:
+      'Required for the site to work (language, session, security). Always on.',
+    analyticsTitle: 'Analytics',
+    analyticsDesc:
+      'Help us understand how the site is used (e.g. Google Analytics), in aggregate.',
+    marketingTitle: 'Marketing',
+    marketingDesc:
+      'Allow campaign measurement and ad personalisation (e.g. Google Ads), only with your consent.',
   },
   common: {
     learnMore: 'Learn more →',
@@ -551,7 +573,9 @@ export const en: typeof pt = {
       {
         title: '7. Cookies',
         paragraphs: [
-          'We use cookies and similar technologies required for the site to work and, where applicable, for aggregated analytics. You can manage preferences in your browser.',
+          'We use cookies and similar technologies in three categories: (1) Essential — required for the site to work (language, authentication, security), always on; (2) Analytics — aggregated usage measurement (e.g. Google Analytics), only with consent; (3) Marketing — campaigns and advertising (e.g. Google Ads), only with consent.',
+          'You can accept, reject or customise non-essential categories via the cookie banner, or reopen preferences anytime via the «Cookies» link in the footer. We use Google Consent Mode v2: until you consent, measurement/advertising tags stay in restricted mode (denied).',
+          'You can also control cookies in your browser settings; blocking essential cookies may affect site functionality.',
         ],
       },
       {

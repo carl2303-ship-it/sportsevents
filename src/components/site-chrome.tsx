@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
+import { ConsentPreferencesLink } from '@/components/consent/ConsentPreferencesLink'
 import {
   switchLocalePath,
   withLocale,
@@ -282,6 +283,7 @@ export function SiteFooter() {
           >
             {t.footer.privacy}
           </Link>
+          <ConsentPreferencesLink className="hover:text-cyan" />
           <Link
             href={withLocale('/termos', locale)}
             className="hover:text-cyan"

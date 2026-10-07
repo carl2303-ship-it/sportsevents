@@ -107,8 +107,24 @@ export function BlogAdminPanel() {
   const [aiDestination, setAiDestination] = useState<
     'Marbella' | 'Algarve' | 'Barcelona'
   >('Algarve')
-  const [aiSocial, setAiSocial] = useState(false)
+  const [aiSocial, setAiSocial] = useState(true)
   const [aiBusy, setAiBusy] = useState(false)
+  const [metaReady, setMetaReady] = useState<{
+    ready_for_facebook: boolean
+    ready_for_instagram: boolean
+    meta_page_token: boolean
+    meta_page_id: boolean
+    instagram_business_id: boolean
+    has_pages_manage_posts?: boolean
+    has_pages_read_engagement?: boolean
+    token_type?: string | null
+    token_page_name?: string | null
+    token_page_id?: string | null
+    configured_page_id?: string | null
+    page_id_matches_token?: boolean
+    scopes?: string[]
+  } | null>(null)
+  const [socialBusy, setSocialBusy] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -129,7 +145,16 @@ export function BlogAdminPanel() {
   }, [])
 
   useEffect(() => {
-    load()
+    void load()
+    void (async () => {
+      try {
+        const res = await fetch('/api/content/meta-status')
+        if (!res.ok) return
+        setMetaReady(await res.json())
+      } catch {
+        // ignore
+      }
+    })()
   }, [load])
 
   function startCreate() {
@@ -228,10 +253,16 @@ export function BlogAdminPanel() {
         data.blog_post_url ? `Blog: ${data.blog_post_url}` : null,
         data.instagram_published ? 'Instagram OK' : null,
         data.facebook_published ? 'Facebook OK' : null,
-        data.errors?.instagram ? `IG: ${data.errors.instagram}` : null,
-        data.errors?.facebook ? `FB: ${data.errors.facebook}` : null,
       ].filter(Boolean)
       setOkMsg(bits.join(' · ') || 'Artigo gerado.')
+      const socialErrs = [
+        data.errors?.instagram,
+        data.errors?.facebook,
+        data.errors?.config,
+      ].filter(Boolean)
+      if (socialErrs.length) {
+        setError(socialErrs.join(' | '))
+      }
       await load()
       if (data.slug) {
         const listRes = await fetch('/api/admin/blog')
@@ -245,6 +276,59 @@ export function BlogAdminPanel() {
       setError('Erro de rede na geração automática.')
     }
     setAiBusy(false)
+  }
+
+  async function republishSocial(
+    platforms?: Array<'instagram' | 'facebook'>
+  ) {
+    if (!form.slug.trim()) {
+      setError('Guarda o artigo com slug antes de publicar nas redes.')
+      return
+    }
+    const needIg = !platforms?.length || platforms.includes('instagram')
+    const needFb = !platforms?.length || platforms.includes('facebook')
+    if (
+      metaReady &&
+      ((needFb && !metaReady.ready_for_facebook) ||
+        (needIg && !metaReady.ready_for_instagram))
+    ) {
+      setError(
+        'Meta incompleto: preenche META_PAGE_ACCESS_TOKEN, META_PAGE_ID e INSTAGRAM_BUSINESS_ACCOUNT_ID no .env.local e reinicia o next dev.'
+      )
+      return
+    }
+    setSocialBusy(true)
+    setError(null)
+    setOkMsg(null)
+    try {
+      const res = await fetch('/api/content/publish-social', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug: form.slug.trim(),
+          ...(platforms?.length ? { platforms } : {}),
+        }),
+      })
+      const data = await res.json()
+      const bits = [
+        data.instagram_published ? 'Instagram OK' : null,
+        data.facebook_published ? 'Facebook OK' : null,
+      ].filter(Boolean)
+      if (bits.length) setOkMsg(bits.join(' · '))
+      const errs = [
+        data.error,
+        data.errors?.config,
+        data.errors?.instagram,
+        data.errors?.facebook,
+      ].filter(Boolean)
+      if (errs.length) setError(errs.join(' | '))
+      if (!bits.length && !errs.length) {
+        setError('Nada foi publicado nas redes.')
+      }
+    } catch {
+      setError('Erro de rede ao publicar nas redes.')
+    }
+    setSocialBusy(false)
   }
 
   return (
@@ -287,9 +371,55 @@ export function BlogAdminPanel() {
             Gerar com IA + redes sociais
           </h3>
           <p className="text-[11px] text-slate-500 mt-1">
-            Cria artigo no blog (OpenAI / Netlify AI Gateway) e, opcionalmente,
-            publica caption no Instagram e link no Facebook via Meta Graph API.
+            Cria artigo no blog (OpenAI / Netlify AI Gateway) e, se o checkbox
+            estiver activo, publica no Instagram e Facebook via Meta.
           </p>
+          {metaReady && (
+            <div className="mt-2 space-y-1">
+              <p
+                className={`text-[11px] ${
+                  metaReady.ready_for_facebook && metaReady.ready_for_instagram
+                    ? 'text-emerald-400'
+                    : 'text-amber-400'
+                }`}
+              >
+                Meta env:{' '}
+                {metaReady.meta_page_token ? 'token✓' : 'token✗'} ·{' '}
+                {metaReady.meta_page_id ? 'page✓' : 'page✗'} ·{' '}
+                {metaReady.instagram_business_id ? 'IG✓' : 'IG✗'}
+                {metaReady.token_type ? ` · tipo=${metaReady.token_type}` : ''}
+              </p>
+              <p
+                className={`text-[11px] ${
+                  metaReady.has_pages_manage_posts
+                    ? 'text-emerald-400'
+                    : 'text-rose-400'
+                }`}
+              >
+                FB permissão pages_manage_posts:{' '}
+                {metaReady.has_pages_manage_posts
+                  ? '✓ no token'
+                  : '✗ AUSENTE no token actual'}
+              </p>
+              {metaReady.token_page_id && (
+                <p
+                  className={`text-[11px] ${
+                    metaReady.page_id_matches_token
+                      ? 'text-emerald-400'
+                      : 'text-rose-400'
+                  }`}
+                >
+                  Token é da página:{' '}
+                  {metaReady.token_page_name || metaReady.token_page_id}
+                  {!metaReady.page_id_matches_token
+                    ? metaReady.configured_page_id
+                      ? ` — mas META_PAGE_ID=${metaReady.configured_page_id} (não corresponde). Actualiza META_PAGE_ID no .env.local para ${metaReady.token_page_id}.`
+                      : ` — META_PAGE_ID está vazio no .env.local. Define META_PAGE_ID=${metaReady.token_page_id} e reinicia o next dev.`
+                    : ' ✓'}
+                </p>
+              )}
+            </div>
+          )}
         </div>
         <div className="grid sm:grid-cols-[1fr_160px_auto] gap-2 items-end">
           <label className="block space-y-1">
@@ -330,14 +460,14 @@ export function BlogAdminPanel() {
             {aiBusy ? 'A gerar…' : 'Gerar & publicar'}
           </button>
         </div>
-        <label className="inline-flex items-center gap-2 text-xs text-slate-300">
+        <label className="inline-flex items-center gap-2 text-xs text-slate-200 font-semibold">
           <input
             type="checkbox"
             checked={aiSocial}
             onChange={(e) => setAiSocial(e.target.checked)}
-            className="rounded border-slate-600"
+            className="rounded border-slate-600 accent-cyan-400"
           />
-          Também publicar no Instagram + Facebook (Meta)
+          Publicar também no Instagram + Facebook (obrigatório marcar)
         </label>
       </div>
 
@@ -566,14 +696,59 @@ export function BlogAdminPanel() {
             Publicado no site (/blog)
           </label>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-slate-950 font-bold text-xs px-4 py-2.5"
-          >
-            <Save className="w-3.5 h-3.5" />
-            {saving ? 'A guardar…' : editingId ? 'Guardar alterações' : 'Criar artigo'}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center gap-2 rounded-xl bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-slate-950 font-bold text-xs px-4 py-2.5"
+            >
+              <Save className="w-3.5 h-3.5" />
+              {saving
+                ? 'A guardar…'
+                : editingId
+                  ? 'Guardar alterações'
+                  : 'Criar artigo'}
+            </button>
+            {editingId && form.slug && (
+              <>
+                <button
+                  type="button"
+                  disabled={
+                    socialBusy ||
+                    Boolean(
+                      metaReady &&
+                        (!metaReady.ready_for_facebook ||
+                          !metaReady.ready_for_instagram)
+                    )
+                  }
+                  title={
+                    metaReady &&
+                    (!metaReady.ready_for_facebook ||
+                      !metaReady.ready_for_instagram)
+                      ? 'Configura META_* no .env.local primeiro'
+                      : undefined
+                  }
+                  onClick={() => void republishSocial()}
+                  className="inline-flex items-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 disabled:opacity-50 text-cyan-300 font-bold text-xs px-4 py-2.5"
+                >
+                  {socialBusy
+                    ? 'A publicar redes…'
+                    : 'Republicar Instagram + Facebook'}
+                </button>
+                <button
+                  type="button"
+                  disabled={
+                    socialBusy ||
+                    Boolean(metaReady && !metaReady.ready_for_facebook)
+                  }
+                  onClick={() => void republishSocial(['facebook'])}
+                  className="inline-flex items-center gap-2 rounded-xl border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 disabled:opacity-50 text-blue-300 font-bold text-xs px-4 py-2.5"
+                >
+                  Só Facebook
+                </button>
+              </>
+            )}
+          </div>
         </form>
       </div>
     </div>

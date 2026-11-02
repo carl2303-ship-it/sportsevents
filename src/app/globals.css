@@ -194,3 +194,42 @@ body {
 .blog-prose tr:last-child td {
   border-bottom: none;
 }
+
+/* Product descriptions from Boost (HTML) */
+.store-prose h2,
+.store-prose h3 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--app-white);
+}
+.store-prose p {
+  margin-bottom: 0.85rem;
+}
+.store-prose ul,
+.store-prose ol {
+  margin: 0 0 1rem 1.25rem;
+  display: grid;
+  gap: 0.35rem;
+}
+.store-prose ul {
+  list-style: disc;
+}
+.store-prose ol {
+  list-style: decimal;
+}
+.store-prose a {
+  color: var(--cyan);
+  text-decoration: underline;
+}
+.store-prose strong {
+  color: var(--app-white);
+  font-weight: 700;
+}
+.store-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  margin: 0.75rem 0;
+}

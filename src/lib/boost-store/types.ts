@@ -5,6 +5,7 @@ export type BoostCategory = {
   description?: string | null
   active?: boolean
   display_order?: number | null
+  shortName?: string
 }
 
 export type BoostBrand = {
@@ -12,6 +13,11 @@ export type BoostBrand = {
   name: string
   slug: string
   active?: boolean
+}
+
+export type BoostColor = {
+  name: string
+  hex: string
 }
 
 export type BoostProduct = {
@@ -23,6 +29,11 @@ export type BoostProduct = {
   compare_at_price?: number | null
   stock: number
   image_url?: string | null
+  additional_images?: string[] | null
+  video_url?: string | null
+  features?: string[] | string | null
+  colors?: BoostColor[] | null
+  sizes?: string[] | null
   active?: boolean
   is_featured?: boolean | null
   is_digital?: boolean | null
@@ -32,7 +43,7 @@ export type BoostProduct = {
   brand_id?: string | null
   category?: BoostCategory | null
   brand?: BoostBrand | null
-  translations?: Record<string, unknown> | null
+  translations?: Record<string, Record<string, string>> | null
 }
 
 export type StoreCartItem = {
@@ -43,4 +54,31 @@ export type StoreCartItem = {
   type: 'physical' | 'digital'
   quantity: number
   category?: string
+}
+
+export function productImageList(product: BoostProduct): string[] {
+  const extras = Array.isArray(product.additional_images)
+    ? product.additional_images.filter(Boolean)
+    : []
+  const main = product.image_url ? [product.image_url] : []
+  return [...new Set([...main, ...extras])]
+}
+
+export function productFeatures(product: BoostProduct): string[] {
+  if (!product.features) return []
+  if (Array.isArray(product.features)) return product.features.map(String)
+  try {
+    const parsed = JSON.parse(product.features)
+    return Array.isArray(parsed) ? parsed.map(String) : []
+  } catch {
+    return []
+  }
+}
+
+/** Strip tags for card previews (descriptions are HTML in Boost). */
+export function stripHtml(html: string): string {
+  return String(html || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }

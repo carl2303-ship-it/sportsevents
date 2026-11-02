@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useStoreCart } from '@/components/store/cart-context'
 import { getBoostStoreBrowserClient } from '@/lib/boost-store/client'
 import {
-  BOOST_SUPABASE_ANON_KEY,
+  BOOST_EDGE_ANON_KEY,
   boostEdgeCheckoutUrl,
 } from '@/lib/boost-store/config'
 import { formatEuro } from '@/lib/boost-store/products'
@@ -219,9 +219,9 @@ export function CheckoutClient({
       const response = await fetch(boostEdgeCheckoutUrl('/create-checkout-session'), {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${BOOST_SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${BOOST_EDGE_ANON_KEY}`,
           'Content-Type': 'application/json',
-          apikey: BOOST_SUPABASE_ANON_KEY,
+          apikey: BOOST_EDGE_ANON_KEY,
         },
         body: JSON.stringify({
           items,

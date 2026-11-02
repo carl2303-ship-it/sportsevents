@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import {
-  BOOST_SUPABASE_ANON_KEY,
+  BOOST_EDGE_ANON_KEY,
   boostEdgeRootUrl,
 } from '@/lib/boost-store/config'
 
@@ -305,7 +305,7 @@ export function TourLandingClient() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${BOOST_SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${BOOST_EDGE_ANON_KEY}`,
         },
         body: JSON.stringify({
           productType: 'saas-tour-subscription',

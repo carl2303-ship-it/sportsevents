@@ -6,7 +6,7 @@ import { getBoostStoreBrowserClient } from '@/lib/boost-store/client'
 import {
   BOOST_STRIPE_PUBLISHABLE_KEY,
   boostEdgeRootUrl,
-  BOOST_SUPABASE_ANON_KEY,
+  BOOST_EDGE_ANON_KEY,
 } from '@/lib/boost-store/config'
 import {
   eurosFromCents,
@@ -79,7 +79,7 @@ export function FunnelLandingClient({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${BOOST_SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${BOOST_EDGE_ANON_KEY}`,
         },
         body: JSON.stringify({
           productType: funnel.ebook_product_type,

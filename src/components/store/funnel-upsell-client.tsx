@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { getBoostStoreBrowserClient } from '@/lib/boost-store/client'
 import {
   BOOST_STRIPE_PUBLISHABLE_KEY,
-  BOOST_SUPABASE_ANON_KEY,
+  BOOST_EDGE_ANON_KEY,
   boostEdgeRootUrl,
 } from '@/lib/boost-store/config'
 import { eurosFromCents, type EbookFunnel } from '@/lib/boost-store/funnels'
@@ -111,7 +111,7 @@ export function FunnelUpsellClient({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${BOOST_SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${BOOST_EDGE_ANON_KEY}`,
         },
         body: JSON.stringify({
           productType: funnel.upsell_product_type,

@@ -5,6 +5,7 @@ import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 import { AddToCartButton } from '@/components/store/add-to-cart-button'
 import { ProductGallery } from '@/components/store/product-gallery'
 import { StoreCartLink } from '@/components/store/store-cart-link'
+import { resolveProductLanding } from '@/lib/boost-store/landing-urls'
 import { localizeStoreProduct } from '@/lib/boost-store/localize'
 import { formatEuro, getProductById } from '@/lib/boost-store/products'
 import {
@@ -51,12 +52,18 @@ export default async function StoreProductPage({ params }: PageProps) {
   if (!raw) notFound()
 
   const product = localizeStoreProduct(raw, locale)
+  const landing = resolveProductLanding(product, locale)
   const numberLocale = numberLocaleFor(locale)
   const images = productImageList(product)
   const features = productFeatures(product)
   const descriptionHtml =
     product.description || product.short_description || ''
   const yt = product.video_url ? youtubeId(product.video_url) : null
+  /** On product detail, «Saber mais» only when landing ≠ this page. */
+  const showLearnMore =
+    landing.learnMore &&
+    !landing.href.includes(`/store/${product.id}`) &&
+    landing.href !== withLocale(`/store/${product.id}`, locale)
 
   return (
     <div className="min-h-screen bg-navy text-app-white">
@@ -151,11 +158,12 @@ export default async function StoreProductPage({ params }: PageProps) {
               </div>
             ) : null}
 
-            {product.learn_more_url ? (
+            {showLearnMore ? (
               <Link
-                href={product.learn_more_url}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={landing.href}
+                {...(landing.external
+                  ? { target: '_blank', rel: 'noopener noreferrer' }
+                  : {})}
                 className="inline-flex rounded-xl bg-cyan px-6 py-3 text-sm font-bold text-navy hover:bg-cyan/90"
               >
                 {t.learnMore}

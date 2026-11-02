@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
     ],
   },
   // Compat: fase 1 usou /loja — canónico é /store
+  // + aliases HTML do Boost (ebook-landing / funnel) para landings SE
   async redirects() {
     return [
       {
@@ -32,8 +33,53 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/loja/funnel",
+        destination: "/store/funnel",
+        permanent: true,
+      },
+      {
+        source: "/loja/funnel/upsell",
+        destination: "/store/funnel/upsell",
+        permanent: true,
+      },
+      {
+        source: "/loja/funnel/thank-you",
+        destination: "/store/funnel/thank-you",
+        permanent: true,
+      },
+      {
+        source: "/loja/ebook-landing",
+        destination: "/store/ebook-landing",
+        permanent: true,
+      },
+      {
         source: "/loja/:id",
         destination: "/store/:id",
+        permanent: true,
+      },
+      {
+        source: "/store/ebook-landing.html",
+        destination: "/store/ebook-landing",
+        permanent: true,
+      },
+      {
+        source: "/ebook-landing",
+        destination: "/store/ebook-landing",
+        permanent: true,
+      },
+      {
+        source: "/ebook-landing.html",
+        destination: "/store/ebook-landing",
+        permanent: true,
+      },
+      {
+        source: "/smartpadelstrategy",
+        destination: "/store/funnel?slug=smartpadelstrategy",
+        permanent: true,
+      },
+      {
+        source: "/smartpadelstrategy.html",
+        destination: "/store/funnel?slug=smartpadelstrategy",
         permanent: true,
       },
     ];

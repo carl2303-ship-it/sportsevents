@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { AddToCartButton } from '@/components/store/add-to-cart-button'
+import { resolveProductLanding } from '@/lib/boost-store/landing-urls'
 import { formatEuro } from '@/lib/boost-store/products'
 import {
   stripHtml,
@@ -11,7 +12,7 @@ import {
   type BoostCategory,
   type BoostProduct,
 } from '@/lib/boost-store/types'
-import { withLocale, type Locale } from '@/i18n/config'
+import { type Locale } from '@/i18n/config'
 
 type CatalogCopy = {
   filterAll: string
@@ -209,11 +210,8 @@ export function ProductCatalog({
             </p>
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {filtered.map((product) => {
-                const href = product.learn_more_url
-                  ? product.learn_more_url
-                  : withLocale(`/store/${product.id}`, locale)
-                const external = Boolean(product.learn_more_url)
+              {              filtered.map((product) => {
+                const landing = resolveProductLanding(product, locale)
                 const blurb = stripHtml(
                   product.short_description || product.description || ''
                 )
@@ -224,8 +222,8 @@ export function ProductCatalog({
                     className="group overflow-hidden rounded-2xl border border-white/10 bg-black/20 transition hover:border-cyan/35"
                   >
                     <Link
-                      href={href}
-                      {...(external
+                      href={landing.href}
+                      {...(landing.external
                         ? { target: '_blank', rel: 'noopener noreferrer' }
                         : {})}
                       className="block"
@@ -273,7 +271,14 @@ export function ProductCatalog({
                         {product.category?.name || '—'}
                       </p>
                       <h3 className="font-[family-name:var(--font-display)] text-lg font-bold text-white">
-                        <Link href={href}>{product.name}</Link>
+                        <Link
+                          href={landing.href}
+                          {...(landing.external
+                            ? { target: '_blank', rel: 'noopener noreferrer' }
+                            : {})}
+                        >
+                          {product.name}
+                        </Link>
                       </h3>
                       {blurb ? (
                         <p className="line-clamp-2 text-sm text-app-white/55">
@@ -294,11 +299,12 @@ export function ProductCatalog({
                             {formatEuro(Number(product.price), numberLocale)}
                           </p>
                         </div>
-                        {product.learn_more_url ? (
+                        {landing.learnMore ? (
                           <Link
-                            href={product.learn_more_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href={landing.href}
+                            {...(landing.external
+                              ? { target: '_blank', rel: 'noopener noreferrer' }
+                              : {})}
                             className="inline-flex rounded-xl border border-cyan/40 px-4 py-2.5 text-sm font-bold text-cyan hover:bg-cyan/10"
                           >
                             {copy.learnMore}

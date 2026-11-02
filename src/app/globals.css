@@ -7,6 +7,10 @@
   --app-white: #f8fafc;
   --background: var(--navy);
   --foreground: var(--app-white);
+  /* Match former next/font/google CSS variables (self-hosted via @fontsource). */
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 @theme inline {
@@ -17,8 +21,8 @@
   --color-gold: var(--gold);
   --color-app-white: var(--app-white);
   --font-sans: var(--font-body);
-  --font-display: var(--font-display);
-  --font-mono: var(--font-mono);
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 @keyframes fade-up {

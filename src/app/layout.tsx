@@ -1,31 +1,22 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Syne, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { InstallPrompt } from "@/components/install-prompt";
 import { ConsentProvider } from "@/components/consent/ConsentProvider";
 import { CONSENT_DEFAULT_SCRIPT } from "@/lib/consent";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getLocale } from "@/i18n/get-locale";
 import { LocaleProvider } from "@/i18n/use-locale";
+/* Self-hosted fonts — avoid next/font/google (Netlify CI egress breaks Google Fonts fetch). */
+import "@fontsource/syne/latin-600.css";
+import "@fontsource/syne/latin-700.css";
+import "@fontsource/syne/latin-800.css";
+import "@fontsource/dm-sans/latin-400.css";
+import "@fontsource/dm-sans/latin-500.css";
+import "@fontsource/dm-sans/latin-600.css";
+import "@fontsource/dm-sans/latin-700.css";
+import "@fontsource/jetbrains-mono/latin-400.css";
+import "@fontsource/jetbrains-mono/latin-500.css";
 import "./globals.css";
-
-const syne = Syne({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
-});
-
-const dmSans = DM_Sans({
-  variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const jetbrains = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-});
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -63,10 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = await getLocale();
   return (
-    <html
-      lang={locale}
-      className={`${syne.variable} ${dmSans.variable} ${jetbrains.variable} h-full antialiased`}
-    >
+    <html lang={locale} className="h-full antialiased">
       <body className="min-h-full flex flex-col font-sans">
         <Script
           id="consent-defaults"

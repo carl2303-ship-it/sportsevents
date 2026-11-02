@@ -6,7 +6,7 @@ import { getBoostStoreBrowserClient } from '@/lib/boost-store/client'
 import { withLocale, type Locale } from '@/i18n/config'
 
 const EBOOK_PDF_URL =
-  'https://gmpyjnufuvsoewbtirsg.supabase.co/storage/v1/object/public/ebook-materials/Guia_Completo_de_Equipamento_de_Padel_POR.pdf'
+  'https://tprbpeacicadsbmvxcqk.supabase.co/storage/v1/object/public/ebook-materials/Guia_Completo_de_Equipamento_de_Padel_POR.pdf'
 
 export type EbookLandingCopy = {
   ebookLabel: string

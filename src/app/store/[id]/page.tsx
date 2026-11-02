@@ -41,7 +41,7 @@ export default async function LojaProductPage({ params }: PageProps) {
       <main className="mx-auto max-w-7xl px-5 py-10 md:px-10 md:py-14">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
           <Link
-            href={withLocale('/loja', locale)}
+            href={withLocale('/store', locale)}
             className="text-sm text-app-white/55 hover:text-cyan"
           >
             ← {t.backToStore}

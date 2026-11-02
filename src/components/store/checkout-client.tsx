@@ -142,7 +142,7 @@ export function CheckoutClient({
       <div className="rounded-2xl border border-cyan/30 bg-cyan/10 p-8 text-center space-y-4">
         <p className="text-lg font-bold text-white">{copy.paymentSuccess}</p>
         <Link
-          href={withLocale('/loja', locale)}
+          href={withLocale('/store', locale)}
           className="inline-flex text-cyan hover:underline"
         >
           {copy.backToStore}
@@ -156,7 +156,7 @@ export function CheckoutClient({
       <div className="rounded-2xl border border-white/10 bg-black/20 p-10 text-center space-y-4">
         <p className="text-app-white/60">{copy.empty}</p>
         <Link
-          href={withLocale('/loja', locale)}
+          href={withLocale('/store', locale)}
           className="inline-flex rounded-xl bg-cyan px-5 py-2.5 text-sm font-bold text-navy"
         >
           {copy.continueShopping}
@@ -214,7 +214,7 @@ export function CheckoutClient({
 
       const origin =
         typeof window !== 'undefined' ? window.location.origin : 'https://sportsevents.app'
-      const checkoutPath = withLocale('/loja/checkout', locale)
+      const checkoutPath = withLocale('/store/checkout', locale)
 
       const response = await fetch(boostEdgeCheckoutUrl('/create-checkout-session'), {
         method: 'POST',

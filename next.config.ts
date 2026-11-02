@@ -18,6 +18,26 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Compat: fase 1 usou /loja — canónico é /store
+  async redirects() {
+    return [
+      {
+        source: "/loja",
+        destination: "/store",
+        permanent: true,
+      },
+      {
+        source: "/loja/checkout",
+        destination: "/store/checkout",
+        permanent: true,
+      },
+      {
+        source: "/loja/:id",
+        destination: "/store/:id",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

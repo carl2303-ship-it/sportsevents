@@ -16,7 +16,7 @@ export function StoreCartLink({
 
   return (
     <Link
-      href={withLocale('/loja/checkout', locale)}
+      href={withLocale('/store/checkout', locale)}
       className="relative inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/25 px-3 py-1.5 text-xs font-semibold text-app-white/85 transition hover:border-cyan/40 hover:text-cyan"
       aria-label={label}
     >

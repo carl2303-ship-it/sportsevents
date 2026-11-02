@@ -67,7 +67,7 @@ export function ProductCatalog({
           {filtered.map((product) => {
             const href = product.learn_more_url
               ? product.learn_more_url
-              : withLocale(`/loja/${product.id}`, locale)
+              : withLocale(`/store/${product.id}`, locale)
             const external = Boolean(product.learn_more_url)
 
             return (

@@ -24,7 +24,7 @@ export default async function LojaCheckoutPage() {
       <main className="mx-auto max-w-6xl px-5 py-10 md:px-10 md:py-14 space-y-8">
         <div>
           <Link
-            href={withLocale('/loja', locale)}
+            href={withLocale('/store', locale)}
             className="text-sm text-app-white/55 hover:text-cyan"
           >
             ← {t.backToStore}

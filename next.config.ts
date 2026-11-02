@@ -82,6 +82,26 @@ const nextConfig: NextConfig = {
         destination: "/store/funnel?slug=smartpadelstrategy",
         permanent: true,
       },
+      {
+        source: "/store/tour.html",
+        destination: "/store/tour",
+        permanent: true,
+      },
+      {
+        source: "/tour",
+        destination: "/store/tour",
+        permanent: true,
+      },
+      {
+        source: "/tour.html",
+        destination: "/store/tour",
+        permanent: true,
+      },
+      {
+        source: "/loja/tour",
+        destination: "/store/tour",
+        permanent: true,
+      },
     ];
   },
 };

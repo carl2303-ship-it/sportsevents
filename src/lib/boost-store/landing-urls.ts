@@ -43,11 +43,23 @@ export function remapBoostStoreUrl(
         learnMore: true,
       }
     }
+    // App runtime (login / org slug) stays on padel1 — marketing landing is /store/tour
     if (
-      abs.hostname === 'tour.padel1.app' ||
       abs.hostname === 'padel1.app' ||
       abs.hostname === 'www.padel1.app'
     ) {
+      return { href: abs.toString(), external: true, learnMore: true }
+    }
+    if (abs.hostname === 'tour.padel1.app') {
+      // Bare host without org path → marketing landing on SE
+      if (abs.pathname === '/' || abs.pathname === '') {
+        const href = '/store/tour'
+        return {
+          href: locale ? withLocale(href, locale) : href,
+          external: false,
+          learnMore: true,
+        }
+      }
       return { href: abs.toString(), external: true, learnMore: true }
     }
   } catch {
@@ -131,9 +143,10 @@ export function remapBoostStoreUrl(
   }
 
   if (pathLower === '/tour.html' || pathLower === '/tour') {
+    const href = '/store/tour'
     return {
-      href: 'https://tour.padel1.app',
-      external: true,
+      href: locale ? withLocale(href, locale) : href,
+      external: false,
       learnMore: true,
     }
   }
@@ -203,10 +216,25 @@ function funnelLanding(slug: string, locale?: Locale): ProductLanding {
  * Canonical landing for a store product (digital funnels / lead magnets / tour).
  * Mirrors Boost «Saber mais» when a landing existed; otherwise product detail.
  */
+/** Known digital SKU → dedicated SE landing (parity with Boost HTML). */
+const PRODUCT_LANDING_BY_ID: Record<string, string> = {
+  // App Gestão Torneios — was boostpadel.store/tour.html
+  'e854bc16-1ea7-4306-9dac-b53145b3999d': '/store/tour',
+}
+
 export function resolveProductLanding(
   product: BoostProduct,
   locale?: Locale
 ): ProductLanding {
+  const byId = PRODUCT_LANDING_BY_ID[product.id]
+  if (byId) {
+    return {
+      href: locale ? withLocale(byId, locale) : byId,
+      external: false,
+      learnMore: true,
+    }
+  }
+
   if (product.funnel_slug) {
     return funnelLanding(product.funnel_slug, locale)
   }
@@ -239,7 +267,7 @@ export function rewriteBoostUrlsInHtml(html: string): string {
     )
     .replace(
       /https?:\/\/(?:www\.)?boostpadel\.store\/tour\.html/gi,
-      'https://tour.padel1.app'
+      '/store/tour'
     )
     .replace(
       /https?:\/\/(?:www\.)?boostpadel\.store\/funnel\.html\?slug=([^"'&\s<#]+)/gi,

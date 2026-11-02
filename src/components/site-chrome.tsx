@@ -123,6 +123,12 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
             {t.nav.events}
           </Link>
           <Link
+            href={withLocale('/loja', locale)}
+            className="hover:text-app-white transition-colors"
+          >
+            {t.nav.store}
+          </Link>
+          <Link
             href={withLocale('/blog', locale)}
             className="hover:text-app-white transition-colors"
           >
@@ -258,6 +264,12 @@ export function SiteFooter() {
             className="hover:text-cyan"
           >
             {t.nav.about}
+          </Link>
+          <Link
+            href={withLocale('/loja', locale)}
+            className="hover:text-cyan"
+          >
+            {t.nav.store}
           </Link>
           <Link
             href={withLocale('/blog', locale)}

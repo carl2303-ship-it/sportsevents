@@ -252,75 +252,95 @@ export function resolveProductLanding(
   }
 }
 
+const SE_STORE = 'https://sportsevents.app/store'
+/** SE product UUIDs used by Boost blog CTAs that landed on bare /store. */
+const BLOG_PRODUCT = {
+  loaded: '6fcd365a-8026-4fb1-bfe0-15b95cb671e3',
+  nrgyGelBox: '85f1171b-cad6-4740-8d52-53140e55eded',
+} as const
+
 /** Rewrite boostpadel.store (and leftover /store/product.html) hrefs in HTML. */
 export function rewriteBoostUrlsInHtml(html: string): string {
   if (
     !html ||
     (!/boostpadel\.store/i.test(html) &&
       !/store\/product\.html\?id=/i.test(html) &&
-      !/\/store\/store(?:["'/?#\s]|$)/i.test(html))
+      !/\/store\/store(?:["'/?#\s]|$)/i.test(html) &&
+      !/Loaded 4Endurance Pro|Nrgy Gel 45/i.test(html))
   ) {
     return html
   }
 
-  return html
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/smartpadelstrategy\.html/gi,
-      '/store/funnel?slug=smartpadelstrategy'
-    )
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/ebook-landing\.html/gi,
-      '/store/ebook-landing'
-    )
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/tour\.html/gi,
-      '/store/tour'
-    )
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/funnel\.html\?slug=([^"'&\s<#]+)/gi,
-      '/store/funnel?slug=$1'
-    )
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/funnel-upsell\.html\?slug=([^"'&\s<#]+)/gi,
-      '/store/funnel/upsell?slug=$1'
-    )
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/funnel-thank-you\.html\?slug=([^"'&\s<#]+)/gi,
-      '/store/funnel/thank-you?slug=$1'
-    )
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/ebook-upsell(?:-1)?\.html/gi,
-      '/store/funnel/upsell?slug=smartpadelstrategy'
-    )
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/ebook-thank-you\.html/gi,
-      '/store/funnel/thank-you?slug=smartpadelstrategy'
-    )
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/store\.html/gi,
-      '/store'
-    )
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/digital\.html/gi,
-      '/store'
-    )
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/product\.html\?id=([^"'&\s<#]+)/gi,
-      '/store/$1'
-    )
-    // Already host-rewritten but path still legacy
-    .replace(
-      /https?:\/\/(?:www\.)?sportsevents\.app\/store\/product\.html\?id=([^"'&\s<#]+)/gi,
-      '/store/$1'
-    )
-    .replace(/\/store\/product\.html\?id=([^"'&\s<#]+)/gi, '/store/$1')
-    .replace(
-      /https?:\/\/(?:www\.)?sportsevents\.app\/store\/store(?=["'/?#\s]|$)/gi,
-      '/store'
-    )
-    .replace(/\/store\/store(?=["'/?#\s]|$)/gi, '/store')
-    .replace(
-      /https?:\/\/(?:www\.)?boostpadel\.store\/?/gi,
-      '/store'
-    )
+  return (
+    html
+      .replace(
+        /https?:\/\/(?:www\.)?boostpadel\.store\/smartpadelstrategy\.html/gi,
+        `${SE_STORE}/funnel?slug=smartpadelstrategy`
+      )
+      .replace(
+        /https?:\/\/(?:www\.)?boostpadel\.store\/ebook-landing\.html/gi,
+        `${SE_STORE}/ebook-landing`
+      )
+      .replace(
+        /https?:\/\/(?:www\.)?boostpadel\.store\/tour\.html/gi,
+        `${SE_STORE}/tour`
+      )
+      .replace(
+        /https?:\/\/(?:www\.)?boostpadel\.store\/funnel\.html\?slug=([^"'&\s<#]+)/gi,
+        `${SE_STORE}/funnel?slug=$1`
+      )
+      .replace(
+        /https?:\/\/(?:www\.)?boostpadel\.store\/funnel-upsell\.html\?slug=([^"'&\s<#]+)/gi,
+        `${SE_STORE}/funnel/upsell?slug=$1`
+      )
+      .replace(
+        /https?:\/\/(?:www\.)?boostpadel\.store\/funnel-thank-you\.html\?slug=([^"'&\s<#]+)/gi,
+        `${SE_STORE}/funnel/thank-you?slug=$1`
+      )
+      .replace(
+        /https?:\/\/(?:www\.)?boostpadel\.store\/ebook-upsell(?:-1)?\.html/gi,
+        `${SE_STORE}/funnel/upsell?slug=smartpadelstrategy`
+      )
+      .replace(
+        /https?:\/\/(?:www\.)?boostpadel\.store\/ebook-thank-you\.html/gi,
+        `${SE_STORE}/funnel/thank-you?slug=smartpadelstrategy`
+      )
+      .replace(
+        /https?:\/\/(?:www\.)?boostpadel\.store\/store\.html/gi,
+        SE_STORE
+      )
+      .replace(
+        /https?:\/\/(?:www\.)?boostpadel\.store\/digital\.html/gi,
+        SE_STORE
+      )
+      .replace(
+        /https?:\/\/(?:www\.)?boostpadel\.store\/product\.html\?id=([^"'&\s<#]+)/gi,
+        `${SE_STORE}/$1`
+      )
+      // Already host-rewritten but path still legacy
+      .replace(
+        /https?:\/\/(?:www\.)?sportsevents\.app\/store\/product\.html\?id=([^"'&\s<#]+)/gi,
+        `${SE_STORE}/$1`
+      )
+      .replace(/\/store\/product\.html\?id=([^"'&\s<#]+)/gi, `${SE_STORE}/$1`)
+      .replace(
+        /https?:\/\/(?:www\.)?sportsevents\.app\/store\/store(?=["'/?#\s]|$)/gi,
+        SE_STORE
+      )
+      .replace(/\/store\/store(?=["'/?#\s]|$)/gi, SE_STORE)
+      .replace(/https?:\/\/(?:www\.)?boostpadel\.store\/?/gi, SE_STORE)
+      // Named CTAs still on bare store home
+      .replace(
+        /href="(?:https?:\/\/(?:www\.)?sportsevents\.app)?\/store"(?=[^>]*>\s*<strong>Loaded 4Endurance Pro<\/strong>)/gi,
+        `href="${SE_STORE}/${BLOG_PRODUCT.loaded}"`
+      )
+      .replace(
+        /href="(?:https?:\/\/(?:www\.)?sportsevents\.app)?\/store"(?=[^>]*>\s*Loaded\s*<)/gi,
+        `href="${SE_STORE}/${BLOG_PRODUCT.loaded}"`
+      )
+      .replace(
+        /href="(?:https?:\/\/(?:www\.)?sportsevents\.app)?\/store"(?=[^>]*>\s*<strong>Nrgy Gel 45(?: da Nduranz)?<\/strong>)/gi,
+        `href="${SE_STORE}/${BLOG_PRODUCT.nrgyGelBox}"`
+      )
+  )
 }

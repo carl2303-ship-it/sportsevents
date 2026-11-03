@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { FunnelLandingClient } from '@/components/store/funnel-landing-client'
+import { PadelIqLandingClient } from '@/components/store/padel-iq-landing-client'
 import {
   getActiveFunnelBySlug,
   listFunnelAssets,
@@ -39,6 +40,10 @@ export default async function StoreFunnelPage({ searchParams }: PageProps) {
         <p>Funil não encontrado ou ainda em rascunho.</p>
       </div>
     )
+  }
+
+  if (slug === 'smartpadelstrategy') {
+    return <PadelIqLandingClient funnel={funnel} slug={slug} />
   }
 
   const assets = await listFunnelAssets(funnel.id)

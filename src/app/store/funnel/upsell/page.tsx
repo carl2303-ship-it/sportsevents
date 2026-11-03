@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { FunnelUpsellClient } from '@/components/store/funnel-upsell-client'
+import { PadelIqUpsellClient } from '@/components/store/padel-iq-upsell-client'
 import { getActiveFunnelBySlug } from '@/lib/boost-store/funnels'
 
 export const dynamic = 'force-dynamic'
@@ -41,6 +42,9 @@ export default async function StoreFunnelUpsellPage({
     )
   }
 
+  const Client =
+    slug === 'smartpadelstrategy' ? PadelIqUpsellClient : FunnelUpsellClient
+
   return (
     <Suspense
       fallback={
@@ -49,7 +53,7 @@ export default async function StoreFunnelUpsellPage({
         </div>
       }
     >
-      <FunnelUpsellClient funnel={funnel} slug={slug} />
+      <Client funnel={funnel} slug={slug} />
     </Suspense>
   )
 }

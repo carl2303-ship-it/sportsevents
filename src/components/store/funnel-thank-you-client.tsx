@@ -72,6 +72,48 @@ export function FunnelThankYouClient({
     .map((kind) => byKind.get(kind))
     .filter((a): a is EbookFunnelAsset => Boolean(a?.public_url))
 
+  const isPadelIq = funnel.slug === 'smartpadelstrategy'
+
+  if (isPadelIq) {
+    return (
+      <div className="min-h-screen bg-slate-50 px-5 py-16 font-sans text-slate-900 md:px-10">
+        <div className="mx-auto max-w-2xl space-y-6">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-600">
+            PADEL IQ PRO
+          </p>
+          <h1 className="text-3xl font-extrabold text-slate-900">
+            Obrigado pela compra
+          </h1>
+          <p className="text-slate-600">
+            {bundle
+              ? 'Recebeste o pack completo (ebook + sistema de confiança). Os links também foram enviados por email.'
+              : 'Os materiais foram enviados para o teu email. Também podes descarregar abaixo.'}
+          </p>
+          <ul className="space-y-3">
+            {items.map((a) => (
+              <li key={`${a.kind}-${a.public_url}`}>
+                <a
+                  href={a.public_url || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm font-semibold text-blue-700 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+                >
+                  <span>{LABELS[a.kind] || a.file_name || a.kind}</span>
+                  <span className="text-xs text-slate-400">Download →</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          {items.length === 0 ? (
+            <p className="text-sm text-slate-400">
+              Materiais a sincronizar — verifica o teu email.
+            </p>
+          ) : null}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-navy px-5 py-16 text-app-white md:px-10">
       <div className="mx-auto max-w-2xl space-y-6">

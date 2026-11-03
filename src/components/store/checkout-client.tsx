@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { useStoreCart } from '@/components/store/cart-context'
-import { getBoostStoreBrowserClient } from '@/lib/boost-store/client'
 import {
   BOOST_EDGE_ANON_KEY,
   boostEdgeCheckoutUrl,
@@ -177,7 +176,6 @@ export function CheckoutClient({
     setBusy(true)
 
     try {
-      const supabase = getBoostStoreBrowserClient()
       const orderNumber =
         'SE-' +
         Date.now() +
@@ -204,13 +202,23 @@ export function CheckoutClient({
         status: 'pending',
       }
 
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert([orderData])
-        .select()
-        .single()
-
-      if (orderError) throw new Error(orderError.message)
+      // Service-role via Next API — evita INSERT anon em boost.orders (RLS 401 no SE).
+      const createRes = await fetch('/api/store/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData),
+      })
+      const createJson = (await createRes.json().catch(() => ({}))) as {
+        order?: { id: string }
+        error?: string
+      }
+      if (!createRes.ok || !createJson.order?.id) {
+        throw new Error(
+          createJson.error ||
+            `Não foi possível criar o pedido (${createRes.status}).`
+        )
+      }
+      const order = createJson.order
 
       const origin =
         typeof window !== 'undefined' ? window.location.origin : 'https://sportsevents.app'

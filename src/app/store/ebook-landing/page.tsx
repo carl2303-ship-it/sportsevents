@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 import {
   EbookLandingClient,
   type EbookLandingCopy,
@@ -11,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 const COPY: Record<Locale, EbookLandingCopy> = {
   pt: {
-    ebookLabel: 'Ebook Gratuito',
+    ebookLabel: '📚 Ebook Gratuito',
     heroTitle: 'O Guia Completo de Equipamento de Padel',
     heroSubtitleHtml:
       'Descubra <span>o que realmente faz diferença</span> no teu equipamento e como escolher as melhores raquetes, protetores, sapatilhas e acessórios para elevar o teu jogo.',
@@ -37,7 +36,7 @@ const COPY: Record<Locale, EbookLandingCopy> = {
         text: 'Mantém o teu equipamento em condições perfeitas',
       },
     ],
-    bonusLabel: 'Bónus Exclusivo:',
+    bonusLabel: '✨ Bónus Exclusivo:',
     bonusText: 'Acesso a descontos especiais na SportsEvents Store',
     formTitle: 'Download Gratuito',
     formSubtitle: 'Recebe o ebook imediatamente no teu navegador',
@@ -49,8 +48,8 @@ const COPY: Record<Locale, EbookLandingCopy> = {
     phonePlaceholder: '+351 912 345 678',
     newsletterText:
       'Quero receber dicas exclusivas de padel e ofertas especiais da SportsEvents',
-    submitButton: 'Descarregar Ebook Grátis',
-    processing: 'A processar…',
+    submitButton: '🚀 Descarregar Ebook Grátis',
+    processing: '⏳ A processar...',
     gdprText:
       'Ao descarregar, concordas em receber emails da SportsEvents. Podes cancelar a subscrição a qualquer momento.',
     successTitle: 'Ebook Enviado!',
@@ -76,6 +75,8 @@ const COPY: Record<Locale, EbookLandingCopy> = {
       },
     ],
     errorGeneric: 'Erro ao processar o pedido. Por favor, tenta novamente.',
+    storeNav: 'Visitar Loja →',
+    footerCopyright: '© 2026 SportsEvents. Todos os direitos reservados.',
   },
   en: {
     ebookLabel: 'Free Ebook',
@@ -137,9 +138,11 @@ const COPY: Record<Locale, EbookLandingCopy> = {
       },
     ],
     errorGeneric: 'Something went wrong. Please try again.',
+    storeNav: 'Visit Store →',
+    footerCopyright: '© 2026 SportsEvents. All rights reserved.',
   },
   es: {
-    ebookLabel: 'Ebook Gratuito',
+    ebookLabel: '📚 Ebook Gratuito',
     heroTitle: 'La Guía Completa de Equipamiento de Pádel',
     heroSubtitleHtml:
       'Descubre <span>lo que realmente marca la diferencia</span> en tu equipamiento y cómo elegir las mejores palas, protectores, zapatillas y accesorios para elevar tu juego.',
@@ -204,6 +207,8 @@ const COPY: Record<Locale, EbookLandingCopy> = {
       },
     ],
     errorGeneric: 'Error al procesar. Inténtalo de nuevo.',
+    storeNav: 'Visitar Tienda →',
+    footerCopyright: '© 2026 SportsEvents. Todos los derechos reservados.',
   },
   fr: {
     ebookLabel: 'Ebook Gratuit',
@@ -271,6 +276,8 @@ const COPY: Record<Locale, EbookLandingCopy> = {
       },
     ],
     errorGeneric: 'Erreur. Veuillez réessayer.',
+    storeNav: 'Visiter la Boutique →',
+    footerCopyright: '© 2026 SportsEvents. Tous droits réservés.',
   },
   de: {
     ebookLabel: 'Kostenloses Ebook',
@@ -338,6 +345,8 @@ const COPY: Record<Locale, EbookLandingCopy> = {
       },
     ],
     errorGeneric: 'Fehler. Bitte erneut versuchen.',
+    storeNav: 'Zum Shop →',
+    footerCopyright: '© 2026 SportsEvents. Alle Rechte vorbehalten.',
   },
 }
 
@@ -361,13 +370,5 @@ export default async function EbookLandingPage() {
   const locale = await getLocale()
   const copy = COPY[locale] || COPY.en
 
-  return (
-    <div className="min-h-screen bg-navy text-app-white">
-      <SiteHeader />
-      <main>
-        <EbookLandingClient locale={locale} copy={copy} />
-      </main>
-      <SiteFooter />
-    </div>
-  )
+  return <EbookLandingClient locale={locale} copy={copy} />
 }

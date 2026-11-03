@@ -8,12 +8,16 @@ import type { Locale } from '@/i18n/config'
 
 export const dynamic = 'force-dynamic'
 
+/**
+ * Copy ported from boostpadel `translations-funnel-pages.js` → ebookLandingTranslations
+ * + hardcoded PT strings in `ebook-landing.html` (SportsEvents brand on SE).
+ */
 const COPY: Record<Locale, EbookLandingCopy> = {
   pt: {
     ebookLabel: '📚 Ebook Gratuito',
     heroTitle: 'O Guia Completo de Equipamento de Padel',
     heroSubtitleHtml:
-      'Descubra <span>o que realmente faz diferença</span> no teu equipamento e como escolher as melhores raquetes, protetores, sapatilhas e acessórios para elevar o teu jogo.',
+      'Descubra <span class="font-bold boost-blue">o que realmente faz diferença</span> no teu equipamento e como escolher as melhores raquetes, protetores, sapatilhas e acessórios para elevar o teu jogo.',
     benefits: [
       {
         title: 'Tipos de Raquetes:',
@@ -54,7 +58,7 @@ const COPY: Record<Locale, EbookLandingCopy> = {
       'Ao descarregar, concordas em receber emails da SportsEvents. Podes cancelar a subscrição a qualquer momento.',
     successTitle: 'Ebook Enviado!',
     successText:
-      'O Ebook chegou numa nova tab do teu navegador — podes descarregá-lo à vontade.',
+      'O Ebook chegou numa nova Tab do teu navegador, podes baixar-lo à vontade.',
     visitStoreButton: 'Visitar a Loja',
     trustedBy: 'Trusted by',
     players: '+ de 5.000 jogadores',
@@ -79,17 +83,23 @@ const COPY: Record<Locale, EbookLandingCopy> = {
     footerCopyright: '© 2026 SportsEvents. Todos os direitos reservados.',
   },
   en: {
-    ebookLabel: 'Free Ebook',
+    ebookLabel: '📚 Free Ebook',
     heroTitle: 'The Complete Padel Equipment Guide',
     heroSubtitleHtml:
-      'Discover <span>what really makes a difference</span> in your equipment and how to choose the best rackets, protectors, shoes and accessories to elevate your game.',
+      'Discover <span class="font-bold boost-blue">what really makes a difference</span> in your equipment and how to choose the best rackets, protectors, shoes and accessories to elevate your game.',
     benefits: [
-      { title: 'Racket Types:', text: 'Learn which is ideal for your playing style' },
+      {
+        title: 'Racket Types:',
+        text: 'Learn which is ideal for your playing style',
+      },
       {
         title: 'Essential Protectors:',
         text: 'Protect your racket and extend its lifespan',
       },
-      { title: 'Right Shoes:', text: 'Avoid injuries and improve your performance' },
+      {
+        title: 'Right Shoes:',
+        text: 'Avoid injuries and improve your performance',
+      },
       {
         title: 'Accessories That Make a Difference:',
         text: 'Overgrips, bags, and much more',
@@ -99,7 +109,7 @@ const COPY: Record<Locale, EbookLandingCopy> = {
         text: 'Keep your equipment in perfect condition',
       },
     ],
-    bonusLabel: 'Exclusive Bonus:',
+    bonusLabel: '✨ Exclusive Bonus:',
     bonusText: 'Access to special discounts at the SportsEvents Store',
     formTitle: 'Free Download',
     formSubtitle: 'Receive the ebook immediately in your browser',
@@ -111,13 +121,13 @@ const COPY: Record<Locale, EbookLandingCopy> = {
     phonePlaceholder: '+44 7700 900000',
     newsletterText:
       'I want to receive exclusive padel tips and special offers from SportsEvents',
-    submitButton: 'Download Free Ebook',
-    processing: 'Processing…',
+    submitButton: '🚀 Download Free Ebook',
+    processing: '⏳ Processing...',
     gdprText:
       'By downloading, you agree to receive emails from SportsEvents. You can unsubscribe at any time.',
     successTitle: 'Ebook Sent!',
     successText:
-      'The ebook opened in a new browser tab — feel free to download it.',
+      'The Ebook opened in a new tab in your browser, feel free to download it.',
     visitStoreButton: 'Visit the Store',
     trustedBy: 'Trusted by',
     players: '+ 5,000 players',
@@ -143,9 +153,9 @@ const COPY: Record<Locale, EbookLandingCopy> = {
   },
   es: {
     ebookLabel: '📚 Ebook Gratuito',
-    heroTitle: 'La Guía Completa de Equipamiento de Pádel',
+    heroTitle: 'La Guía Completa de Equipamiento de Padel',
     heroSubtitleHtml:
-      'Descubre <span>lo que realmente marca la diferencia</span> en tu equipamiento y cómo elegir las mejores palas, protectores, zapatillas y accesorios para elevar tu juego.',
+      'Descubre <span class="font-bold boost-blue">lo que realmente marca la diferencia</span> en tu equipamiento y cómo elegir las mejores palas, protectores, zapatillas y accesorios para elevar tu juego.',
     benefits: [
       {
         title: 'Tipos de Palas:',
@@ -168,7 +178,7 @@ const COPY: Record<Locale, EbookLandingCopy> = {
         text: 'Mantén tu equipamiento en perfectas condiciones',
       },
     ],
-    bonusLabel: 'Bonus Exclusivo:',
+    bonusLabel: '✨ Bonus Exclusivo:',
     bonusText: 'Acceso a descuentos especiales en SportsEvents Store',
     formTitle: 'Descarga Gratuita',
     formSubtitle: 'Recibe el ebook inmediatamente en tu navegador',
@@ -180,15 +190,15 @@ const COPY: Record<Locale, EbookLandingCopy> = {
     phonePlaceholder: '+34 612 345 678',
     newsletterText:
       'Quiero recibir consejos exclusivos de pádel y ofertas especiales de SportsEvents',
-    submitButton: 'Descargar Ebook Gratis',
-    processing: 'Procesando…',
+    submitButton: '🚀 Descargar Ebook Gratis',
+    processing: '⏳ Procesando...',
     gdprText:
       'Al descargar, aceptas recibir emails de SportsEvents. Puedes cancelar la suscripción en cualquier momento.',
     successTitle: '¡Ebook Enviado!',
     successText:
-      'El ebook se abrió en una nueva pestaña — puedes descargarlo cuando quieras.',
+      'El Ebook se abrió en una nueva pestaña de tu navegador, puedes descargarlo cuando quieras.',
     visitStoreButton: 'Visitar la Tienda',
-    trustedBy: 'Trusted by',
+    trustedBy: 'Confían en nosotros',
     players: '+ de 5.000 jugadores',
     premiumProducts: 'Productos Premium',
     freeShipping: 'Envío Gratis +100€',
@@ -203,7 +213,7 @@ const COPY: Record<Locale, EbookLandingCopy> = {
       },
       {
         title: 'Ahorra Dinero',
-        text: 'Evita compras equivocadas e invierte en lo que importa',
+        text: 'Evita compras equivocadas e invierte en lo que realmente importa',
       },
     ],
     errorGeneric: 'Error al procesar. Inténtalo de nuevo.',
@@ -211,14 +221,14 @@ const COPY: Record<Locale, EbookLandingCopy> = {
     footerCopyright: '© 2026 SportsEvents. Todos los derechos reservados.',
   },
   fr: {
-    ebookLabel: 'Ebook Gratuit',
-    heroTitle: 'Le Guide Complet de l’Équipement de Padel',
+    ebookLabel: '📚 Ebook Gratuit',
+    heroTitle: "Le Guide Complet de l'Équipement Padel",
     heroSubtitleHtml:
-      'Découvrez <span>ce qui fait vraiment la différence</span> dans votre équipement et comment choisir les meilleures raquettes, protecteurs, chaussures et accessoires.',
+      'Découvrez <span class="font-bold boost-blue">ce qui fait vraiment la différence</span> dans votre équipement et comment choisir les meilleures raquettes, protecteurs, chaussures et accessoires pour élever votre jeu.',
     benefits: [
       {
         title: 'Types de Raquettes:',
-        text: 'Apprenez laquelle convient à votre style de jeu',
+        text: 'Apprenez laquelle est idéale pour votre style de jeu',
       },
       {
         title: 'Protecteurs Essentiels:',
@@ -230,32 +240,32 @@ const COPY: Record<Locale, EbookLandingCopy> = {
       },
       {
         title: 'Accessoires qui Font la Différence:',
-        text: 'Overgrips, sacs, et bien plus',
+        text: 'Surgrips, sacs, et bien plus',
       },
       {
-        title: 'Conseils d’Entretien:',
-        text: 'Gardez votre équipement en parfait état',
+        title: "Conseils d'Entretien:",
+        text: 'Maintenez votre équipement en parfait état',
       },
     ],
-    bonusLabel: 'Bonus Exclusif:',
+    bonusLabel: '✨ Bonus Exclusif:',
     bonusText: 'Accès à des réductions spéciales sur SportsEvents Store',
     formTitle: 'Téléchargement Gratuit',
-    formSubtitle: 'Recevez l’ebook immédiatement dans votre navigateur',
+    formSubtitle: "Recevez l'ebook immédiatement dans votre navigateur",
     nameLabel: 'Nom Complet *',
     namePlaceholder: 'Jean Dupont',
     emailLabel: 'Email *',
-    emailPlaceholder: 'jean@exemple.com',
+    emailPlaceholder: 'jean@exemple.fr',
     phoneLabel: 'Téléphone (optionnel)',
     phonePlaceholder: '+33 6 12 34 56 78',
     newsletterText:
       'Je souhaite recevoir des conseils exclusifs de padel et des offres SportsEvents',
-    submitButton: 'Télécharger l’Ebook Gratuit',
-    processing: 'Traitement…',
+    submitButton: "🚀 Télécharger l'Ebook Gratuit",
+    processing: '⏳ Traitement...',
     gdprText:
       'En téléchargeant, vous acceptez de recevoir des emails de SportsEvents. Désabonnement possible à tout moment.',
     successTitle: 'Ebook Envoyé!',
     successText:
-      'L’ebook s’est ouvert dans un nouvel onglet — téléchargez-le librement.',
+      "L'Ebook s'est ouvert dans un nouvel onglet — téléchargez-le librement.",
     visitStoreButton: 'Visiter la Boutique',
     trustedBy: 'Trusted by',
     players: '+ de 5 000 joueurs',
@@ -267,7 +277,7 @@ const COPY: Record<Locale, EbookLandingCopy> = {
         text: 'Découvrez comment le bon équipement transforme votre jeu',
       },
       {
-        title: 'Conseils d’Experts',
+        title: "Conseils d'Experts",
         text: 'Informations validées par des joueurs professionnels',
       },
       {
@@ -280,10 +290,10 @@ const COPY: Record<Locale, EbookLandingCopy> = {
     footerCopyright: '© 2026 SportsEvents. Tous droits réservés.',
   },
   de: {
-    ebookLabel: 'Kostenloses Ebook',
+    ebookLabel: '📚 Kostenloses Ebook',
     heroTitle: 'Der komplette Padel-Ausrüstungsguide',
     heroSubtitleHtml:
-      'Entdecke <span>was wirklich den Unterschied macht</span> bei deiner Ausrüstung und wie du die besten Schläger, Protektoren, Schuhe und Accessoires wählst.',
+      'Entdecke <span class="font-bold boost-blue">was wirklich den Unterschied macht</span> bei deiner Ausrüstung und wie du die besten Schläger, Protektoren, Schuhe und Accessoires wählst.',
     benefits: [
       {
         title: 'Schlägertypen:',
@@ -306,7 +316,7 @@ const COPY: Record<Locale, EbookLandingCopy> = {
         text: 'Halte deine Ausrüstung in perfektem Zustand',
       },
     ],
-    bonusLabel: 'Exklusiver Bonus:',
+    bonusLabel: '✨ Exklusiver Bonus:',
     bonusText: 'Zugang zu Sonderangeboten im SportsEvents Store',
     formTitle: 'Kostenloser Download',
     formSubtitle: 'Erhalte das Ebook sofort in deinem Browser',
@@ -318,8 +328,8 @@ const COPY: Record<Locale, EbookLandingCopy> = {
     phonePlaceholder: '+49 170 1234567',
     newsletterText:
       'Ich möchte exklusive Padel-Tipps und Angebote von SportsEvents erhalten',
-    submitButton: 'Kostenloses Ebook herunterladen',
-    processing: 'Wird verarbeitet…',
+    submitButton: '🚀 Kostenloses Ebook herunterladen',
+    processing: '⏳ Wird verarbeitet...',
     gdprText:
       'Mit dem Download stimmst du E-Mails von SportsEvents zu. Abmeldung jederzeit möglich.',
     successTitle: 'Ebook gesendet!',
@@ -353,22 +363,23 @@ const COPY: Record<Locale, EbookLandingCopy> = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale()
   const titles: Record<Locale, string> = {
-    pt: 'Guia Completo de Equipamento de Padel — Ebook Gratuito | SportsEvents',
-    en: 'Complete Padel Equipment Guide — Free Ebook | SportsEvents',
-    es: 'Guía Completa de Equipamiento de Pádel — Ebook Gratuito | SportsEvents',
-    fr: 'Guide Complet de l’Équipement de Padel — Ebook Gratuit | SportsEvents',
-    de: 'Kompletter Padel-Ausrüstungsguide — Kostenloses Ebook | SportsEvents',
+    pt: 'Guia Completo de Equipamento de Padel - Ebook Gratuito | SportsEvents',
+    en: 'Complete Padel Equipment Guide - Free Ebook | SportsEvents',
+    es: 'Guía Completa de Equipamiento de Padel - Ebook Gratuito | SportsEvents',
+    fr: "Guide Complet de l'Équipement Padel - Ebook Gratuit | SportsEvents",
+    de: 'Kompletter Padel-Ausrüstungsguide - Kostenloses Ebook | SportsEvents',
   }
   return {
-    title: titles[locale] || titles.en,
+    title: titles[locale] || titles.pt,
     description:
-      'Download gratuito do guia completo de equipamento de padel — raquetes, protetores, sapatilhas e acessórios.',
+      'Descubra o que realmente faz diferença no equipamento de padel. Download gratuito do guia completo.',
   }
 }
 
 export default async function EbookLandingPage() {
   const locale = await getLocale()
-  const copy = COPY[locale] || COPY.en
+  // Lead magnet defaults to PT copy when locale unknown — mirrors Boost html lang="pt"
+  const copy = COPY[locale] || COPY.pt
 
   return <EbookLandingClient locale={locale} copy={copy} />
 }

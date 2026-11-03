@@ -102,6 +102,30 @@ const nextConfig: NextConfig = {
         destination: "/store/tour",
         permanent: true,
       },
+      // Blog Boost mal-rewritten: /store/product.html?id=<uuid> → /store/<uuid>
+      {
+        source: "/store/product.html",
+        has: [{ type: "query", key: "id", value: "(?<id>[0-9a-fA-F-]{36})" }],
+        destination: "/store/:id",
+        permanent: true,
+      },
+      {
+        source: "/product.html",
+        has: [{ type: "query", key: "id", value: "(?<id>[0-9a-fA-F-]{36})" }],
+        destination: "/store/:id",
+        permanent: true,
+      },
+      // Host rewrite leftover: /store/store
+      {
+        source: "/store/store",
+        destination: "/store",
+        permanent: true,
+      },
+      {
+        source: "/store/store.html",
+        destination: "/store",
+        permanent: true,
+      },
     ];
   },
 };

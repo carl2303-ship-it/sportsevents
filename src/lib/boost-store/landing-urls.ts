@@ -252,9 +252,16 @@ export function resolveProductLanding(
   }
 }
 
-/** Rewrite boostpadel.store hrefs inside product HTML descriptions. */
+/** Rewrite boostpadel.store (and leftover /store/product.html) hrefs in HTML. */
 export function rewriteBoostUrlsInHtml(html: string): string {
-  if (!html || !/boostpadel\.store/i.test(html)) return html
+  if (
+    !html ||
+    (!/boostpadel\.store/i.test(html) &&
+      !/store\/product\.html\?id=/i.test(html) &&
+      !/\/store\/store(?:["'/?#\s]|$)/i.test(html))
+  ) {
+    return html
+  }
 
   return html
     .replace(
@@ -301,6 +308,17 @@ export function rewriteBoostUrlsInHtml(html: string): string {
       /https?:\/\/(?:www\.)?boostpadel\.store\/product\.html\?id=([^"'&\s<#]+)/gi,
       '/store/$1'
     )
+    // Already host-rewritten but path still legacy
+    .replace(
+      /https?:\/\/(?:www\.)?sportsevents\.app\/store\/product\.html\?id=([^"'&\s<#]+)/gi,
+      '/store/$1'
+    )
+    .replace(/\/store\/product\.html\?id=([^"'&\s<#]+)/gi, '/store/$1')
+    .replace(
+      /https?:\/\/(?:www\.)?sportsevents\.app\/store\/store(?=["'/?#\s]|$)/gi,
+      '/store'
+    )
+    .replace(/\/store\/store(?=["'/?#\s]|$)/gi, '/store')
     .replace(
       /https?:\/\/(?:www\.)?boostpadel\.store\/?/gi,
       '/store'

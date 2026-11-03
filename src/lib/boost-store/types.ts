@@ -37,13 +37,45 @@ export type BoostProduct = {
   active?: boolean
   is_featured?: boolean | null
   is_digital?: boolean | null
+  /** Custom hub order (lower = earlier within featured / in-stock buckets). */
+  display_order?: number | null
   learn_more_url?: string | null
   funnel_slug?: string | null
   category_id?: string | null
   brand_id?: string | null
+  created_at?: string | null
   category?: BoostCategory | null
   brand?: BoostBrand | null
   translations?: Record<string, Record<string, string>> | null
+}
+
+/** Physical stock 0 only — digitals often store stock=0 and stay buyable. */
+export function isProductSoldOut(product: BoostProduct): boolean {
+  return !product.is_digital && Number(product.stock) === 0
+}
+
+/**
+ * Store order: in-stock first, featured first, then display_order, then created_at.
+ * Sold-out physical products always sink to the end.
+ */
+export function compareStoreProducts(a: BoostProduct, b: BoostProduct): number {
+  const soldA = isProductSoldOut(a) ? 1 : 0
+  const soldB = isProductSoldOut(b) ? 1 : 0
+  if (soldA !== soldB) return soldA - soldB
+
+  const featA = a.is_featured ? 1 : 0
+  const featB = b.is_featured ? 1 : 0
+  if (featA !== featB) return featB - featA
+
+  const orderA = Number(a.display_order ?? 0)
+  const orderB = Number(b.display_order ?? 0)
+  if (orderA !== orderB) return orderA - orderB
+
+  const createdA = a.created_at || ''
+  const createdB = b.created_at || ''
+  if (createdA !== createdB) return createdB.localeCompare(createdA)
+
+  return String(a.name || '').localeCompare(String(b.name || ''), 'pt')
 }
 
 export type StoreCartItem = {

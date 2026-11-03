@@ -1,8 +1,9 @@
 import { createBoostStoreClient } from '@/lib/boost-store/client'
-import type {
-  BoostBrand,
-  BoostCategory,
-  BoostProduct,
+import {
+  compareStoreProducts,
+  type BoostBrand,
+  type BoostCategory,
+  type BoostProduct,
 } from '@/lib/boost-store/types'
 
 const PRODUCT_SELECT = `
@@ -13,18 +14,32 @@ const PRODUCT_SELECT = `
 
 export async function listActiveProducts(): Promise<BoostProduct[]> {
   const supabase = createBoostStoreClient()
-  const { data, error } = await supabase
-    .from('products')
-    .select(PRODUCT_SELECT)
-    .eq('active', true)
+  const base = () =>
+    supabase.from('products').select(PRODUCT_SELECT).eq('active', true)
+
+  // Prefer SQL pre-order when display_order exists; always re-sort in TS so
+  // sold-out physical products sink (digitals with stock=0 stay in place).
+  let { data, error } = await base()
     .order('is_featured', { ascending: false })
+    .order('display_order', { ascending: true })
     .order('created_at', { ascending: false })
+
+  if (error) {
+    const retry = await base()
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+    data = retry.data
+    error = retry.error
+  }
 
   if (error) {
     console.error('[boost-store] products', error.message)
     return []
   }
-  return (data as BoostProduct[]) || []
+
+  const list = ((data as BoostProduct[]) || []).slice()
+  list.sort(compareStoreProducts)
+  return list
 }
 
 export async function getProductById(

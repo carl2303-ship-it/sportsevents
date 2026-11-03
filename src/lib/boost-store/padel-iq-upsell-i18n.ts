@@ -42,7 +42,7 @@ export const padelIqUpsellTranslations = {
     ctaBenefit1: 'Sem inserir dados do cartão novamente',
     ctaBenefit2: 'Acesso imediato aos vídeos',
     rejectLink: 'Não, obrigado. Prefiro tentar lidar com a pressão e a frustração sozinho e fico-me apenas pelo Ebook.',
-    footerCopyright: '© 2025 BOOST PADEL. Todos os direitos reservados.'
+    footerCopyright: '© 2025 SportsEvents. Todos os direitos reservados.'
   },
 
   en: {
@@ -83,7 +83,7 @@ export const padelIqUpsellTranslations = {
     ctaBenefit1: 'No need to enter card details again',
     ctaBenefit2: 'Immediate access to videos',
     rejectLink: 'No, thanks. I prefer to try to deal with pressure and frustration alone and stick with just the Ebook.',
-    footerCopyright: '© 2025 BOOST PADEL. All rights reserved.'
+    footerCopyright: '© 2025 SportsEvents. All rights reserved.'
   },
 
   es: {
@@ -124,7 +124,7 @@ export const padelIqUpsellTranslations = {
     ctaBenefit1: 'Sin necesidad de ingresar datos de tarjeta nuevamente',
     ctaBenefit2: 'Acceso inmediato a los vídeos',
     rejectLink: 'No, gracias. Prefiero intentar lidiar con la presión y la frustración solo y quedarme solo con el Ebook.',
-    footerCopyright: '© 2025 BOOST PADEL. Todos los derechos reservados.'
+    footerCopyright: '© 2025 SportsEvents. Todos los derechos reservados.'
   },
 
   it: {
@@ -165,7 +165,7 @@ export const padelIqUpsellTranslations = {
     ctaBenefit1: 'Senza reinserire i dati della carta',
     ctaBenefit2: 'Accesso immediato ai video',
     rejectLink: 'No, grazie. Preferisco cercare di gestire da solo la pressione e la frustrazione e restare solo con l\'Ebook.',
-    footerCopyright: '© 2025 BOOST PADEL. Tutti i diritti riservati.'
+    footerCopyright: '© 2025 SportsEvents. Tutti i diritti riservati.'
   },
 
   fr: {

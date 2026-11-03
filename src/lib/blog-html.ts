@@ -3,6 +3,8 @@
  * Se já for HTML, devolve-o (com wraps mínimos se necessário).
  */
 
+import { rewriteBoostUrlsInHtml } from '@/lib/boost-store/landing-urls'
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -219,6 +221,6 @@ export function plainTextToBlogHtml(raw: string): string {
 export function ensureBlogHtml(input: string): string {
   const raw = (input || '').trim()
   if (!raw) return ''
-  if (looksLikeHtml(raw)) return raw
-  return plainTextToBlogHtml(raw)
+  if (looksLikeHtml(raw)) return rewriteBoostUrlsInHtml(raw)
+  return rewriteBoostUrlsInHtml(plainTextToBlogHtml(raw))
 }

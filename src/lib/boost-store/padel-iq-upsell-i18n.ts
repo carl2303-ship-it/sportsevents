@@ -206,7 +206,7 @@ export const padelIqUpsellTranslations = {
     ctaBenefit1: 'Sans ressaisir les détails de la carte',
     ctaBenefit2: 'Accès immédiat aux vidéos',
     rejectLink: 'Non, merci. Je préfère essayer de gérer seul la pression et la frustration et garder seulement l\'Ebook.',
-    footerCopyright: '© 2025 BOOST PADEL. Tous droits réservés.'
+    footerCopyright: '© 2025 SportsEvents. Tous droits réservés.'
   }
 } as const
 

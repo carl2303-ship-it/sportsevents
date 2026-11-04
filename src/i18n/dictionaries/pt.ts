@@ -8,7 +8,10 @@ export const pt = {
     destinations: 'Destinos',
     about: 'Quem Somos',
     events: 'Eventos',
+    camps: 'Estágios',
+    tournaments: 'Torneios & Ligas',
     store: 'Loja',
+    storePro: 'Loja Pro',
     blog: 'Blog',
     build: 'Construir Estágio',
     contact: 'Contactos',
@@ -16,6 +19,9 @@ export const pt = {
     algarve: '🇵🇹 Algarve (Portugal)',
     barcelona: '🇪🇸 Barcelona (Espanha)',
     marbella: '🇪🇸 Marbella (Espanha)',
+    openMenu: 'Abrir menu',
+    closeMenu: 'Fechar menu',
+    cart: 'Carrinho',
   },
   footer: {
     blurb:
@@ -109,6 +115,25 @@ export const pt = {
       {
         title: 'Grupos Privados',
         text: 'O refúgio desportivo ideal para fechar a sua época com os amigos, com competição e diversão garantidas.',
+      },
+    ],
+    proGearEyebrow: 'Loja Pro',
+    proGearTitle: 'Pro Gear & Performance',
+    proGearLead:
+      'Equipamento pensado para o jogador exigente — o mesmo padrão de performance que leva para o estágio.',
+    proGearCta: 'Explorar a Loja Pro →',
+    proGearItems: [
+      {
+        title: 'Protectores Custom 3K Carbon Fiber',
+        text: 'Protecção premium em fibra de carbono 3K para a tua pala — leve, rígida e feita para o ritmo ibérico.',
+      },
+      {
+        title: 'Overgrips',
+        text: 'Grip seco e consistente sessão após sessão. Essencial em treinos intensivos e torneios.',
+      },
+      {
+        title: 'Nutrição Desportiva (Electrólitos)',
+        text: 'Hidratação e recuperação para dias longos em campo — electrólitos formulados para o padel.',
       },
     ],
   },
@@ -399,6 +424,10 @@ export const pt = {
     payNeedPackage: 'Escolhe um pacote do catálogo no passo 1 para pagar online.',
     yes: 'Sim',
     no: 'Não',
+    welcomePack: 'Adicionar Welcome Pack / Pro Gear',
+    welcomePackDesc:
+      'Incluir interesse no Welcome Pack Pro Gear (protectores, overgrips, electrólitos) — a equipa SE confirma disponibilidade e preços no orçamento.',
+    welcomePackShort: 'Welcome Pack Pro Gear',
     sentTitle: 'Pedido enviado',
     sentBody:
       'Obrigado{name}. A estimativa ficou em cerca de {double} € / jogador (quarto duplo) ou {single} € / jogador (single). Total grupo: {total} €. Entramos em contacto em breve.',

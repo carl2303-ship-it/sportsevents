@@ -129,6 +129,49 @@ export default function Home() {
         </div>
       </section>
 
+      <section
+        id="pro-gear"
+        className="relative border-t border-white/10 px-5 md:px-10 py-20 md:py-28 bg-gradient-to-b from-navy via-[#0a2438] to-navy"
+      >
+        <div className="mx-auto max-w-7xl">
+          <p className="font-mono text-xs uppercase tracking-[0.25em] text-gold">
+            {h.proGearEyebrow}
+          </p>
+          <h2 className="mt-3 font-[family-name:var(--font-display)] text-3xl md:text-5xl font-extrabold tracking-tight max-w-3xl">
+            {h.proGearTitle}
+          </h2>
+          <p className="mt-5 max-w-2xl text-app-white/70 text-base md:text-lg leading-relaxed">
+            {h.proGearLead}
+          </p>
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+            {h.proGearItems.map((item, i) => (
+              <div
+                key={item.title}
+                className="relative pl-5 border-l border-gold/40 animate-fade-up"
+                style={{ animationDelay: `${i * 80}ms` }}
+              >
+                <h3 className="font-[family-name:var(--font-display)] text-xl font-bold text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-3 text-sm md:text-base text-app-white/65 leading-relaxed">
+                  {item.text}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-14">
+            <Link
+              href={withLocale('/store', locale)}
+              className="inline-flex items-center justify-center rounded-full border border-gold/50 bg-gold/10 px-6 py-3 text-sm font-bold text-gold hover:bg-gold hover:text-navy transition"
+            >
+              {h.proGearCta}
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="relative border-t border-white/10 px-5 md:px-10 py-20 md:py-28 bg-gradient-to-br from-navy via-[#0c4a6e]/25 to-navy">
         <div className="mx-auto max-w-7xl">
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">

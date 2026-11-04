@@ -10,7 +10,10 @@ export const en: typeof pt = {
     destinations: 'Destinations',
     about: 'About Us',
     events: 'Events',
+    camps: 'Training Camps',
+    tournaments: 'Tournaments & Leagues',
     store: 'Store',
+    storePro: 'Pro Store',
     blog: 'Blog',
     build: 'Build Your Camp',
     contact: 'Contact',
@@ -18,6 +21,9 @@ export const en: typeof pt = {
     algarve: '🇵🇹 Algarve (Portugal)',
     barcelona: '🇪🇸 Barcelona (Spain)',
     marbella: '🇪🇸 Marbella (Spain)',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+    cart: 'Cart',
   },
   footer: {
     blurb:
@@ -111,6 +117,25 @@ export const en: typeof pt = {
       {
         title: 'Private Groups',
         text: 'The ideal sports getaway to close your season with friends — competition and fun guaranteed.',
+      },
+    ],
+    proGearEyebrow: 'Pro Store',
+    proGearTitle: 'Pro Gear & Performance',
+    proGearLead:
+      'Gear built for demanding players — the same performance standard you take into camp.',
+    proGearCta: 'Explore the Pro Store →',
+    proGearItems: [
+      {
+        title: 'Custom 3K Carbon Fiber Racket Protectors',
+        text: 'Premium 3K carbon fiber protection for your racket — light, rigid and built for the Iberian pace.',
+      },
+      {
+        title: 'Overgrips',
+        text: 'Dry, consistent grip session after session. Essential for intensive training and tournaments.',
+      },
+      {
+        title: 'Sports Nutrition (Electrolytes)',
+        text: 'Hydration and recovery for long days on court — electrolytes formulated for padel.',
       },
     ],
   },
@@ -417,6 +442,10 @@ export const en: typeof pt = {
     payNeedPackage: 'Select a catalog package in step 1 to pay online.',
     yes: 'Yes',
     no: 'No',
+    welcomePack: 'Add Welcome Pack / Pro Gear',
+    welcomePackDesc:
+      'Flag interest in the Pro Gear Welcome Pack (protectors, overgrips, electrolytes) — the SE team confirms availability and pricing in your quote.',
+    welcomePackShort: 'Pro Gear Welcome Pack',
     sentTitle: 'Request sent',
     sentBody:
       'Thank you{name}. The estimate is about {double} € / player (twin room) or {single} € / player (single). Group total: {total} €. We’ll be in touch soon.',

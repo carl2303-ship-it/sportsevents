@@ -520,6 +520,14 @@ function ConstruirEstagioClient() {
                         yesLabel={b.yes}
                         noLabel={b.no}
                       />
+                      <ToggleRow
+                        label={b.welcomePack}
+                        description={b.welcomePackDesc}
+                        value={config.welcomePack}
+                        onChange={(v) => patch('welcomePack', v)}
+                        yesLabel={b.yes}
+                        noLabel={b.no}
+                      />
                       <NumberField
                         label={b.singleRooms}
                         value={config.singleRooms}
@@ -573,6 +581,7 @@ function ConstruirEstagioClient() {
                             {b.matchShort} · {config.mealPlan}
                             {config.tournament ? ` · ${b.tournamentShort}` : ''}
                             {config.airportTransfer ? ` · ${b.transferShort}` : ''}
+                            {config.welcomePack ? ` · ${b.welcomePackShort}` : ''}
                           </p>
                         </div>
 

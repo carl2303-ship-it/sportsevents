@@ -10,7 +10,10 @@ export const es: typeof pt = {
     destinations: 'Destinos',
     about: 'Quiénes somos',
     events: 'Eventos',
+    camps: 'Campus / Stages',
+    tournaments: 'Torneos & Ligas',
     store: 'Tienda',
+    storePro: 'Tienda Pro',
     blog: 'Blog',
     build: 'Diseña tu campus',
     contact: 'Contacto',
@@ -18,6 +21,9 @@ export const es: typeof pt = {
     algarve: '🇵🇹 Algarve (Portugal)',
     barcelona: '🇪🇸 Barcelona (España)',
     marbella: '🇪🇸 Marbella (España)',
+    openMenu: 'Abrir menú',
+    closeMenu: 'Cerrar menú',
+    cart: 'Carrito',
   },
   footer: {
     blurb:
@@ -111,6 +117,25 @@ export const es: typeof pt = {
       {
         title: 'Grupos privados',
         text: 'La escapada deportiva ideal para cerrar la temporada con amigos — competición y diversión garantizadas.',
+      },
+    ],
+    proGearEyebrow: 'Tienda Pro',
+    proGearTitle: 'Pro Gear & Performance',
+    proGearLead:
+      'Equipamiento pensado para el jugador exigente — el mismo estándar de rendimiento que llevas al campus.',
+    proGearCta: 'Explorar la Tienda Pro →',
+    proGearItems: [
+      {
+        title: 'Protectores Custom 3K Carbon Fiber',
+        text: 'Protección premium en fibra de carbono 3K para tu pala — ligera, rígida y hecha para el ritmo ibérico.',
+      },
+      {
+        title: 'Overgrips',
+        text: 'Grip seco y consistente sesión tras sesión. Esencial en entrenamientos intensivos y torneos.',
+      },
+      {
+        title: 'Nutrición deportiva (Electrolitos)',
+        text: 'Hidratación y recuperación para días largos en pista — electrolitos formulados para el pádel.',
       },
     ],
   },
@@ -417,6 +442,10 @@ export const es: typeof pt = {
     payNeedPackage: 'Elige un paquete del catálogo en el paso 1 para pagar online.',
     yes: 'Sí',
     no: 'No',
+    welcomePack: 'Añadir Welcome Pack / Pro Gear',
+    welcomePackDesc:
+      'Incluir interés en el Welcome Pack Pro Gear (protectores, overgrips, electrolitos) — el equipo SE confirma disponibilidad y precios en el presupuesto.',
+    welcomePackShort: 'Welcome Pack Pro Gear',
     sentTitle: 'Solicitud enviada',
     sentBody:
       'Gracias{name}. La estimación es de unos {double} € / jugador (habitación doble) o {single} € / jugador (individual). Total del grupo: {total} €. Nos pondremos en contacto pronto.',

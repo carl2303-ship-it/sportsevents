@@ -104,6 +104,7 @@ export function summarizeConfig(config: StageBuilderConfig): string {
     `Torneio: ${config.tournament ? 'Sim' : 'Não'}`,
     `Transfer: ${config.airportTransfer ? 'Sim' : 'Não'}`,
     `Pensão: ${config.mealPlan}`,
+    `Welcome Pack / Pro Gear: ${config.welcomePack ? 'Sim' : 'Não'}`,
     `Língua aulas: ${config.lessonLanguage}`,
     `Nível: ${config.playLevel}`,
     config.notes ? `Notas: ${config.notes}` : null,

@@ -21,6 +21,8 @@ export type StageBuilderConfig = {
   hotelStars: HotelStars
   lessonLanguage: LessonLang
   playLevel: PlayLevel
+  /** Interest in Pro Gear Welcome Pack (protectors / overgrips / electrolytes). */
+  welcomePack: boolean
   notes: string
   clientName: string
   clientEmail: string
@@ -129,6 +131,7 @@ export const DEFAULT_STAGE_CONFIG: StageBuilderConfig = {
   hotelStars: '4',
   lessonLanguage: 'en',
   playLevel: 'MISTO',
+  welcomePack: false,
   notes: '',
   clientName: '',
   clientEmail: '',

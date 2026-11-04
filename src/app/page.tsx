@@ -9,18 +9,18 @@ import { useDictionary } from '@/i18n/use-locale'
 
 const HERO_IMAGE = '/home/hero.jpg'
 
-/** One product image per Pro Gear card (order matches `proGearItems` in dictionaries). */
+/** Carlos product shots for homepage Pro Gear — static assets, not live store catalog images. */
 const PRO_GEAR_IMAGES = [
   {
-    src: '/home/pro-gear/racket-protectors.jpg',
+    src: '/home/pro-gear/racket-carbon.jpg',
     alt: 'Custom 3K carbon fiber padel racket protectors',
   },
   {
-    src: '/home/pro-gear/overgrips.webp',
+    src: '/home/pro-gear/4on-overgrip.jpg',
     alt: '4on Premium Comfort Overgrips, 3-pack',
   },
   {
-    src: '/home/pro-gear/electrolytes.webp',
+    src: '/home/pro-gear/nduranz-zero-drink.jpg',
     alt: 'NDURANZ Zero Drink Citrus electrolytes',
   },
 ] as const
@@ -170,7 +170,7 @@ export default function Home() {
                   style={{ animationDelay: `${i * 80}ms` }}
                 >
                   {image ? (
-                    <div className="relative mb-5 aspect-[4/3] overflow-hidden bg-black/30">
+                    <div className="relative mb-5 aspect-square overflow-hidden border border-white/10 bg-[#071525]">
                       <Image
                         src={image.src}
                         alt={image.alt}

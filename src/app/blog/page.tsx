@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 import { BlogCard } from '@/components/blog/blog-card'
 import { BlogCTA } from '@/components/blog/blog-cta'
@@ -71,14 +70,6 @@ export default async function BlogIndexPage({ searchParams }: PageProps) {
             </h1>
             <p className="mt-4 text-base md:text-lg text-app-white/65">
               {t.lead}
-            </p>
-            <p className="mt-4 text-sm text-app-white/50">
-              <Link
-                href={withLocale('/blog/auto', locale)}
-                className="font-semibold text-cyan hover:underline"
-              >
-                {t.autoBlogLink}
-              </Link>
             </p>
           </header>
 

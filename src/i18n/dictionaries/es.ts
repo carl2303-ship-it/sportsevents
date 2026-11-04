@@ -281,6 +281,8 @@ export const es: typeof pt = {
     metaDescription:
       'Empresa familiar con ambición multinacional: operaciones en el Algarve y expansión comercial paneuropea.',
     eyebrow: 'Quiénes somos',
+    heroAlt:
+      'Dos entrenadores con chaquetas del Albufeira Padel Club frente a las pistas',
     heroTitle: 'Nuestra historia. Nuestra visión.',
     heroText:
       'Somos una empresa familiar con ambición multinacional, que combina operaciones ejecutivas sobre el terreno con una visión tecnológica y comercial paneuropea.',

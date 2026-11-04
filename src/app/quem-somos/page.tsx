@@ -23,11 +23,11 @@ export default async function QuemSomosPage() {
       <section className="relative min-h-[60svh] overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=2000&q=80"
-            alt="SportsEvents team"
+            src="/about/coaches.jpg"
+            alt={t.heroAlt}
             fill
             priority
-            className="object-cover"
+            className="object-cover object-[center_30%]"
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-navy/80 via-navy/60 to-navy" />

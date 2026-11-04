@@ -40,6 +40,11 @@ export async function generateMetadata(): Promise<Metadata> {
       // Cache-bust: Netlify Durable can keep prior favicon/icon bytes for a long time.
       icon: [
         {
+          url: "/favicon.ico?v=20261104",
+          type: "image/x-icon",
+          sizes: "any",
+        },
+        {
           url: "/brand/icon-192.png?v=20261104",
           type: "image/png",
           sizes: "192x192",

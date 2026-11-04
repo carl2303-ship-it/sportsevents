@@ -9,6 +9,22 @@ import { useDictionary } from '@/i18n/use-locale'
 
 const HERO_IMAGE = '/home/hero.jpg'
 
+/** One product image per Pro Gear card (order matches `proGearItems` in dictionaries). */
+const PRO_GEAR_IMAGES = [
+  {
+    src: '/home/pro-gear/racket-protectors.jpg',
+    alt: 'Custom 3K carbon fiber padel racket protectors',
+  },
+  {
+    src: '/home/pro-gear/overgrips.webp',
+    alt: '4on Premium Comfort Overgrips, 3-pack',
+  },
+  {
+    src: '/home/pro-gear/electrolytes.webp',
+    alt: 'NDURANZ Zero Drink Citrus electrolytes',
+  },
+] as const
+
 export default function Home() {
   const { locale, t } = useDictionary()
   const h = t.home
@@ -145,20 +161,36 @@ export default function Home() {
           </p>
 
           <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
-            {h.proGearItems.map((item, i) => (
-              <div
-                key={item.title}
-                className="relative pl-5 border-l border-gold/40 animate-fade-up"
-                style={{ animationDelay: `${i * 80}ms` }}
-              >
-                <h3 className="font-[family-name:var(--font-display)] text-xl font-bold text-white">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm md:text-base text-app-white/65 leading-relaxed">
-                  {item.text}
-                </p>
-              </div>
-            ))}
+            {h.proGearItems.map((item, i) => {
+              const image = PRO_GEAR_IMAGES[i]
+              return (
+                <div
+                  key={item.title}
+                  className="relative animate-fade-up"
+                  style={{ animationDelay: `${i * 80}ms` }}
+                >
+                  {image ? (
+                    <div className="relative mb-5 aspect-[4/3] overflow-hidden bg-black/30">
+                      <Image
+                        src={image.src}
+                        alt={image.alt}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                    </div>
+                  ) : null}
+                  <div className="pl-5 border-l border-gold/40">
+                    <h3 className="font-[family-name:var(--font-display)] text-xl font-bold text-white">
+                      {item.title}
+                    </h3>
+                    <p className="mt-3 text-sm md:text-base text-app-white/65 leading-relaxed">
+                      {item.text}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
           </div>
 
           <div className="mt-14">

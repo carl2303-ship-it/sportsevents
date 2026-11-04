@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react'
 import Link from 'next/link'
-import { CheckCircle2, Mail, MapPin, Phone } from 'lucide-react'
+import { CheckCircle2, Mail, MapPin, MessageCircle } from 'lucide-react'
 import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 import { withLocale } from '@/i18n/config'
 import { useDictionary } from '@/i18n/use-locale'
@@ -175,21 +175,29 @@ export default function ContactoPage() {
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <Phone className="w-4 h-4 text-gold shrink-0 mt-0.5" />
+                  <MessageCircle className="w-4 h-4 text-gold shrink-0 mt-0.5" />
                   <div className="space-y-1">
                     <p className="text-[10px] uppercase tracking-wider text-app-white/45 font-bold">
-                      {c.phone}
+                      {c.whatsapp}
                     </p>
                     <p className="text-sm text-white">
-                      POR{' '}
-                      <a href="tel:+351969365059" className="hover:text-cyan">
-                        +351 969 365 059
+                      <a
+                        href="https://wa.me/351969365059"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-cyan"
+                      >
+                        {t.footer.whatsappPor} · +351 969 365 059
                       </a>
                     </p>
                     <p className="text-sm text-white">
-                      ESP{' '}
-                      <a href="tel:+34631699818" className="hover:text-cyan">
-                        +34 631 699 818
+                      <a
+                        href="https://wa.me/34631699818"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-cyan"
+                      >
+                        {t.footer.whatsappEsp} · +34 631 699 818
                       </a>
                     </p>
                   </div>

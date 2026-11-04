@@ -22,6 +22,57 @@ const nextConfig: NextConfig = {
   // + aliases HTML do Boost (ebook-landing / funnel) para landings SE
   async redirects() {
     return [
+      // EN alias → canonical PT path /eventos
+      {
+        source: "/events",
+        destination: "/eventos",
+        permanent: true,
+      },
+      {
+        source: "/events/:path*",
+        destination: "/eventos/:path*",
+        permanent: true,
+      },
+      {
+        source: "/pt/events",
+        destination: "/pt/eventos",
+        permanent: true,
+      },
+      {
+        source: "/pt/events/:path*",
+        destination: "/pt/eventos/:path*",
+        permanent: true,
+      },
+      {
+        source: "/es/events",
+        destination: "/es/eventos",
+        permanent: true,
+      },
+      {
+        source: "/es/events/:path*",
+        destination: "/es/eventos/:path*",
+        permanent: true,
+      },
+      {
+        source: "/fr/events",
+        destination: "/fr/eventos",
+        permanent: true,
+      },
+      {
+        source: "/fr/events/:path*",
+        destination: "/fr/eventos/:path*",
+        permanent: true,
+      },
+      {
+        source: "/de/events",
+        destination: "/de/eventos",
+        permanent: true,
+      },
+      {
+        source: "/de/events/:path*",
+        destination: "/de/eventos/:path*",
+        permanent: true,
+      },
       {
         source: "/loja",
         destination: "/store",

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { BrandLogo } from '@/components/brand-logo'
+import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 import { BookingForm } from './booking-form'
 import {
   Building2,
@@ -55,24 +55,17 @@ export default async function EventoDetailPage({
   const deposit = Number(event.deposit_amount || 0)
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <header className="border-b border-slate-800 px-5 md:px-10 py-4">
-        <div className="mx-auto max-w-6xl flex items-center justify-between gap-4">
-          <BrandLogo
-            variant="full"
-            href={withLocale('/', locale)}
-            className="h-12 w-auto"
-          />
-          <Link
-            href={withLocale('/eventos', locale)}
-            className="text-xs text-slate-400 hover:text-cyan-400"
-          >
-            {t.allEvents}
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-screen bg-navy text-app-white">
+      <SiteHeader />
 
-      <main className="mx-auto max-w-6xl px-5 md:px-10 py-8 grid grid-cols-1 lg:grid-cols-5 gap-8">
+      <main className="mx-auto max-w-6xl px-5 md:px-10 py-8 space-y-6">
+        <Link
+          href={withLocale('/eventos', locale)}
+          className="inline-flex text-xs text-app-white/55 hover:text-cyan"
+        >
+          {t.allEvents}
+        </Link>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-3 space-y-6">
           <div className="relative aspect-[16/9] rounded-2xl overflow-hidden border border-slate-800 bg-slate-900">
             {event.cover_image_url ? (
@@ -235,7 +228,10 @@ export default async function EventoDetailPage({
             maxParticipants={max}
           />
         </aside>
+        </div>
       </main>
+
+      <SiteFooter />
     </div>
   )
 }

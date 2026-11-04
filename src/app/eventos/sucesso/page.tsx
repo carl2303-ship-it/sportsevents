@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { BrandLogo } from '@/components/brand-logo'
+import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 import { CheckCircle2 } from 'lucide-react'
 import { withLocale, numberLocaleFor } from '@/i18n/config'
 import { fillTemplate } from '@/i18n/dictionaries'
@@ -16,81 +16,77 @@ function SuccessContent() {
   const e = t.events
   const numberLocale = numberLocaleFor(locale)
   const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading')
-  const [booking, setBooking] = useState<any>(null)
+  const [booking, setBooking] = useState<Record<string, unknown> | null>(null)
   const [message, setMessage] = useState('')
 
   useEffect(() => {
     if (!sessionId) {
-      setStatus('error')
-      setMessage(e.missingSession)
-      return
+      const id = window.setTimeout(() => {
+        setStatus('error')
+        setMessage(e.missingSession)
+      }, 0)
+      return () => window.clearTimeout(id)
     }
+    let cancelled = false
     fetch(`/api/bookings/confirm?session_id=${encodeURIComponent(sessionId)}`)
       .then(async (res) => {
         const data = await res.json()
         if (!res.ok) throw new Error(data.error || e.successError)
+        if (cancelled) return
         setBooking(data.booking)
         setStatus('ok')
       })
       .catch((err) => {
+        if (cancelled) return
         setStatus('error')
         setMessage(err.message || e.successError)
       })
+    return () => {
+      cancelled = true
+    }
   }, [sessionId, e.missingSession, e.successError])
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
-      <header className="border-b border-slate-800 px-5 md:px-10 py-4">
-        <div className="mx-auto max-w-lg flex items-center justify-between">
-          <BrandLogo
-            variant="full"
-            href={withLocale('/', locale)}
-            className="h-10 w-auto"
-          />
-          <Link
-            href={withLocale('/eventos', locale)}
-            className="text-xs text-slate-400 hover:text-cyan-400"
-          >
-            {e.eventsLink}
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-screen bg-navy text-app-white flex flex-col">
+      <SiteHeader />
       <main className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center space-y-4">
+        <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center space-y-4">
           {status === 'loading' && (
-            <p className="text-sm text-slate-400">{e.successLoading}</p>
+            <p className="text-sm text-app-white/55">{e.successLoading}</p>
           )}
           {status === 'ok' && (
             <>
               <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
               <h1 className="text-2xl font-black">{e.successTitle}</h1>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-app-white/60">
                 {fillTemplate(e.successThanks, {
                   name: booking?.customer_name
-                    ? `, ${booking.customer_name}`
+                    ? `, ${String(booking.customer_name)}`
                     : '',
                 })}
               </p>
-              {booking?.events && (
-                <div className="text-left text-xs bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-1">
+              {booking?.events && typeof booking.events === 'object' ? (
+                <div className="text-left text-xs bg-black/30 border border-white/10 rounded-xl p-4 space-y-1">
                   <div className="font-bold text-white">
-                    {booking.events.title}
+                    {String((booking.events as Record<string, unknown>).title || '')}
                   </div>
-                  <div className="text-slate-400">
-                    {booking.events.start_date} → {booking.events.end_date}
+                  <div className="text-app-white/55">
+                    {String((booking.events as Record<string, unknown>).start_date || '')}{' '}
+                    →{' '}
+                    {String((booking.events as Record<string, unknown>).end_date || '')}
                   </div>
-                  <div className="text-slate-400">
-                    {booking.participants} pax ·{' '}
+                  <div className="text-app-white/55">
+                    {String(booking.participants ?? '')} pax ·{' '}
                     {booking.payment_type === 'FULL'
                       ? e.fullPayment
                       : e.depositPayment}{' '}
                     · {Number(booking.amount).toLocaleString(numberLocale)} €
                   </div>
                 </div>
-              )}
+              ) : null}
               <Link
                 href={withLocale('/eventos', locale)}
-                className="inline-flex rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs px-4 py-2"
+                className="inline-flex rounded-xl bg-cyan text-navy font-bold text-xs px-4 py-2"
               >
                 {e.seeMore}
               </Link>
@@ -101,10 +97,10 @@ function SuccessContent() {
               <h1 className="text-xl font-black text-red-400">
                 {e.somethingFailed}
               </h1>
-              <p className="text-sm text-slate-400">{message}</p>
+              <p className="text-sm text-app-white/55">{message}</p>
               <Link
                 href={withLocale('/eventos', locale)}
-                className="text-xs text-cyan-400"
+                className="text-xs text-cyan"
               >
                 {e.backToEvents}
               </Link>
@@ -112,6 +108,7 @@ function SuccessContent() {
           )}
         </div>
       </main>
+      <SiteFooter />
     </div>
   )
 }
@@ -121,7 +118,7 @@ export default function EventoSucessoPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 text-slate-500 flex items-center justify-center text-sm">
+        <div className="min-h-screen bg-navy text-app-white/50 flex items-center justify-center text-sm">
           {t.events.loading}
         </div>
       }

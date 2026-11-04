@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { BrandLogo } from '@/components/brand-logo'
+import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 import { Calendar, MapPin } from 'lucide-react'
 import { withLocale, numberLocaleFor } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
@@ -20,38 +20,24 @@ export default async function EventosPage() {
     .order('start_date', { ascending: true })
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <header className="border-b border-slate-800 px-5 md:px-10 py-4">
-        <div className="mx-auto max-w-6xl flex items-center justify-between gap-4">
-          <BrandLogo
-            variant="full"
-            href={withLocale('/', locale)}
-            className="h-12 w-auto"
-          />
-          <Link
-            href={withLocale('/', locale)}
-            className="text-xs text-slate-400 hover:text-cyan-400"
-          >
-            {t.backSite}
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-screen bg-navy text-app-white">
+      <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-5 md:px-10 py-10 space-y-8">
         <div>
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-cyan-400">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-cyan">
             {t.eyebrow}
           </p>
           <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl md:text-5xl font-extrabold">
             {t.title}
           </h1>
-          <p className="mt-3 max-w-2xl text-slate-400 text-sm md:text-base">
+          <p className="mt-3 max-w-2xl text-app-white/65 text-sm md:text-base">
             {t.lead}
           </p>
         </div>
 
         {!events?.length ? (
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-10 text-center text-sm text-slate-500">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center text-sm text-app-white/50">
             {t.empty}
           </div>
         ) : (
@@ -63,9 +49,9 @@ export default async function EventosPage() {
                   `/eventos/${event.slug || event.id}`,
                   locale
                 )}
-                className="group rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden hover:border-cyan-500/40 transition-all"
+                className="group rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden hover:border-cyan/40 transition-all"
               >
-                <div className="aspect-[16/9] bg-slate-950 relative">
+                <div className="aspect-[16/9] bg-navy relative">
                   {event.cover_image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -74,25 +60,25 @@ export default async function EventosPage() {
                       className="absolute inset-0 h-full w-full object-cover opacity-80 group-hover:opacity-100 transition"
                     />
                   ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-slate-900 to-amber-500/10" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-cyan/20 via-navy to-gold/10" />
                   )}
                 </div>
                 <div className="p-5 space-y-3">
-                  <div className="flex items-center gap-2 text-[11px] text-cyan-400 font-semibold">
+                  <div className="flex items-center gap-2 text-[11px] text-cyan font-semibold">
                     <MapPin className="w-3.5 h-3.5" />
                     {event.destinations?.name || 'Hub'} ·{' '}
                     {event.sports?.name || 'Padel'}
                   </div>
-                  <h2 className="text-lg font-bold text-white group-hover:text-cyan-300 transition">
+                  <h2 className="text-lg font-bold text-white group-hover:text-cyan transition">
                     {event.title}
                   </h2>
                   {event.short_description && (
-                    <p className="text-sm text-slate-400 line-clamp-2">
+                    <p className="text-sm text-app-white/60 line-clamp-2">
                       {event.short_description}
                     </p>
                   )}
-                  <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
-                    <span className="inline-flex items-center gap-1.5 text-slate-400">
+                  <div className="flex items-center justify-between text-xs pt-2 border-t border-white/10">
+                    <span className="inline-flex items-center gap-1.5 text-app-white/55">
                       <Calendar className="w-3.5 h-3.5" />
                       {event.start_date} → {event.end_date}
                     </span>
@@ -110,6 +96,8 @@ export default async function EventosPage() {
           </div>
         )}
       </main>
+
+      <SiteFooter />
     </div>
   )
 }

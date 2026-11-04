@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronDown, Menu, ShoppingBag, X } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
 import { ConsentPreferencesLink } from '@/components/consent/ConsentPreferencesLink'
@@ -87,6 +88,7 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
   const [openDestinos, setOpenDestinos] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileDestinosOpen, setMobileDestinosOpen] = useState(false)
+  const [portalReady, setPortalReady] = useState(false)
   const menuId = useId()
 
   const destinos = [
@@ -115,6 +117,13 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
     if (mobileDestinosOpen) setMobileDestinosOpen(false)
   }
 
+  // Portal the drawer to <body> so sticky/backdrop-filter on the header
+  // cannot create a containing block that clips fixed positioning to the
+  // header height (which made non-home pages show only "Build Your Camp").
+  useEffect(() => {
+    setPortalReady(true)
+  }, [])
+
   useEffect(() => {
     if (!mobileOpen) return
     const prev = document.body.style.overflow
@@ -128,6 +137,126 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
       window.removeEventListener('keydown', onKey)
     }
   }, [mobileOpen])
+
+  const mobileDrawer = (
+    <div
+      className={`lg:hidden fixed inset-0 z-[60] transition-[visibility] duration-300 ${
+        mobileOpen ? 'visible' : 'invisible pointer-events-none'
+      }`}
+      aria-hidden={!mobileOpen}
+    >
+      <button
+        type="button"
+        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+          mobileOpen ? 'opacity-100' : 'opacity-0'
+        }`}
+        aria-label={t.nav.closeMenu}
+        onClick={() => setMobileOpen(false)}
+      />
+      <aside
+        id={menuId}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t.nav.openMenu}
+        className={`absolute inset-y-0 right-0 flex h-dvh w-[min(100%,20.5rem)] max-w-full flex-col border-l border-white/10 bg-navy shadow-2xl transition-transform duration-300 ease-out ${
+          mobileOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
+          <BrandLogo
+            variant="full"
+            href={withLocale('/', locale)}
+            className="h-10 w-auto"
+          />
+          <button
+            type="button"
+            className="inline-flex rounded-full border border-white/15 p-2 text-app-white/80 hover:text-cyan"
+            aria-label={t.nav.closeMenu}
+            onClick={() => setMobileOpen(false)}
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <nav
+          className="flex-1 overflow-y-auto overscroll-contain px-4 py-5 space-y-1 text-sm font-medium"
+          aria-label="Primary"
+        >
+          <MobileAccordion
+            label={t.nav.destinations}
+            open={mobileDestinosOpen}
+            onToggle={() => setMobileDestinosOpen((v) => !v)}
+          >
+            {destinos.map((d) => (
+              <Link
+                key={d.href}
+                href={d.href}
+                onClick={() => setMobileOpen(false)}
+                className="block rounded-lg px-3 py-2.5 text-app-white/75 hover:bg-white/5 hover:text-app-white"
+              >
+                {d.label}
+              </Link>
+            ))}
+          </MobileAccordion>
+
+          <MobileLink
+            href={campsHref}
+            onNavigate={() => setMobileOpen(false)}
+          >
+            {t.nav.camps}
+          </MobileLink>
+          <MobileLink
+            href={tournamentsHref}
+            onNavigate={() => setMobileOpen(false)}
+          >
+            {t.nav.tournaments}
+          </MobileLink>
+          <MobileLink
+            href={storeHref}
+            onNavigate={() => setMobileOpen(false)}
+            icon={<ShoppingBag className="h-4 w-4" aria-hidden />}
+          >
+            {t.nav.storePro}
+          </MobileLink>
+          <MobileLink
+            href={withLocale('/quem-somos', locale)}
+            onNavigate={() => setMobileOpen(false)}
+          >
+            {t.nav.about}
+          </MobileLink>
+          <MobileLink
+            href={withLocale('/blog', locale)}
+            onNavigate={() => setMobileOpen(false)}
+          >
+            {t.nav.blog}
+          </MobileLink>
+          <MobileLink
+            href={withLocale('/contacto', locale)}
+            onNavigate={() => setMobileOpen(false)}
+          >
+            {t.nav.contact}
+          </MobileLink>
+        </nav>
+
+        <div className="border-t border-white/10 p-4 space-y-3">
+          <Link
+            href={buildHref}
+            onClick={() => setMobileOpen(false)}
+            className="flex w-full items-center justify-center rounded-full bg-gold px-5 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
+          >
+            {t.nav.build}
+          </Link>
+          <Link
+            href="/admin"
+            onClick={() => setMobileOpen(false)}
+            className="flex w-full items-center justify-center text-xs font-semibold text-app-white/50 hover:text-cyan"
+          >
+            {t.nav.staff}
+          </Link>
+        </div>
+      </aside>
+    </div>
+  )
 
   return (
     <header
@@ -253,121 +382,7 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
         </div>
       </div>
 
-      {/* Mobile drawer */}
-      <div
-        className={`lg:hidden fixed inset-0 z-50 transition-[visibility] duration-300 ${
-          mobileOpen ? 'visible' : 'invisible pointer-events-none'
-        }`}
-        aria-hidden={!mobileOpen}
-      >
-        <button
-          type="button"
-          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
-            mobileOpen ? 'opacity-100' : 'opacity-0'
-          }`}
-          aria-label={t.nav.closeMenu}
-          onClick={() => setMobileOpen(false)}
-        />
-        <aside
-          id={menuId}
-          role="dialog"
-          aria-modal="true"
-          aria-label={t.nav.openMenu}
-          className={`absolute inset-y-0 right-0 flex w-[min(100%,20.5rem)] max-w-full flex-col border-l border-white/10 bg-navy shadow-2xl transition-transform duration-300 ease-out ${
-            mobileOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-        >
-          <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
-            <BrandLogo
-              variant="full"
-              href={withLocale('/', locale)}
-              className="h-10 w-auto"
-            />
-            <button
-              type="button"
-              className="inline-flex rounded-full border border-white/15 p-2 text-app-white/80 hover:text-cyan"
-              aria-label={t.nav.closeMenu}
-              onClick={() => setMobileOpen(false)}
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-
-          <nav className="flex-1 overflow-y-auto overscroll-contain px-4 py-5 space-y-1 text-sm font-medium">
-            <MobileAccordion
-              label={t.nav.destinations}
-              open={mobileDestinosOpen}
-              onToggle={() => setMobileDestinosOpen((v) => !v)}
-            >
-              {destinos.map((d) => (
-                <Link
-                  key={d.href}
-                  href={d.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="block rounded-lg px-3 py-2.5 text-app-white/75 hover:bg-white/5 hover:text-app-white"
-                >
-                  {d.label}
-                </Link>
-              ))}
-            </MobileAccordion>
-
-            <MobileLink
-              href={campsHref}
-              onNavigate={() => setMobileOpen(false)}
-            >
-              {t.nav.camps}
-            </MobileLink>
-            <MobileLink
-              href={tournamentsHref}
-              onNavigate={() => setMobileOpen(false)}
-            >
-              {t.nav.tournaments}
-            </MobileLink>
-            <MobileLink
-              href={storeHref}
-              onNavigate={() => setMobileOpen(false)}
-              icon={<ShoppingBag className="h-4 w-4" aria-hidden />}
-            >
-              {t.nav.storePro}
-            </MobileLink>
-            <MobileLink
-              href={withLocale('/quem-somos', locale)}
-              onNavigate={() => setMobileOpen(false)}
-            >
-              {t.nav.about}
-            </MobileLink>
-            <MobileLink
-              href={withLocale('/blog', locale)}
-              onNavigate={() => setMobileOpen(false)}
-            >
-              {t.nav.blog}
-            </MobileLink>
-            <MobileLink
-              href={withLocale('/contacto', locale)}
-              onNavigate={() => setMobileOpen(false)}
-            >
-              {t.nav.contact}
-            </MobileLink>
-          </nav>
-
-          <div className="border-t border-white/10 p-4 space-y-3">
-            <Link
-              href={buildHref}
-              onClick={() => setMobileOpen(false)}
-              className="flex w-full items-center justify-center rounded-full bg-gold px-5 py-3 text-sm font-bold text-navy hover:brightness-110 transition"
-            >
-              {t.nav.build}
-            </Link>
-            <Link
-              href="/admin"
-              onClick={() => setMobileOpen(false)}
-              className="flex w-full items-center justify-center text-xs font-semibold text-app-white/50 hover:text-cyan"
-            >
-              {t.nav.staff}
-            </Link>
-          </div>
-        </aside>
-      </div>
+      {portalReady ? createPortal(mobileDrawer, document.body) : null}
     </header>
   )
 }

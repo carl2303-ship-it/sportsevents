@@ -27,19 +27,23 @@ export function LocaleProvider({
 }
 
 /**
- * SSR + first client render always use the server locale (identical → no hydration mismatch).
- * After mount, follow the browser pathname (/pt, /es, …).
+ * SSR + first client paint use the server locale (identical → no hydration mismatch).
+ * After mount, always follow the browser pathname (`/pt`, `/es`, …).
+ *
+ * Important with rewrite-based i18n: soft-nav from `/store` → `/pt/store` does not
+ * remount RSC pages (same rewritten segment), so client UI must read the URL path.
  */
 export function useLocale(): Locale {
   const serverLocale = useContext(LocaleContext)
   const pathname = usePathname()
-  const [clientLocale, setClientLocale] = useState<Locale | null>(null)
+  const pathLocale = localeFromPathname(pathname || '/')
+  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    setClientLocale(localeFromPathname(pathname || '/'))
-  }, [pathname])
+    setHydrated(true)
+  }, [])
 
-  return clientLocale ?? serverLocale
+  return hydrated ? pathLocale : serverLocale
 }
 
 export function useDictionary(): { locale: Locale; t: Dictionary } {

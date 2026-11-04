@@ -8,7 +8,8 @@ import {
   boostEdgeCheckoutUrl,
 } from '@/lib/boost-store/config'
 import { formatEuro } from '@/lib/boost-store/products'
-import { withLocale, type Locale } from '@/i18n/config'
+import { numberLocaleFor, withLocale } from '@/i18n/config'
+import { useDictionary } from '@/i18n/use-locale'
 
 type ShippingOption = { name: string; cost: number; days: string }
 
@@ -93,15 +94,55 @@ function shippingOptionsFor(
   }
 }
 
-export function CheckoutClient({
-  locale,
-  numberLocale,
-  copy,
-}: {
-  locale: Locale
-  numberLocale: string
-  copy: CheckoutCopy
-}) {
+export function CheckoutClient() {
+  const { locale, t } = useDictionary()
+  const s = t.store
+  const numberLocale = numberLocaleFor(locale)
+  const copy = useMemo<CheckoutCopy>(
+    () => ({
+      empty: s.cartEmpty,
+      continueShopping: s.continueShopping,
+      title: s.checkoutTitle,
+      orderSummary: s.orderSummary,
+      subtotal: s.subtotal,
+      shipping: s.shipping,
+      total: s.total,
+      remove: s.remove,
+      customer: s.customer,
+      name: s.name,
+      email: s.email,
+      phone: s.phone,
+      nif: s.nif,
+      address: s.address,
+      postal: s.postal,
+      city: s.city,
+      country: s.country,
+      notes: s.notes,
+      placeOrder: s.placeOrder,
+      processing: s.processing,
+      selectShipping: s.selectShipping,
+      paymentSuccess: s.paymentSuccess,
+      paymentCanceled: s.paymentCanceled,
+      backToStore: s.backToStore,
+      shipDigital: s.shipDigital,
+      shipDigitalDays: s.shipDigitalDays,
+      shipFree: s.shipFree,
+      shipStandard: s.shipStandard,
+      shipExpress: s.shipExpress,
+      days35: s.days35,
+      days12: s.days12,
+      days57: s.days57,
+      days47: s.days47,
+      days710: s.days710,
+      countryPt: s.countryPt,
+      countryPtIslands: s.countryPtIslands,
+      countryEs: s.countryEs,
+      countryEu: s.countryEu,
+      countryWorld: s.countryWorld,
+      errorGeneric: s.errorGeneric,
+    }),
+    [s]
+  )
   const { items, subtotal, removeItem, clear, ready } = useStoreCart()
   const [country, setCountry] = useState('PT_CONTINENTAL')
   const [shippingIdx, setShippingIdx] = useState(0)
@@ -123,12 +164,19 @@ export function CheckoutClient({
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     if (params.get('success') === 'true') {
-      clear()
-      setSuccessFlash(true)
-      window.history.replaceState({}, '', window.location.pathname)
-    } else if (params.get('canceled') === 'true') {
-      setError(copy.paymentCanceled)
-      window.history.replaceState({}, '', window.location.pathname)
+      const id = window.setTimeout(() => {
+        clear()
+        setSuccessFlash(true)
+        window.history.replaceState({}, '', window.location.pathname)
+      }, 0)
+      return () => window.clearTimeout(id)
+    }
+    if (params.get('canceled') === 'true') {
+      const id = window.setTimeout(() => {
+        setError(copy.paymentCanceled)
+        window.history.replaceState({}, '', window.location.pathname)
+      }, 0)
+      return () => window.clearTimeout(id)
     }
   }, [clear, copy.paymentCanceled])
 

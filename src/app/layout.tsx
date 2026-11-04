@@ -37,19 +37,32 @@ export async function generateMetadata(): Promise<Metadata> {
       telephone: false,
     },
     icons: {
+      // Cache-bust: Netlify Durable can keep prior favicon/icon bytes for a long time.
       icon: [
-        { url: "/brand/icon-192.png", type: "image/png", sizes: "192x192" },
-        { url: "/brand/icon-512.png", type: "image/png", sizes: "512x512" },
-        { url: "/brand/icon.png", type: "image/png", sizes: "512x512" },
+        {
+          url: "/brand/icon-192.png?v=20261104",
+          type: "image/png",
+          sizes: "192x192",
+        },
+        {
+          url: "/brand/icon-512.png?v=20261104",
+          type: "image/png",
+          sizes: "512x512",
+        },
+        {
+          url: "/brand/icon.png?v=20261104",
+          type: "image/png",
+          sizes: "512x512",
+        },
       ],
       apple: [
         {
-          url: "/brand/apple-touch-icon.png",
+          url: "/brand/apple-touch-icon.png?v=20261104",
           type: "image/png",
           sizes: "180x180",
         },
       ],
-      shortcut: "/brand/icon-192.png",
+      shortcut: "/brand/icon-192.png?v=20261104",
     },
     openGraph: {
       title: t.siteTitle,

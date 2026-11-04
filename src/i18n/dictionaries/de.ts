@@ -15,6 +15,7 @@ export const de: typeof pt = {
     store: 'Shop',
     storePro: 'Pro Shop',
     blog: 'Blog',
+    blogAi: 'Blog AI',
     build: 'Camp planen',
     contact: 'Kontakt',
     staff: 'Staff',
@@ -474,6 +475,17 @@ export const de: typeof pt = {
     ctaText:
       'Nennt uns Termine, Gruppengröße und Level. Wir senden ein kostenloses Angebot mit Coaching, Hotels und Transfers.',
     ctaButton: 'Kostenloses Angebot anfordern',
+    autoBlogLink: 'Automatische Artikel ansehen (Blog AI) →',
+  },
+  blogAuto: {
+    metaTitle: 'Blog AI — Automatische Artikel | SportsEvents',
+    metaDescription:
+      'Automatisch über TryHolo veröffentlichte Artikel — Padel-Tipps, Camps und iberische Destinationen.',
+    eyebrow: 'Automatische Veröffentlichung',
+    title: 'Blog AI',
+    lead:
+      'Automatisch veröffentlichte Artikel. Der redaktionelle Blog bleibt unter /blog.',
+    manualBlogLink: '← Zurück zum redaktionellen Blog',
   },
   events: {
     backSite: '← Zurück zur Website',

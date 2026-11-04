@@ -202,6 +202,12 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
             {t.nav.blog}
           </Link>
           <Link
+            href={withLocale('/blog/auto', locale)}
+            className="hover:text-app-white transition-colors"
+          >
+            {t.nav.blogAi}
+          </Link>
+          <Link
             href={buildHref}
             className="hover:text-app-white transition-colors"
           >
@@ -341,6 +347,12 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
               onNavigate={() => setMobileOpen(false)}
             >
               {t.nav.blog}
+            </MobileLink>
+            <MobileLink
+              href={withLocale('/blog/auto', locale)}
+              onNavigate={() => setMobileOpen(false)}
+            >
+              {t.nav.blogAi}
             </MobileLink>
             <MobileLink
               href={withLocale('/contacto', locale)}
@@ -541,6 +553,12 @@ export function SiteFooter() {
             className="hover:text-cyan"
           >
             {t.nav.blog}
+          </Link>
+          <Link
+            href={withLocale('/blog/auto', locale)}
+            className="hover:text-cyan"
+          >
+            {t.nav.blogAi}
           </Link>
           <Link
             href={withLocale('/construir', locale)}

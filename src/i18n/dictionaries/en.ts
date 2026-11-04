@@ -15,6 +15,7 @@ export const en: typeof pt = {
     store: 'Store',
     storePro: 'Pro Store',
     blog: 'Blog',
+    blogAi: 'Blog AI',
     build: 'Build Your Camp',
     contact: 'Contact',
     staff: 'Staff',
@@ -474,6 +475,17 @@ export const en: typeof pt = {
     ctaText:
       'Tell us your dates, group size and level. We reply with a free proposal covering coaching, hotels and transfers.',
     ctaButton: 'Request a Free Proposal',
+    autoBlogLink: 'Browse auto-published articles (Blog AI) →',
+  },
+  blogAuto: {
+    metaTitle: 'Blog AI — Auto-published articles | SportsEvents',
+    metaDescription:
+      'Articles published automatically via TryHolo — padel tips, camps and Iberian destinations.',
+    eyebrow: 'Automatic publishing',
+    title: 'Blog AI',
+    lead:
+      'Articles published automatically. The editorial blog remains at /blog.',
+    manualBlogLink: '← Back to the editorial blog',
   },
   events: {
     backSite: '← Back to site',

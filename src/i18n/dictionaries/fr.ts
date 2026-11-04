@@ -15,6 +15,7 @@ export const fr: typeof pt = {
     store: 'Boutique',
     storePro: 'Boutique Pro',
     blog: 'Blog',
+    blogAi: 'Blog AI',
     build: 'Créer votre stage',
     contact: 'Contact',
     staff: 'Staff',
@@ -474,6 +475,17 @@ export const fr: typeof pt = {
     ctaText:
       'Indiquez dates, taille du groupe et niveau. Nous envoyons une proposition gratuite (coaching, hôtels, transfers).',
     ctaButton: 'Demander une proposition gratuite',
+    autoBlogLink: 'Voir les articles automatiques (Blog AI) →',
+  },
+  blogAuto: {
+    metaTitle: 'Blog AI — Articles automatiques | SportsEvents',
+    metaDescription:
+      'Articles publiés automatiquement via TryHolo — conseils padel, stages et destinations ibériques.',
+    eyebrow: 'Publication automatique',
+    title: 'Blog AI',
+    lead:
+      'Articles publiés automatiquement. Le blog éditorial reste sur /blog.',
+    manualBlogLink: '← Retour au blog éditorial',
   },
   events: {
     backSite: '← Retour au site',

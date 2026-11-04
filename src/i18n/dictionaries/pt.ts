@@ -13,6 +13,7 @@ export const pt = {
     store: 'Loja',
     storePro: 'Loja Pro',
     blog: 'Blog',
+    blogAi: 'Blog AI',
     build: 'Construir Estágio',
     contact: 'Contactos',
     staff: 'Staff',
@@ -456,6 +457,17 @@ export const pt = {
     ctaText:
       'Tell us your dates, group size and level. We reply with a free proposal covering coaching, hotels and transfers.',
     ctaButton: 'Request a Free Proposal',
+    autoBlogLink: 'Ver artigos automáticos (Blog AI) →',
+  },
+  blogAuto: {
+    metaTitle: 'Blog AI — Artigos automáticos | SportsEvents',
+    metaDescription:
+      'Artigos gerados automaticamente via TryHolo — dicas de padel, estágios e destinos ibéricos.',
+    eyebrow: 'Publicação automática',
+    title: 'Blog AI',
+    lead:
+      'Artigos publicados automaticamente. O blog editorial manual continua em /blog.',
+    manualBlogLink: '← Voltar ao blog editorial',
   },
   events: {
     backSite: '← Voltar ao site',

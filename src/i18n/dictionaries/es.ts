@@ -15,6 +15,7 @@ export const es: typeof pt = {
     store: 'Tienda',
     storePro: 'Tienda Pro',
     blog: 'Blog',
+    blogAi: 'Blog AI',
     build: 'Diseña tu campus',
     contact: 'Contacto',
     staff: 'Staff',
@@ -474,6 +475,17 @@ export const es: typeof pt = {
     ctaText:
       'Cuéntanos fechas, tamaño del grupo y nivel. Te enviamos una propuesta gratuita con coaching, hoteles y transfers.',
     ctaButton: 'Pedir propuesta gratuita',
+    autoBlogLink: 'Ver artículos automáticos (Blog AI) →',
+  },
+  blogAuto: {
+    metaTitle: 'Blog AI — Artículos automáticos | SportsEvents',
+    metaDescription:
+      'Artículos publicados automáticamente vía TryHolo — tips de pádel, campus y destinos ibéricos.',
+    eyebrow: 'Publicación automática',
+    title: 'Blog AI',
+    lead:
+      'Artículos publicados automáticamente. El blog editorial sigue en /blog.',
+    manualBlogLink: '← Volver al blog editorial',
   },
   events: {
     backSite: '← Volver al sitio',

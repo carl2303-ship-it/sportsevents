@@ -27,7 +27,7 @@ export default async function QuemSomosPage() {
             alt={t.heroAlt}
             fill
             priority
-            className="object-cover object-[center_30%]"
+            className="object-cover object-[center_62%] md:object-[center_68%] lg:object-[center_72%]"
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-navy/80 via-navy/60 to-navy" />

@@ -38,8 +38,9 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: {
       icon: [
+        { url: "/brand/icon-192.png", type: "image/png", sizes: "192x192" },
+        { url: "/brand/icon-512.png", type: "image/png", sizes: "512x512" },
         { url: "/brand/icon.png", type: "image/png", sizes: "512x512" },
-        { url: "/brand/icon.png", type: "image/png", sizes: "192x192" },
       ],
       apple: [
         {
@@ -48,7 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
           sizes: "180x180",
         },
       ],
-      shortcut: "/brand/icon.png",
+      shortcut: "/brand/icon-192.png",
     },
     openGraph: {
       title: t.siteTitle,

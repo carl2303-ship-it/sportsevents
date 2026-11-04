@@ -37,8 +37,18 @@ export async function generateMetadata(): Promise<Metadata> {
       telephone: false,
     },
     icons: {
-      icon: [{ url: "/brand/icon.png", type: "image/png" }],
-      apple: [{ url: "/brand/icon.png", type: "image/png" }],
+      icon: [
+        { url: "/brand/icon.png", type: "image/png", sizes: "512x512" },
+        { url: "/brand/icon.png", type: "image/png", sizes: "192x192" },
+      ],
+      apple: [
+        {
+          url: "/brand/apple-touch-icon.png",
+          type: "image/png",
+          sizes: "180x180",
+        },
+      ],
+      shortcut: "/brand/icon.png",
     },
     openGraph: {
       title: t.siteTitle,

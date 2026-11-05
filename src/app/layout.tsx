@@ -38,37 +38,37 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: {
       // Cache-bust: Netlify Durable can keep prior favicon/icon bytes for a long time.
-      // v=20261105se — restore navy SE mark (Admin red was HUB-60 only).
+      // v=20261105carlos — SE mark from Carlos media/brand/se-app-icon.jpg (HUB-62).
       icon: [
         {
-          url: "/favicon.ico?v=20261105se",
+          url: "/favicon.ico?v=20261105carlos",
           type: "image/x-icon",
           sizes: "any",
         },
         {
-          url: "/brand/icon-192.png?v=20261105se",
+          url: "/brand/icon-192.png?v=20261105carlos",
           type: "image/png",
           sizes: "192x192",
         },
         {
-          url: "/brand/icon-512.png?v=20261105se",
+          url: "/brand/icon-512.png?v=20261105carlos",
           type: "image/png",
           sizes: "512x512",
         },
         {
-          url: "/brand/icon.png?v=20261105se",
+          url: "/brand/icon.png?v=20261105carlos",
           type: "image/png",
           sizes: "512x512",
         },
       ],
       apple: [
         {
-          url: "/brand/apple-touch-icon.png?v=20261105se",
+          url: "/brand/apple-touch-icon.png?v=20261105carlos",
           type: "image/png",
           sizes: "180x180",
         },
       ],
-      shortcut: "/brand/icon-192.png?v=20261105se",
+      shortcut: "/brand/icon-192.png?v=20261105carlos",
     },
     openGraph: {
       title: t.siteTitle,

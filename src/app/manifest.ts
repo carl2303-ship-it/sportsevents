@@ -15,19 +15,19 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ['sports', 'travel', 'business'],
     icons: [
       {
-        src: '/brand/icon-192.png?v=20261105se',
+        src: '/brand/icon-192.png?v=20261105carlos',
         sizes: '192x192',
         type: 'image/png',
         purpose: 'any',
       },
       {
-        src: '/brand/icon-512.png?v=20261105se',
+        src: '/brand/icon-512.png?v=20261105carlos',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'any',
       },
       {
-        src: '/brand/icon-512.png?v=20261105se',
+        src: '/brand/icon-512.png?v=20261105carlos',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'maskable',

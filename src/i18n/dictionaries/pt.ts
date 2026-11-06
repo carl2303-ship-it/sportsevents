@@ -626,6 +626,8 @@ export const pt = {
     categoryTitle: 'Todos os produtos',
     categoryDescription: 'Acessórios, digital e equipamento para padel.',
     featuresTitle: 'Características',
+    colorsTitle: 'Cores',
+    sizesTitle: 'Tamanhos',
     inStock: 'Em stock',
     featured: 'Destaque',
     digital: 'Digital',

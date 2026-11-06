@@ -644,6 +644,8 @@ export const fr: typeof pt = {
     categoryTitle: 'Tous les produits',
     categoryDescription: 'Accessoires, digital et équipement de padel.',
     featuresTitle: 'Caractéristiques',
+    colorsTitle: 'Couleurs',
+    sizesTitle: 'Tailles',
     inStock: 'En stock',
     featured: 'À la une',
     digital: 'Digital',

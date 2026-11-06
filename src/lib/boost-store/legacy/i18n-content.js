@@ -1,7 +1,8 @@
 export const DEFAULT_LANGUAGE = 'pt';
 
 import { shortDescriptionI18n } from './product-short-i18n.js';
-import { productTranslationsById } from './product-translations.js';
+// product-translations.js catalog intentionally unused (HUB-64): it overrode live
+// boost.products description/short_description for non-PT locales.
 
 /** Lang must be passed explicitly from Next locale. */
 function getCurrentLanguage() {
@@ -10,7 +11,9 @@ function getCurrentLanguage() {
 
 /**
  * Resolve a localized field from a row with optional `translations` JSONB.
- * Fallback order: JSONB → by-id catalog → short-description map → phrase heuristics → PT.
+ * Fallback order: live JSONB → short-description map → phrase heuristics → live column.
+ *
+ * HUB-64: ship-time by-id catalog no longer masks hub edits on `/store` (often EN).
  */
 export function localizeField(row, field, lang = getCurrentLanguage()) {
   if (!row) return '';
@@ -22,13 +25,6 @@ export function localizeField(row, field, lang = getCurrentLanguage()) {
     }
   }
 
-  if (lang && lang !== DEFAULT_LANGUAGE && row.id && productTranslationsById?.[row.id]?.[lang]?.[field]) {
-    const fromCatalog = productTranslationsById[row.id][lang][field];
-    if (fromCatalog != null && fromCatalog !== '') {
-      return fromCatalog;
-    }
-  }
-
   const base = row[field] ?? '';
   if (!base || lang === DEFAULT_LANGUAGE) return base;
 
@@ -37,7 +33,13 @@ export function localizeField(row, field, lang = getCurrentLanguage()) {
     if (mapped) return mapped;
   }
 
-  if (field === 'name' || field === 'short_description' || field === 'description' || field === 'title' || field === 'excerpt') {
+  if (
+    field === 'name' ||
+    field === 'short_description' ||
+    field === 'description' ||
+    field === 'title' ||
+    field === 'excerpt'
+  ) {
     return applyPhraseMap(String(base), lang);
   }
 

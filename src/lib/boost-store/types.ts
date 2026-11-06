@@ -107,6 +107,58 @@ export function productFeatures(product: BoostProduct): string[] {
   }
 }
 
+/** Normalize `boost.products.colors` jsonb → display rows. */
+export function productColors(product: BoostProduct): BoostColor[] {
+  const raw = product.colors as unknown
+  if (!raw) return []
+  const list = Array.isArray(raw)
+    ? raw
+    : typeof raw === 'string'
+      ? (() => {
+          try {
+            const parsed = JSON.parse(raw)
+            return Array.isArray(parsed) ? parsed : []
+          } catch {
+            return []
+          }
+        })()
+      : []
+  return list
+    .map((c) => {
+      if (!c || typeof c !== 'object') return null
+      const o = c as { name?: unknown; hex?: unknown }
+      const name = String(o.name || '').trim()
+      const hex = String(o.hex || '').trim()
+      if (!name && !hex) return null
+      return {
+        name: name || hex.toUpperCase(),
+        hex: hex || '#000000',
+      }
+    })
+    .filter(Boolean) as BoostColor[]
+}
+
+/** Normalize `boost.products.sizes` jsonb → labels. */
+export function productSizes(product: BoostProduct): string[] {
+  const raw = product.sizes as unknown
+  if (!raw) return []
+  if (Array.isArray(raw)) return raw.map((s) => String(s || '').trim()).filter(Boolean)
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) {
+        return parsed.map((s) => String(s || '').trim()).filter(Boolean)
+      }
+    } catch {
+      return raw
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+    }
+  }
+  return []
+}
+
 /** Strip tags for card previews (descriptions are HTML in Boost). */
 export function stripHtml(html: string): string {
   return String(html || '')

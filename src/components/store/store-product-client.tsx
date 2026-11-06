@@ -10,8 +10,10 @@ import { resolveProductLanding } from '@/lib/boost-store/landing-urls'
 import { localizeStoreProduct } from '@/lib/boost-store/localize'
 import { formatEuro } from '@/lib/boost-store/products'
 import {
+  productColors,
   productFeatures,
   productImageList,
+  productSizes,
   type BoostProduct,
 } from '@/lib/boost-store/types'
 import { numberLocaleFor, withLocale } from '@/i18n/config'
@@ -35,6 +37,8 @@ export function StoreProductClient({ raw }: { raw: BoostProduct }) {
   const numberLocale = numberLocaleFor(locale)
   const images = productImageList(product)
   const features = productFeatures(product)
+  const colors = productColors(product)
+  const sizes = productSizes(product)
   const descriptionHtml =
     product.description || product.short_description || ''
   const yt = product.video_url ? youtubeId(product.video_url) : null
@@ -97,6 +101,48 @@ export function StoreProductClient({ raw }: { raw: BoostProduct }) {
               <p className="text-sm font-semibold text-emerald-400">
                 {s.inStock}
               </p>
+            ) : null}
+
+            {colors.length > 0 ? (
+              <div>
+                <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-app-white/55">
+                  {s.colorsTitle}
+                </h2>
+                <ul className="flex flex-wrap gap-3">
+                  {colors.map((c) => (
+                    <li
+                      key={`${c.name}-${c.hex}`}
+                      className="inline-flex items-center gap-2 text-sm text-app-white/80"
+                    >
+                      <span
+                        className="h-5 w-5 shrink-0 rounded-full border border-white/25"
+                        style={{ backgroundColor: c.hex || '#000000' }}
+                        title={c.hex}
+                        aria-hidden
+                      />
+                      <span>{c.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {sizes.length > 0 ? (
+              <div>
+                <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-app-white/55">
+                  {s.sizesTitle}
+                </h2>
+                <ul className="flex flex-wrap gap-2">
+                  {sizes.map((size) => (
+                    <li
+                      key={size}
+                      className="rounded-lg border border-white/15 bg-black/25 px-3 py-1.5 text-sm text-app-white/80"
+                    >
+                      {size}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ) : null}
 
             {features.length > 0 ? (

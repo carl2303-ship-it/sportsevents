@@ -644,6 +644,8 @@ export const en: typeof pt = {
     categoryTitle: 'All products',
     categoryDescription: 'Accessories, digital and padel gear.',
     featuresTitle: 'Features',
+    colorsTitle: 'Colors',
+    sizesTitle: 'Sizes',
     inStock: 'In stock',
     featured: 'Featured',
     digital: 'Digital',

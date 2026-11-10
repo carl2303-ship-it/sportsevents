@@ -1,0 +1,8 @@
+# Minimal project config for Edge Function deploy flags.
+# Stripe webhooks do not send a Supabase JWT — verify_jwt must be false
+# or the gateway returns 401 before the function runs.
+# Auth for /webhook is Stripe-Signature + STRIPE_WEBHOOK_SECRET.
+# Source of truth: sportsevents repo (not boostpadel). Deploy only to SE.
+
+[functions.stripe-checkout]
+verify_jwt = false

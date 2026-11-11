@@ -1,8 +1,20 @@
 # Minimal project config for Edge Function deploy flags.
+# Source of truth: sportsevents repo (not boostpadel). Deploy only to SE
+# project-ref tprbpeacicadsbmvxcqk.
+#
 # Stripe webhooks do not send a Supabase JWT — verify_jwt must be false
 # or the gateway returns 401 before the function runs.
 # Auth for /webhook is Stripe-Signature + STRIPE_WEBHOOK_SECRET.
-# Source of truth: sportsevents repo (not boostpadel). Deploy only to SE.
+#
+# Tour SaaS helpers receive a Padel1 (Tour) JWT, not an SE JWT — gateway
+# verify_jwt must be false; each function validates Tour Auth manually.
+# provision-saas-license uses SE Auth (hub staff) — leave default verify_jwt ON.
 
 [functions.stripe-checkout]
+verify_jwt = false
+
+[functions.manage-saas-subscription]
+verify_jwt = false
+
+[functions.sync-org-branding]
 verify_jwt = false

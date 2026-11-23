@@ -42,9 +42,15 @@
     Cache-Control = "public, max-age=0, must-revalidate"
     Netlify-CDN-Cache-Control = "public, max-age=60, stale-while-revalidate=86400, durable"
 
-# HUB-86: store.padel1.app — host rewrite is in Next proxy (src/proxy.ts).
-# Netlify domain-level 301s as belt-and-suspenders for SE → canonical store.
-# (App Router + @netlify/plugin-nextjs: prefer proxy over /* → /store 200 rewrites.)
+# HUB-86 / HUB-91: store.padel1.app host rewrite lives in Next proxy (src/proxy.ts)
+# as an *internal* rewrite `/` → `/store` (no external Location). Canonicalization
+# of duplicate `/store` → `/` is also in the proxy (single 301).
+#
+# Do NOT add Netlify force redirects for store.padel1.app/store → / here.
+# force=true on that path fights the internal rewrite and causes
+# ERR_TOO_MANY_REDIRECTS (`/` rewrite→`/store` then 301→`/` forever).
+#
+# SE host → canonical store (domain-level 301s; safe — different host).
 
 [[redirects]]
   from = "https://sportsevents.app/store"
@@ -66,19 +72,6 @@
 
 [[redirects]]
   from = "https://www.sportsevents.app/store/*"
-  to = "https://store.padel1.app/:splat"
-  status = 301
-  force = true
-
-# Duplicate /store on the store host → public root (also in proxy)
-[[redirects]]
-  from = "https://store.padel1.app/store"
-  to = "https://store.padel1.app/"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "https://store.padel1.app/store/*"
   to = "https://store.padel1.app/:splat"
   status = 301
   force = true

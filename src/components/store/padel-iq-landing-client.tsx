@@ -18,6 +18,7 @@ import {
   BOOST_EDGE_ANON_KEY,
   boostEdgeRootUrl,
 } from '@/lib/boost-store/config'
+import { browserStoreUrl } from '@/lib/boost-store/store-host'
 import { PADEL_IQ_ASSETS } from '@/lib/boost-store/padel-iq-assets'
 import {
   PADEL_IQ_LANGS,
@@ -96,7 +97,6 @@ export function PadelIqLandingClient({
     setBusy(true)
     setError(null)
     try {
-      const origin = window.location.origin
       const response = await fetch(boostEdgeRootUrl(), {
         method: 'POST',
         headers: {
@@ -107,8 +107,12 @@ export function PadelIqLandingClient({
           productType: funnel.ebook_product_type,
           amount: funnel.ebook_price_cents,
           language: lang,
-          successUrl: `${origin}/store/funnel/upsell?slug=${encodeURIComponent(slug)}&session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${origin}/store/funnel?slug=${encodeURIComponent(slug)}`,
+          successUrl: browserStoreUrl(
+            `funnel/upsell?slug=${encodeURIComponent(slug)}&session_id={CHECKOUT_SESSION_ID}`
+          ),
+          cancelUrl: browserStoreUrl(
+            `funnel?slug=${encodeURIComponent(slug)}`
+          ),
         }),
       })
       const payload = await response.json()

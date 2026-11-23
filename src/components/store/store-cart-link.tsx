@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { ShoppingBag } from 'lucide-react'
 import { useStoreCart } from '@/components/store/cart-context'
-import { withLocale, type Locale } from '@/i18n/config'
+import { useStoreHref } from '@/lib/boost-store/use-store-path'
+import type { Locale } from '@/i18n/config'
 
 export function StoreCartLink({
   locale,
@@ -13,10 +14,11 @@ export function StoreCartLink({
   label: string
 }) {
   const { count, ready } = useStoreCart()
+  const checkoutHref = useStoreHref('/store/checkout', locale)
 
   return (
     <Link
-      href={withLocale('/store/checkout', locale)}
+      href={checkoutHref}
       className="relative inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/25 px-3 py-1.5 text-xs font-semibold text-app-white/85 transition hover:border-cyan/40 hover:text-cyan"
       aria-label={label}
     >

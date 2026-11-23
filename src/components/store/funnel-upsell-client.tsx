@@ -10,6 +10,10 @@ import {
   boostEdgeRootUrl,
 } from '@/lib/boost-store/config'
 import { eurosFromCents, type EbookFunnel } from '@/lib/boost-store/funnels'
+import {
+  browserStorePath,
+  browserStoreUrl,
+} from '@/lib/boost-store/store-host'
 
 declare global {
   interface Window {
@@ -90,7 +94,9 @@ export function FunnelUpsellClient({
       )
       if (cancelled) return
       if (!p) {
-        window.location.href = `/store/funnel?slug=${encodeURIComponent(slug)}`
+        window.location.href = browserStorePath(
+          `funnel?slug=${encodeURIComponent(slug)}`
+        )
         return
       }
       setPurchase(p)
@@ -106,7 +112,6 @@ export function FunnelUpsellClient({
     setBusy(true)
     setError(null)
     try {
-      const origin = window.location.origin
       const response = await fetch(boostEdgeRootUrl(), {
         method: 'POST',
         headers: {
@@ -120,8 +125,12 @@ export function FunnelUpsellClient({
           customerName: purchase.customer_name,
           originalSessionId: purchase.stripe_session_id,
           language: purchase.language || 'pt',
-          successUrl: `${origin}/store/funnel/thank-you?slug=${encodeURIComponent(slug)}&bundle=1&session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${origin}/store/funnel/thank-you?slug=${encodeURIComponent(slug)}`,
+          successUrl: browserStoreUrl(
+            `funnel/thank-you?slug=${encodeURIComponent(slug)}&bundle=1&session_id={CHECKOUT_SESSION_ID}`
+          ),
+          cancelUrl: browserStoreUrl(
+            `funnel/thank-you?slug=${encodeURIComponent(slug)}`
+          ),
         }),
       })
       const payload = await response.json()

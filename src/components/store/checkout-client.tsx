@@ -8,7 +8,9 @@ import {
   boostEdgeCheckoutUrl,
 } from '@/lib/boost-store/config'
 import { formatEuro } from '@/lib/boost-store/products'
-import { numberLocaleFor, withLocale } from '@/i18n/config'
+import { absoluteStoreHref } from '@/lib/boost-store/store-host'
+import { useStoreHref } from '@/lib/boost-store/use-store-path'
+import { numberLocaleFor } from '@/i18n/config'
 import { useDictionary } from '@/i18n/use-locale'
 
 type ShippingOption = { name: string; cost: number; days: string }
@@ -96,6 +98,7 @@ function shippingOptionsFor(
 
 export function CheckoutClient() {
   const { locale, t } = useDictionary()
+  const storeHomeHref = useStoreHref('/store', locale)
   const s = t.store
   const numberLocale = numberLocaleFor(locale)
   const copy = useMemo<CheckoutCopy>(
@@ -189,7 +192,7 @@ export function CheckoutClient() {
       <div className="rounded-2xl border border-cyan/30 bg-cyan/10 p-8 text-center space-y-4">
         <p className="text-lg font-bold text-white">{copy.paymentSuccess}</p>
         <Link
-          href={withLocale('/store', locale)}
+          href={storeHomeHref}
           className="inline-flex text-cyan hover:underline"
         >
           {copy.backToStore}
@@ -203,7 +206,7 @@ export function CheckoutClient() {
       <div className="rounded-2xl border border-white/10 bg-black/20 p-10 text-center space-y-4">
         <p className="text-app-white/60">{copy.empty}</p>
         <Link
-          href={withLocale('/store', locale)}
+          href={storeHomeHref}
           className="inline-flex rounded-xl bg-cyan px-5 py-2.5 text-sm font-bold text-navy"
         >
           {copy.continueShopping}
@@ -268,10 +271,6 @@ export function CheckoutClient() {
       }
       const order = createJson.order
 
-      const origin =
-        typeof window !== 'undefined' ? window.location.origin : 'https://sportsevents.app'
-      const checkoutPath = withLocale('/store/checkout', locale)
-
       const response = await fetch(boostEdgeCheckoutUrl('/create-checkout-session'), {
         method: 'POST',
         headers: {
@@ -286,8 +285,8 @@ export function CheckoutClient() {
           shippingMethod: { name: shipping.name, cost: shipping.cost },
           orderId: order.id,
           language: locale,
-          successUrl: `${origin}${checkoutPath}?success=true&order_id=${order.id}`,
-          cancelUrl: `${origin}${checkoutPath}?canceled=true`,
+          successUrl: `${absoluteStoreHref('/store/checkout', { locale })}?success=true&order_id=${order.id}`,
+          cancelUrl: `${absoluteStoreHref('/store/checkout', { locale })}?canceled=true`,
         }),
       })
 

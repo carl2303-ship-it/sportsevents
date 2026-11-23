@@ -19,6 +19,10 @@ import {
   type Locale,
 } from '@/i18n/config'
 import { useDictionary } from '@/i18n/use-locale'
+import {
+  storeCanonicalUrl,
+  toPublicStorePath,
+} from '@/lib/boost-store/store-host'
 
 const activeLanguages: Locale[] = ['en', 'pt', 'es', 'fr', 'de']
 const languageLabels: Record<Locale, string> = {
@@ -103,7 +107,10 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
     },
   ]
 
-  const storeHref = withLocale('/store', locale)
+  // Canonical store host (public paths — no `/store`)
+  const storeHref = storeCanonicalUrl(
+    toPublicStorePath(withLocale('/store', locale))
+  )
   const campsHref = `${withLocale('/', locale)}#hubs`
   const tournamentsHref = withLocale('/eventos', locale)
   const buildHref = withLocale('/construir', locale)
@@ -553,7 +560,7 @@ export function SiteFooter() {
             {t.nav.about}
           </Link>
           <Link
-            href={withLocale('/store', locale)}
+            href={storeHref}
             className="inline-flex items-center gap-1 hover:text-cyan"
           >
             <ShoppingBag className="h-3.5 w-3.5" aria-hidden />

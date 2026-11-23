@@ -6,6 +6,10 @@ import { SiteFooter, SiteHeader } from '@/components/site-chrome'
 import { BrandLogo } from '@/components/brand-logo'
 import { withLocale } from '@/i18n/config'
 import { useDictionary } from '@/i18n/use-locale'
+import {
+  storeCanonicalUrl,
+  toPublicStorePath,
+} from '@/lib/boost-store/store-host'
 
 const HERO_IMAGE = '/home/hero.jpg'
 
@@ -195,7 +199,9 @@ export default function Home() {
 
           <div className="mt-14">
             <Link
-              href={withLocale('/store', locale)}
+              href={storeCanonicalUrl(
+                toPublicStorePath(withLocale('/store', locale))
+              )}
               className="inline-flex items-center justify-center rounded-full border border-gold/50 bg-gold/10 px-6 py-3 text-sm font-bold text-gold hover:bg-gold hover:text-navy transition"
             >
               {h.proGearCta}

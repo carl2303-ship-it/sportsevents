@@ -8,8 +8,8 @@ import {
   getEbookLandingCopy,
   type EbookLandingCopy,
 } from '@/lib/boost-store/ebook-landing-copy'
-import { withLocale } from '@/i18n/config'
 import { useLocale } from '@/i18n/use-locale'
+import { useStoreHref } from '@/lib/boost-store/use-store-path'
 
 export type { EbookLandingCopy }
 
@@ -41,6 +41,7 @@ function triggerEbookDownload() {
 
 export function EbookLandingClient() {
   const locale = useLocale()
+  const storeHref = useStoreHref('/store', locale)
   const copy = getEbookLandingCopy(locale)
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState(false)
@@ -105,8 +106,6 @@ export function EbookLandingClient() {
       setBusy(false)
     }
   }
-
-  const storeHref = withLocale('/store', locale)
 
   return (
     <div className="min-h-screen bg-navy text-app-white">

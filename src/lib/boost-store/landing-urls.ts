@@ -1,5 +1,6 @@
 import { withLocale, type Locale } from '@/i18n/config'
 import type { BoostProduct } from '@/lib/boost-store/types'
+import { STORE_CANONICAL_ORIGIN } from '@/lib/boost-store/store-host'
 
 export type ProductLanding = {
   href: string
@@ -31,12 +32,25 @@ export function remapBoostStoreUrl(
         learnMore: true,
       }
     }
-    const abs = new URL(url, 'https://sportsevents.app')
+    const abs = new URL(url, STORE_CANONICAL_ORIGIN)
     if (
+      abs.hostname === 'store.padel1.app' ||
       abs.hostname === 'sportsevents.app' ||
       abs.hostname === 'www.sportsevents.app'
     ) {
-      const path = `${abs.pathname}${abs.search}`
+      let path = `${abs.pathname}${abs.search}`
+      // Legacy SE /store… → keep relative internal path for now
+      if (
+        abs.hostname === 'store.padel1.app' &&
+        (abs.pathname === '/' || abs.pathname === '')
+      ) {
+        path = `/store${abs.search}`
+      } else if (
+        abs.hostname === 'store.padel1.app' &&
+        !abs.pathname.startsWith('/store')
+      ) {
+        path = `/store${abs.pathname}${abs.search}`
+      }
       return {
         href: locale ? withLocale(path, locale) : path,
         external: false,
@@ -252,7 +266,8 @@ export function resolveProductLanding(
   }
 }
 
-const SE_STORE = 'https://sportsevents.app/store'
+/** Canonical public store (host root — no `/store` path). */
+const SE_STORE = STORE_CANONICAL_ORIGIN
 /** SE product UUIDs used by Boost blog CTAs that landed on bare /store. */
 const BLOG_PRODUCT = {
   loaded: '6fcd365a-8026-4fb1-bfe0-15b95cb671e3',
@@ -329,6 +344,15 @@ export function rewriteBoostUrlsInHtml(html: string): string {
       )
       .replace(/\/store\/store(?=["'/?#\s]|$)/gi, SE_STORE)
       .replace(/https?:\/\/(?:www\.)?boostpadel\.store\/?/gi, SE_STORE)
+      // Legacy SE /store… → canonical store host (strip /store prefix)
+      .replace(
+        /https?:\/\/(?:www\.)?sportsevents\.app\/store\/?/gi,
+        `${SE_STORE}/`
+      )
+      .replace(
+        /https?:\/\/(?:www\.)?sportsevents\.app\/store(?=["'/?#\s]|$)/gi,
+        SE_STORE
+      )
       // Named CTAs still on bare store home
       .replace(
         /href="(?:https?:\/\/(?:www\.)?sportsevents\.app)?\/store"(?=[^>]*>\s*<strong>Loaded 4Endurance Pro<\/strong>)/gi,
@@ -340,6 +364,14 @@ export function rewriteBoostUrlsInHtml(html: string): string {
       )
       .replace(
         /href="(?:https?:\/\/(?:www\.)?sportsevents\.app)?\/store"(?=[^>]*>\s*<strong>Nrgy Gel 45(?: da Nduranz)?<\/strong>)/gi,
+        `href="${SE_STORE}/${BLOG_PRODUCT.nrgyGelBox}"`
+      )
+      .replace(
+        /href="(?:https?:\/\/store\.padel1\.app)?\/store"(?=[^>]*>\s*<strong>Loaded 4Endurance Pro<\/strong>)/gi,
+        `href="${SE_STORE}/${BLOG_PRODUCT.loaded}"`
+      )
+      .replace(
+        /href="(?:https?:\/\/store\.padel1\.app)?\/store"(?=[^>]*>\s*<strong>Nrgy Gel 45(?: da Nduranz)?<\/strong>)/gi,
         `href="${SE_STORE}/${BLOG_PRODUCT.nrgyGelBox}"`
       )
   )

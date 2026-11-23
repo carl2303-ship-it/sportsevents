@@ -12,7 +12,8 @@ import {
   getTourLandingCopy,
   type TourPlanCopy,
 } from '@/lib/boost-store/tour-landing-i18n'
-import { withLocale } from '@/i18n/config'
+import { absoluteStoreHref } from '@/lib/boost-store/store-host'
+import { useStoreHref } from '@/lib/boost-store/use-store-path'
 import { useDictionary, useLocale } from '@/i18n/use-locale'
 
 type PlanId = TourPlanCopy['id']
@@ -71,6 +72,7 @@ function Check() {
 
 export function TourLandingClient() {
   const locale = useLocale()
+  const storeHref = useStoreHref('/store', locale)
   const { t: dict } = useDictionary()
   const t = getTourLandingCopy(locale)
   const [billing, setBilling] = useState<Billing>('mensal')
@@ -156,7 +158,6 @@ export function TourLandingClient() {
     setBusy(true)
     setError(null)
     try {
-      const origin = window.location.origin
       const response = await fetch(boostEdgeRootUrl(), {
         method: 'POST',
         headers: {
@@ -172,8 +173,8 @@ export function TourLandingClient() {
           ownerEmail: email,
           language: checkoutLang,
           currency,
-          successUrl: `${origin}${withLocale('/store/tour', locale)}?subscription=success&slug=${encodeURIComponent(organizationSlug)}`,
-          cancelUrl: `${origin}${withLocale('/store/tour', locale)}#precos`,
+          successUrl: `${absoluteStoreHref('/store/tour', { locale })}?subscription=success&slug=${encodeURIComponent(organizationSlug)}`,
+          cancelUrl: `${absoluteStoreHref('/store/tour', { locale })}#precos`,
         }),
       })
       const data = await response.json()
@@ -186,8 +187,6 @@ export function TourLandingClient() {
       setBusy(false)
     }
   }
-
-  const storeHref = withLocale('/store', locale)
 
   return (
     <div className="min-h-screen bg-navy text-app-white">

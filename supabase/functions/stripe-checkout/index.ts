@@ -14,12 +14,42 @@ import {
 } from "../_shared/provisionTourOrganizer.ts";
 
 const CHECKOUT_BUILD = "funnel-v2-20261110-webhook";
+/** Canonical public store (root host — no `/store` in public paths). */
+const STORE_CANONICAL_ORIGIN = "https://store.padel1.app";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey, stripe-signature",
 };
+
+/** Resolve checkout site origin; prefer browser Origin, else canonical store. */
+function resolveCheckoutOrigin(req: Request): string {
+  const origin = (req.headers.get("origin") || "").replace(/\/$/, "");
+  return origin || STORE_CANONICAL_ORIGIN;
+}
+
+/**
+ * Build a public store URL for Stripe success/cancel.
+ * store.padel1.app (and canonical fallback) → `/checkout` (no `/store`);
+ * sportsevents.app → `/store/checkout` (legacy until 301 cutover completes).
+ */
+function storePublicUrl(siteUrl: string, pathWithinStore: string): string {
+  const base = siteUrl.replace(/\/$/, "");
+  const suffix = pathWithinStore.replace(/^\//, "");
+  let host = "";
+  try {
+    host = new URL(base).hostname.toLowerCase();
+  } catch {
+    host = "";
+  }
+  const onSeHost = host === "sportsevents.app" || host === "www.sportsevents.app";
+  if (onSeHost) {
+    return suffix ? `${base}/store/${suffix}` : `${base}/store`;
+  }
+  // store host + canonical fallback + other origins: public paths (proxy rewrite)
+  return suffix ? `${base}/${suffix}` : `${base}/`;
+}
 
 /** True when request path is the Stripe webhook route (.../stripe-checkout/webhook). */
 function isWebhookPath(pathname: string): boolean {
@@ -237,11 +267,12 @@ Deno.serve(async (req: Request) => {
         });
       }
 
-      const origin = req.headers.get("origin") || "";
-      const siteUrl = origin || "https://sportsevents.app";
-      const defaultSuccess =
-        `${siteUrl}/store/checkout?success=true&order_id=${orderId}`;
-      const defaultCancel = `${siteUrl}/store/checkout?canceled=true`;
+      const siteUrl = resolveCheckoutOrigin(req);
+      const defaultSuccess = storePublicUrl(
+        siteUrl,
+        `checkout?success=true&order_id=${orderId}`,
+      );
+      const defaultCancel = storePublicUrl(siteUrl, "checkout?canceled=true");
 
       const session = await stripe.checkout.sessions.create({
         line_items,
@@ -277,7 +308,7 @@ Deno.serve(async (req: Request) => {
 
         console.log(`Creating ${productType} checkout session`);
 
-        const siteUrl = req.headers.get("origin") || "https://sportsevents.app";
+        const siteUrl = resolveCheckoutOrigin(req);
         const detectedLang = language || detectLanguageFromEmail(customerEmail) || 'pt';
 
         const { funnel, kind } = await resolveFunnelByProductType(supabase, productType);
@@ -311,19 +342,19 @@ Deno.serve(async (req: Request) => {
 
         const defaultSuccess = funnel
           ? (isUpsell
-            ? `${siteUrl}/store/funnel/thank-you?slug=${funnel.slug}&bundle=1&session_id={CHECKOUT_SESSION_ID}`
-            : `${siteUrl}/store/funnel/upsell?slug=${funnel.slug}&session_id={CHECKOUT_SESSION_ID}`)
+            ? storePublicUrl(siteUrl, `funnel/thank-you?slug=${funnel.slug}&bundle=1&session_id={CHECKOUT_SESSION_ID}`)
+            : storePublicUrl(siteUrl, `funnel/upsell?slug=${funnel.slug}&session_id={CHECKOUT_SESSION_ID}`))
           : (isUpsell
-            ? `${siteUrl}/store/funnel/thank-you?slug=smartpadelstrategy&bundle=1`
-            : `${siteUrl}/store/funnel/upsell?slug=smartpadelstrategy&session_id={CHECKOUT_SESSION_ID}`);
+            ? storePublicUrl(siteUrl, "funnel/thank-you?slug=smartpadelstrategy&bundle=1")
+            : storePublicUrl(siteUrl, "funnel/upsell?slug=smartpadelstrategy&session_id={CHECKOUT_SESSION_ID}"));
 
         const defaultCancel = funnel
           ? (isUpsell
-            ? `${siteUrl}/store/funnel/thank-you?slug=${funnel.slug}`
-            : `${siteUrl}/store/funnel?slug=${funnel.slug}`)
+            ? storePublicUrl(siteUrl, `funnel/thank-you?slug=${funnel.slug}`)
+            : storePublicUrl(siteUrl, `funnel?slug=${funnel.slug}`))
           : (isUpsell
-            ? `${siteUrl}/store/funnel/thank-you?slug=smartpadelstrategy`
-            : `${siteUrl}/store/funnel?slug=smartpadelstrategy`);
+            ? storePublicUrl(siteUrl, "funnel/thank-you?slug=smartpadelstrategy")
+            : storePublicUrl(siteUrl, "funnel?slug=smartpadelstrategy"));
 
         const sessionConfig: any = {
           line_items: [{

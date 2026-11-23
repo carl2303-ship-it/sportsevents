@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
+import { browserStorePath } from '@/lib/boost-store/store-host'
 
 function ProductRedirectInner() {
   const router = useRouter()
@@ -11,9 +12,9 @@ function ProductRedirectInner() {
 
   useEffect(() => {
     if (id) {
-      router.replace(`/store/${id}`)
+      router.replace(browserStorePath(id))
     } else {
-      router.replace('/store')
+      router.replace(browserStorePath('/'))
     }
   }, [id, router])
 

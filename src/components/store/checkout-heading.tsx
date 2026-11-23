@@ -1,16 +1,17 @@
 'use client'
 
 import Link from 'next/link'
-import { withLocale } from '@/i18n/config'
+import { useStoreHref } from '@/lib/boost-store/use-store-path'
 import { useDictionary } from '@/i18n/use-locale'
 
 export function CheckoutHeading() {
   const { locale, t } = useDictionary()
   const s = t.store
+  const storeHomeHref = useStoreHref('/store', locale)
   return (
     <div>
       <Link
-        href={withLocale('/store', locale)}
+        href={storeHomeHref}
         className="text-sm text-app-white/55 hover:text-cyan"
       >
         ← {s.backToStore}

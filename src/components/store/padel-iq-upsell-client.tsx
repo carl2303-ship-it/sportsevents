@@ -9,6 +9,10 @@ import {
   BOOST_EDGE_ANON_KEY,
   boostEdgeRootUrl,
 } from '@/lib/boost-store/config'
+import {
+  browserStorePath,
+  browserStoreUrl,
+} from '@/lib/boost-store/store-host'
 import { PADEL_IQ_ASSETS } from '@/lib/boost-store/padel-iq-assets'
 import {
   PADEL_IQ_LANGS,
@@ -116,7 +120,9 @@ export function PadelIqUpsellClient({
       )
       if (cancelled) return
       if (!p) {
-        window.location.href = `/store/funnel?slug=${encodeURIComponent(slug)}`
+        window.location.href = browserStorePath(
+          `funnel?slug=${encodeURIComponent(slug)}`
+        )
         return
       }
       setPurchase(p)
@@ -139,7 +145,6 @@ export function PadelIqUpsellClient({
     setBusy(true)
     setError(null)
     try {
-      const origin = window.location.origin
       const response = await fetch(boostEdgeRootUrl(), {
         method: 'POST',
         headers: {
@@ -153,8 +158,12 @@ export function PadelIqUpsellClient({
           customerName: purchase.customer_name,
           originalSessionId: purchase.stripe_session_id,
           language: purchase.language || lang,
-          successUrl: `${origin}/store/funnel/thank-you?slug=${encodeURIComponent(slug)}&bundle=1&session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${origin}/store/funnel/thank-you?slug=${encodeURIComponent(slug)}`,
+          successUrl: browserStoreUrl(
+            `funnel/thank-you?slug=${encodeURIComponent(slug)}&bundle=1&session_id={CHECKOUT_SESSION_ID}`
+          ),
+          cancelUrl: browserStoreUrl(
+            `funnel/thank-you?slug=${encodeURIComponent(slug)}`
+          ),
         }),
       })
       const payload = await response.json()

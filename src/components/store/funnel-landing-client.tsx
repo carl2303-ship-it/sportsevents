@@ -8,6 +8,7 @@ import {
   boostEdgeRootUrl,
   BOOST_EDGE_ANON_KEY,
 } from '@/lib/boost-store/config'
+import { browserStoreUrl } from '@/lib/boost-store/store-host'
 import {
   eurosFromCents,
   simpleMarkdown,
@@ -74,7 +75,6 @@ export function FunnelLandingClient({
     setError(null)
     try {
       const language = (navigator.language || 'pt').slice(0, 2)
-      const origin = window.location.origin
       const response = await fetch(boostEdgeRootUrl(), {
         method: 'POST',
         headers: {
@@ -85,8 +85,12 @@ export function FunnelLandingClient({
           productType: funnel.ebook_product_type,
           amount: funnel.ebook_price_cents,
           language,
-          successUrl: `${origin}/store/funnel/upsell?slug=${encodeURIComponent(slug)}&session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${origin}/store/funnel?slug=${encodeURIComponent(slug)}`,
+          successUrl: browserStoreUrl(
+            `funnel/upsell?slug=${encodeURIComponent(slug)}&session_id={CHECKOUT_SESSION_ID}`
+          ),
+          cancelUrl: browserStoreUrl(
+            `funnel?slug=${encodeURIComponent(slug)}`
+          ),
         }),
       })
       const payload = await response.json()

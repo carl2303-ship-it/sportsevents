@@ -52,7 +52,18 @@ export const BOOST_STRIPE_PUBLISHABLE_KEY =
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
   ''
 
+/**
+ * Internal App Router base. Public canonical host is store.padel1.app
+ * (paths without `/store` — see store-host.ts + proxy rewrite).
+ */
 export const STORE_BASE_PATH = '/store'
+
+export {
+  STORE_CANONICAL_ORIGIN,
+  STORE_HOST,
+  storePath,
+  storeCanonicalUrl,
+} from '@/lib/boost-store/store-host'
 
 export function boostEdgeCheckoutUrl(path = '/create-checkout-session') {
   const base = `${BOOST_EDGE_URL}/functions/v1/stripe-checkout`

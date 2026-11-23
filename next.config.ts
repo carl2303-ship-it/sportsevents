@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
 
+/** Skip redirects that would fight store.padel1.app public paths (proxy rewrites those). */
+const notStoreHost = {
+  missing: [{ type: "host" as const, value: "store.padel1.app" }],
+};
+
 const nextConfig: NextConfig = {
   images: {
     qualities: [75, 95],
@@ -18,7 +23,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Compat: fase 1 usou /loja — canónico é /store
+  // Compat: fase 1 usou /loja — canónico público é store.padel1.app (sem /store)
   // + aliases HTML do Boost (ebook-landing / funnel) para landings SE
   async redirects() {
     return [
@@ -73,40 +78,48 @@ const nextConfig: NextConfig = {
         destination: "/de/eventos/:path*",
         permanent: true,
       },
+      // Legacy /loja → internal /store on SE only (store host uses public paths)
       {
         source: "/loja",
         destination: "/store",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/loja/checkout",
         destination: "/store/checkout",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/loja/funnel",
         destination: "/store/funnel",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/loja/funnel/upsell",
         destination: "/store/funnel/upsell",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/loja/funnel/thank-you",
         destination: "/store/funnel/thank-you",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/loja/ebook-landing",
         destination: "/store/ebook-landing",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/loja/:id",
         destination: "/store/:id",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/store/ebook-landing.html",
@@ -117,21 +130,25 @@ const nextConfig: NextConfig = {
         source: "/ebook-landing",
         destination: "/store/ebook-landing",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/ebook-landing.html",
         destination: "/store/ebook-landing",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/smartpadelstrategy",
         destination: "/store/funnel?slug=smartpadelstrategy",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/smartpadelstrategy.html",
         destination: "/store/funnel?slug=smartpadelstrategy",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/store/tour.html",
@@ -142,16 +159,19 @@ const nextConfig: NextConfig = {
         source: "/tour",
         destination: "/store/tour",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/tour.html",
         destination: "/store/tour",
         permanent: true,
+        ...notStoreHost,
       },
       {
         source: "/loja/tour",
         destination: "/store/tour",
         permanent: true,
+        ...notStoreHost,
       },
       // Blog Boost mal-rewritten: /store/product.html?id=<uuid> → /store/<uuid>
       {
@@ -165,6 +185,7 @@ const nextConfig: NextConfig = {
         has: [{ type: "query", key: "id", value: "(?<id>[0-9a-fA-F-]{36})" }],
         destination: "/store/:id",
         permanent: true,
+        ...notStoreHost,
       },
       // Host rewrite leftover: /store/store
       {
@@ -175,6 +196,31 @@ const nextConfig: NextConfig = {
       {
         source: "/store/store.html",
         destination: "/store",
+        permanent: true,
+      },
+      // sportsevents.app/store → canonical store host (also in proxy.ts)
+      {
+        source: "/store",
+        has: [{ type: "host", value: "sportsevents.app" }],
+        destination: "https://store.padel1.app/",
+        permanent: true,
+      },
+      {
+        source: "/store/:path*",
+        has: [{ type: "host", value: "sportsevents.app" }],
+        destination: "https://store.padel1.app/:path*",
+        permanent: true,
+      },
+      {
+        source: "/store",
+        has: [{ type: "host", value: "www.sportsevents.app" }],
+        destination: "https://store.padel1.app/",
+        permanent: true,
+      },
+      {
+        source: "/store/:path*",
+        has: [{ type: "host", value: "www.sportsevents.app" }],
+        destination: "https://store.padel1.app/:path*",
         permanent: true,
       },
     ];

@@ -18,6 +18,7 @@ import {
 } from '@/lib/boost-store/types'
 import { numberLocaleFor, withLocale } from '@/i18n/config'
 import { useDictionary } from '@/i18n/use-locale'
+import { useStoreHref } from '@/lib/boost-store/use-store-path'
 
 function youtubeId(url: string): string | null {
   const m = url.match(
@@ -29,6 +30,7 @@ function youtubeId(url: string): string | null {
 export function StoreProductClient({ raw }: { raw: BoostProduct }) {
   const { locale, t } = useDictionary()
   const s = t.store
+  const storeHomeHref = useStoreHref('/store', locale)
   const product = useMemo(() => localizeStoreProduct(raw, locale), [raw, locale])
   const landing = useMemo(
     () => resolveProductLanding(product, locale),
@@ -53,7 +55,7 @@ export function StoreProductClient({ raw }: { raw: BoostProduct }) {
       <main className="mx-auto max-w-7xl px-5 py-10 md:px-10 md:py-14">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
           <Link
-            href={withLocale('/store', locale)}
+            href={storeHomeHref}
             className="text-sm text-app-white/55 hover:text-cyan"
           >
             ← {s.backToStore}

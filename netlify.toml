@@ -42,4 +42,43 @@
     Cache-Control = "public, max-age=0, must-revalidate"
     Netlify-CDN-Cache-Control = "public, max-age=60, stale-while-revalidate=86400, durable"
 
-# HUB-62: retrigger production deploy after skipped build for 8005e43
+# HUB-86: store.padel1.app — host rewrite is in Next proxy (src/proxy.ts).
+# Netlify domain-level 301s as belt-and-suspenders for SE → canonical store.
+# (App Router + @netlify/plugin-nextjs: prefer proxy over /* → /store 200 rewrites.)
+
+[[redirects]]
+  from = "https://sportsevents.app/store"
+  to = "https://store.padel1.app/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://sportsevents.app/store/*"
+  to = "https://store.padel1.app/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.sportsevents.app/store"
+  to = "https://store.padel1.app/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.sportsevents.app/store/*"
+  to = "https://store.padel1.app/:splat"
+  status = 301
+  force = true
+
+# Duplicate /store on the store host → public root (also in proxy)
+[[redirects]]
+  from = "https://store.padel1.app/store"
+  to = "https://store.padel1.app/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://store.padel1.app/store/*"
+  to = "https://store.padel1.app/:splat"
+  status = 301
+  force = true

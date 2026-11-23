@@ -101,8 +101,9 @@ function shouldBypassStoreRewrite(pathname: string): boolean {
 
 /**
  * store.padel1.app: public URLs without `/store`.
- * - `/store` and `/store/*` (and locale variants) → 301 to public equivalent
- * - everything else → rewrite to internal `/store…`
+ * - everything (incl. `/store…`) → *internal* rewrite to `/store…` (no
+ *   external 301 `/`↔`/store` — that looped with Netlify force redirects)
+ * - legacy `/loja…` → 301 to public path (no `/store` in Location)
  */
 function handleStoreHost(request: NextRequest): NextResponse {
   const pathname = request.nextUrl.pathname
@@ -130,15 +131,7 @@ function handleStoreHost(request: NextRequest): NextResponse {
   const locale = localeFromPathname(pathname)
   const stripped = stripLocalePrefix(pathname)
 
-  // Duplicate public URL with /store → canonical without it
-  if (stripped === '/store' || stripped.startsWith('/store/')) {
-    const publicPath = toPublicStorePath(pathname)
-    const url = request.nextUrl.clone()
-    url.pathname = publicPath
-    return NextResponse.redirect(url, 301)
-  }
-
-  // Legacy /loja → public store paths on this host
+  // Legacy /loja → public store paths on this host (no /store in Location)
   if (stripped === '/loja' || stripped.startsWith('/loja/')) {
     const rest = stripped === '/loja' ? '/' : stripped.slice('/loja'.length)
     const url = request.nextUrl.clone()
@@ -146,6 +139,9 @@ function handleStoreHost(request: NextRequest): NextResponse {
     return NextResponse.redirect(url, 301)
   }
 
+  // Internal rewrite only — never 301 `/store`→`/` here. A public 301 of
+  // `/store`→`/` plus rewrite `/`→`/store` causes ERR_TOO_MANY_REDIRECTS
+  // when the edge re-applies rules on the rewrite target (HUB-91).
   const internalPath = toInternalStorePath(pathname)
   const storeHeader = { [STORE_HOST_HEADER]: '1' }
   if (locale !== 'en') {

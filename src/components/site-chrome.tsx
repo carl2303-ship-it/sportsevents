@@ -456,6 +456,10 @@ function MobileLink({
 
 export function SiteFooter() {
   const { locale, t } = useDictionary()
+  // Canonical store host (public paths — no `/store`)
+  const storeHref = storeCanonicalUrl(
+    toPublicStorePath(withLocale('/store', locale))
+  )
 
   return (
     <footer className="border-t border-white/10 px-5 md:px-10 py-12 text-xs text-app-white/45 bg-navy">
